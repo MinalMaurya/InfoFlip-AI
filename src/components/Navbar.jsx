@@ -40,7 +40,7 @@ export default function Navbar({ activeTab, setActiveTab, historyCount = 0 }) {
                     InfoFlip<span className="text-indigo-600">-AI</span>
                   </span>
                   <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                    <Cpu className="w-3 h-3" /> SIH 2024
+                    <Cpu className="w-3 h-3" /> SIH26154
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 font-medium hidden sm:block">
@@ -147,7 +147,7 @@ export default function Navbar({ activeTab, setActiveTab, historyCount = 0 }) {
             })}
           </div>
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 px-2">
-            <span>SIH GenAI Prototype</span>
+            <span>SIH26154 Prototype</span>
             <span className="font-semibold text-emerald-600 flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5" /> Human in the Loop
             </span>

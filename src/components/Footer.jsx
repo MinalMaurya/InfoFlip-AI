@@ -18,7 +18,7 @@ export default function Footer({ onReset }) {
         </div>
 
         <div className="flex items-center gap-4 text-[11px]">
-          <span>Smart India Hackathon (SIH) Prototype</span>
+          <span>SIH Prototype • Problem Statement: SIH26154</span>
           <span className="text-slate-300">•</span>
           <button
             onClick={onReset}

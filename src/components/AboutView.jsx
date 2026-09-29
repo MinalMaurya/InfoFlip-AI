@@ -54,13 +54,13 @@ export default function AboutView({ onStartTransforming }) {
       {/* Hero Badge */}
       <div className="text-center max-w-2xl mx-auto mb-10">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 mb-3">
-          <Cpu className="w-3.5 h-3.5 text-indigo-600" /> Smart India Hackathon (SIH) Prototype
+          <Cpu className="w-3.5 h-3.5 text-indigo-600" /> SIH Problem Statement: SIH26154
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
           InfoFlip<span className="text-indigo-600">-AI</span>
         </h1>
         <p className="text-base text-slate-600 mt-2 font-medium">
-          Gen AI Platform for Automated Content Transformation
+          Gen AI Platform for Automated Content Transformation (SIH26154)
         </p>
         <p className="text-sm text-slate-500 mt-3 leading-relaxed">
           Transforms unstructured information into audience-specific communication artefacts using configurable content transformation workflows.
@@ -71,7 +71,7 @@ export default function AboutView({ onStartTransforming }) {
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs mb-8">
         <h2 className="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
-          The SIH Problem Statement
+          Problem Statement: SIH26154
         </h2>
         <p className="text-sm text-slate-600 leading-relaxed">
           In emergencies, public administration, healthcare, and enterprise crises, a single piece of critical information (such as a weather advisory or policy change) must be rapidly communicated to diverse groups: citizens need simple, reassuring directives; field teams need operational SOPs; senior leaders need executive summaries; and media outlets need formal press releases.

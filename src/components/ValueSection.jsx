@@ -48,7 +48,7 @@ export default function ValueSection() {
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto mb-8">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 mb-2">
-          <Zap className="w-3.5 h-3.5 text-indigo-600" /> SIH Value Proposition
+          <Zap className="w-3.5 h-3.5 text-indigo-600" /> SIH26154 Value Proposition
         </div>
         <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
           Why InfoFlip-AI?

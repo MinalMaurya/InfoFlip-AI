@@ -1,6 +1,6 @@
 # InfoFlip-AI
 ### Gen AI Platform for Automated Content Transformation
-**Smart India Hackathon (SIH) Prototype**
+**Smart India Hackathon (SIH) Prototype • Problem Statement: SIH26154**
 
 Transform one piece of unstructured information (news article, advisory, incident report, or policy document) into multiple audience-specific communication artefacts across different audiences, tones, languages, and formats.
 
