@@ -41,7 +41,7 @@ Export (Copy, Download .txt bundle)
 
 ---
 
-## ⏱️ 60–90 Second SIH Presentation Demo Script
+## Using the prototype
 
 1. **Open the App**: Shows the enterprise AI workspace with high-polish typography and subtle accents.
 2. **Load Preloaded Scenario**: Click **"Load Demo Content"** and select **"Emergency: Heavy Rainfall Advisory"**.
@@ -74,18 +74,3 @@ Export (Copy, Download .txt bundle)
 - **Styling**: Tailwind CSS 3 (enterprise palette with indigo/purple accents)
 - **Icons**: Lucide React
 - **Architecture**: Modular service layer (`src/services/transformationService.js`) isolated for drop-in LLM integration.
-
----
-
-## ☁️ Deployment Instructions
-
-### Deploy to Vercel
-1. Run `npx vercel` or push this repository to GitHub and import it on [vercel.com](https://vercel.com).
-2. Framework Preset: **Vite**
-3. Build Command: `npm run build`
-4. Output Directory: `dist`
-
-### Deploy to Netlify
-1. Drag and drop the `dist/` folder into Netlify Drop, or connect Git repo.
-2. Build Command: `npm run build`
-3. Publish Directory: `dist`
