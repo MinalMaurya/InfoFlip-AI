@@ -6,8 +6,8 @@ import {
   ShieldCheck, 
   ArrowRight, 
   ArrowDown, 
-  Sparkles,
-  Zap
+  Sparkles, 
+  Zap 
 } from 'lucide-react';
 
 export default function ValueSection() {
@@ -43,17 +43,17 @@ export default function ValueSection() {
   ];
 
   return (
-    <section className="mt-12 pt-8 border-t border-slate-200">
+    <section className="mt-12 pt-8 border-t border-slate-200 dark:border-slate-800 transition-colors">
       
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto mb-8">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 mb-2">
-          <Zap className="w-3.5 h-3.5 text-indigo-600" /> SIH26154 Value Proposition
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 mb-2">
+          <Zap className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" /> SIH26154 Value Proposition
         </div>
-        <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+        <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
           Why InfoFlip-AI?
         </h2>
-        <p className="text-xs sm:text-sm text-slate-500 mt-1">
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
           Eliminate repetitive drafting, prevent message distortion, and accelerate crisis response from hours to seconds.
         </p>
       </div>
@@ -65,19 +65,19 @@ export default function ValueSection() {
           return (
             <div
               key={idx}
-              className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between"
+              className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-2xs hover:shadow-md transition-all duration-200 flex flex-col justify-between"
             >
               <div>
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center mb-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3">
                   <Icon className="w-5 h-5" />
                 </div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-600">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                   {c.title}
                 </h3>
-                <h4 className="text-sm font-bold text-slate-900 mt-0.5 leading-snug">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 mt-0.5 leading-snug">
                   {c.highlight}
                 </h4>
-                <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
                   {c.description}
                 </p>
               </div>

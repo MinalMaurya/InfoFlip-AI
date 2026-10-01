@@ -53,31 +53,31 @@ export default function AboutView({ onStartTransforming }) {
       
       {/* Hero Badge */}
       <div className="text-center max-w-2xl mx-auto mb-10">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 mb-3">
-          <Cpu className="w-3.5 h-3.5 text-indigo-600" /> SIH Problem Statement: SIH26154
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 mb-3">
+          <Cpu className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" /> SIH Problem Statement: SIH26154
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-          InfoFlip<span className="text-indigo-600">-AI</span>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+          InfoFlip<span className="text-indigo-600 dark:text-indigo-400">-AI</span>
         </h1>
-        <p className="text-base text-slate-600 mt-2 font-medium">
+        <p className="text-base text-slate-600 dark:text-slate-400 mt-2 font-medium">
           Gen AI Platform for Automated Content Transformation (SIH26154)
         </p>
-        <p className="text-sm text-slate-500 mt-3 leading-relaxed">
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-3 leading-relaxed">
           Transforms unstructured information into audience-specific communication artefacts using configurable content transformation workflows.
         </p>
       </div>
 
       {/* Problem Statement Card */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs mb-8">
-        <h2 className="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xs mb-8">
+        <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-2 flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400"></span>
           Problem Statement: SIH26154
         </h2>
-        <p className="text-sm text-slate-600 leading-relaxed">
+        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
           In emergencies, public administration, healthcare, and enterprise crises, a single piece of critical information (such as a weather advisory or policy change) must be rapidly communicated to diverse groups: citizens need simple, reassuring directives; field teams need operational SOPs; senior leaders need executive summaries; and media outlets need formal press releases.
         </p>
-        <div className="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200/80 text-xs font-medium text-slate-700 space-y-1">
-          <div className="font-bold text-slate-900 mb-1">The Current Bottleneck:</div>
+        <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 space-y-1">
+          <div className="font-bold text-slate-900 dark:text-slate-100 mb-1">The Current Bottleneck:</div>
           <p>• Manual rewriting takes hours and causes response delays.</p>
           <p>• Information gets distorted or inconsistent across departments.</p>
           <p>• Translation into vernacular languages introduces critical misinterpretations.</p>
@@ -86,7 +86,7 @@ export default function AboutView({ onStartTransforming }) {
 
       {/* Core Capabilities Grid */}
       <div className="mb-10">
-        <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
           <span>Core Capabilities</span>
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -95,14 +95,14 @@ export default function AboutView({ onStartTransforming }) {
             return (
               <div 
                 key={idx}
-                className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-start gap-3.5"
+                className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex items-start gap-3.5"
               >
-                <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600 shrink-0">
+                <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 shrink-0">
                   <Icon className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">{cap.title}</h3>
-                  <p className="text-xs text-slate-500 mt-1 leading-relaxed">{cap.desc}</p>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">{cap.title}</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{cap.desc}</p>
                 </div>
               </div>
             );
@@ -111,7 +111,7 @@ export default function AboutView({ onStartTransforming }) {
       </div>
 
       {/* Production Architecture Roadmap */}
-      <div className="bg-gradient-to-br from-indigo-900 to-slate-900 rounded-2xl p-6 text-white shadow-xl mb-8">
+      <div className="bg-gradient-to-br from-indigo-900 to-slate-900 rounded-2xl p-6 text-white shadow-xl mb-8 border border-indigo-800/50">
         <h3 className="text-base font-bold mb-2 flex items-center gap-2 text-indigo-200">
           <Sparkles className="w-4 h-4 text-indigo-400" />
           Production-Ready Architecture Roadmap
@@ -140,7 +140,7 @@ export default function AboutView({ onStartTransforming }) {
         <button
           type="button"
           onClick={onStartTransforming}
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-300 transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-300 dark:shadow-indigo-950 transition-colors"
         >
           <span>Try Demo in Workspace</span>
           <ArrowRight className="w-4 h-4" />

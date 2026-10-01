@@ -3,15 +3,67 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: #f8fafc; /* slate-50 */
+    --foreground: #0f172a; /* slate-900 */
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    --card-subtle: #f8fafc;
+    --border: #e2e8f0; /* slate-200 */
+    --primary: #4f46e5; /* indigo-600 */
+    --primary-foreground: #ffffff;
+    --primary-hover: #4338ca;
+    --secondary: #f1f5f9;
+    --secondary-foreground: #1e293b;
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+    --accent: #6366f1;
+    --accent-subtle: #eef2ff;
+    --success: #10b981;
+    --success-subtle: #ecfdf5;
+    --warning: #f59e0b;
+    --warning-subtle: #fffbeb;
+    --error: #ef4444;
+    --error-subtle: #fef2f2;
+  }
+
+  .dark {
+    --background: #090d16;
+    --foreground: #f8fafc;
+    --card: #0f172a;
+    --card-foreground: #f8fafc;
+    --card-subtle: #1e293b;
+    --border: #1e293b;
+    --primary: #6366f1;
+    --primary-foreground: #ffffff;
+    --primary-hover: #818cf8;
+    --secondary: #1e293b;
+    --secondary-foreground: #e2e8f0;
+    --muted: #111827;
+    --muted-foreground: #94a3b8;
+    --accent: #818cf8;
+    --accent-subtle: #1e1b4b;
+    --success: #10b981;
+    --success-subtle: #064e3b;
+    --warning: #f59e0b;
+    --warning-subtle: #78350f;
+    --error: #f87171;
+    --error-subtle: #450a0a;
+  }
+
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--background);
+    color: var(--foreground);
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
+
   code, pre {
     font-family: 'JetBrains Mono', monospace;
   }
 }
 
-/* Custom scrollbar for clean UI */
+/* Custom scrollbar for clean UI with dark mode support */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -23,6 +75,22 @@
   background: #cbd5e1;
   border-radius: 9999px;
 }
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Accessibility: Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import Navbar from './components/Navbar';
+import Module1CreateView from './components/input/Module1CreateView';
 import SourceInput from './components/SourceInput';
 import TransformationControls from './components/TransformationControls';
 import ProgressIndicator from './components/ProgressIndicator';
@@ -9,6 +10,7 @@ import ValueSection from './components/ValueSection';
 import HistoryView from './components/HistoryView';
 import AboutView from './components/AboutView';
 import Footer from './components/Footer';
+import DataContractModal from './components/input/DataContractModal';
 import { DEMO_SCENARIOS, INITIAL_HISTORY } from './data/demoScenarios';
 import { generateContent } from './services/transformationService';
 import { 
@@ -22,12 +24,16 @@ import {
   CheckCircle2, 
   ShieldCheck,
   Send,
-  AlertCircle
+  AlertCircle,
+  FileCheck2,
+  Code,
+  PlusCircle,
+  ArrowRight
 } from 'lucide-react';
 
 export default function App() {
-  // Navigation State
-  const [activeTab, setActiveTab] = useState('workspace'); // 'workspace' | 'history' | 'about'
+  // Navigation State: 'create' (Module 1) | 'workspace' (Module 2 & Transformation) | 'history' | 'about'
+  const [activeTab, setActiveTab] = useState('create');
 
   // Input & Configuration State
   const [source, setSource] = useState(DEMO_SCENARIOS[0].source);
@@ -39,6 +45,10 @@ export default function App() {
     'Short Brief',
     'Email'
   ]);
+
+  // Ingested Data Contract from Module 1
+  const [ingestedContract, setIngestedContract] = useState(null);
+  const [showContractModal, setShowContractModal] = useState(false);
 
   // Generation & Pipeline State
   const [isTransforming, setIsTransforming] = useState(false);
@@ -80,11 +90,30 @@ export default function App() {
     setSelectedFormats(['Social Media Post', 'Short Brief', 'Email']);
     setArtefacts([]);
     setContextSummary(null);
+    setIngestedContract(null);
     setSourceError('');
     setFormatError('');
   };
 
-  // Run Transformation
+  // Handle Handoff from Module 1 (Smart Input & Ingestion) to Module 2
+  const handleProceedToModule2 = (contract) => {
+    if (!contract) return;
+    setIngestedContract(contract);
+    setSource(contract.extractedText || contract.rawText);
+
+    if (contract.metadata?.detectedLanguage && ['English', 'Hindi', 'Marathi'].includes(contract.metadata.detectedLanguage)) {
+      setLanguage(contract.metadata.detectedLanguage);
+    }
+
+    setSourceError('');
+    setFormatError('');
+
+    // Switch to Workspace so user can see Module 2 AI understanding & transformation
+    setActiveTab('workspace');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Run Transformation (Module 2 AI Understanding -> Downstream Formats)
   const handleTransform = async () => {
     let hasError = false;
 
@@ -230,7 +259,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col font-sans text-slate-800 dark:text-slate-100 transition-colors">
       
       {/* Top Navbar */}
       <Navbar 
@@ -241,7 +270,13 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex-1">
-        {activeTab === 'history' ? (
+        {activeTab === 'create' ? (
+          /* MODULE 1: SMART INPUT & CONTENT INGESTION */
+          <Module1CreateView
+            initialSource={source}
+            onProceedToModule2={handleProceedToModule2}
+          />
+        ) : activeTab === 'history' ? (
           <HistoryView
             historyItems={historyItems}
             onSelectHistoryItem={handleSelectHistoryItem}
@@ -249,21 +284,21 @@ export default function App() {
           />
         ) : activeTab === 'about' ? (
           <AboutView 
-            onStartTransforming={() => setActiveTab('workspace')} 
+            onStartTransforming={() => setActiveTab('create')} 
           />
         ) : (
-          /* WORKSPACE TAB */
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          /* WORKSPACE / TRANSFORMATION DASHBOARD */
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 animate-fade-in">
             
-            {/* Hero / Header Section */}
+            {/* Header Section */}
             <div className="mb-8">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                    GenAI Content Transformation Platform
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+                    Transformation Workspace & Synthesis
                   </h1>
-                  <p className="text-sm sm:text-base text-slate-600 mt-1">
-                    Transform one source into audience-specific communication content.
+                  <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1">
+                    Multi-Format GenAI Engine (Module 2: Content Understanding & Multi-Format Synthesis)
                   </p>
                 </div>
 
@@ -271,17 +306,26 @@ export default function App() {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => handleLoadScenario(DEMO_SCENARIOS[0])}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white hover:bg-slate-50 text-indigo-700 border border-slate-200 shadow-2xs transition-colors"
+                    onClick={() => setActiveTab('create')}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-2xs transition-colors"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                    <PlusCircle className="w-3.5 h-3.5" />
+                    <span>New Ingestion (Module 1)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleLoadScenario(DEMO_SCENARIOS[0])}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-indigo-700 dark:text-indigo-300 border border-slate-200 dark:border-slate-700 shadow-2xs transition-colors"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                     <span>Quick Demo</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={handleReset}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 shadow-2xs transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 shadow-2xs transition-colors"
                     title="Reset workspace"
                   >
                     <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
@@ -290,16 +334,40 @@ export default function App() {
                 </div>
               </div>
 
+              {/* Ingested Module 1 notification banner if available */}
+              {ingestedContract && (
+                <div className="mt-4 p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex flex-wrap items-center justify-between gap-3 text-xs text-emerald-800 dark:text-emerald-200 animate-fade-in">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    <span>
+                      <strong>Module 1 Ingested Source Active:</strong>{' '}
+                      <span className="font-semibold text-emerald-900 dark:text-emerald-100">
+                        {ingestedContract.fileName || `${ingestedContract.sourceType.toUpperCase()} Document`}
+                      </span>{' '}
+                      ({ingestedContract.metadata?.wordCount || 0} words)
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowContractModal(true)}
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 font-semibold hover:bg-emerald-200 dark:hover:bg-emerald-800 transition-colors"
+                  >
+                    <Code className="w-3.5 h-3.5" />
+                    <span>Inspect Data Contract</span>
+                  </button>
+                </div>
+              )}
+
               {/* Concept reminder banner */}
-              <div className="mt-4 px-4 py-2.5 rounded-xl bg-indigo-50/60 border border-indigo-100 flex flex-wrap items-center justify-between gap-2 text-xs text-indigo-900 font-medium">
+              <div className="mt-3 px-4 py-2.5 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex flex-wrap items-center justify-between gap-2 text-xs text-indigo-900 dark:text-indigo-200 font-medium">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-indigo-700">SIH26154 Concept Flow:</span>
-                  <span className="text-slate-600">
-                    1 Source ➔ Understand Context & Intent ➔ Configure Transformation ➔ Generate Formats ➔ Human Review
+                  <span className="font-bold text-indigo-700 dark:text-indigo-400">SIH26154 Concept Flow:</span>
+                  <span className="text-slate-600 dark:text-slate-400">
+                    1 Source (Module 1) ➔ Context & Intent (Module 2) ➔ Transform ➔ Review ➔ Dispatch
                   </span>
                 </div>
-                <div className="hidden sm:flex items-center gap-1.5 text-emerald-700 font-semibold">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <div className="hidden sm:flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-semibold">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                   <span>Audited & Verifiable</span>
                 </div>
               </div>
@@ -308,7 +376,7 @@ export default function App() {
             {/* Input Grid: Section 1 & Section 2 */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               
-              {/* Left Column: Source Information (5 cols) */}
+              {/* Left Column: Source Information (6 cols) */}
               <div className="lg:col-span-6 space-y-6">
                 <SourceInput
                   source={source}
@@ -318,7 +386,7 @@ export default function App() {
                 />
               </div>
 
-              {/* Right Column: Transformation Controls (7 cols) */}
+              {/* Right Column: Transformation Controls (6 cols) */}
               <div className="lg:col-span-6 space-y-6">
                 <TransformationControls
                   audience={audience}
@@ -355,18 +423,18 @@ export default function App() {
                   <ContextIntentCard contextSummary={contextSummary} />
 
                   {/* Results Header */}
-                  <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200">
+                  <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
                     <div>
                       <div className="flex items-center gap-2">
-                        <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+                        <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
                           Generated Communication
                         </h2>
-                        <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">
+                        <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
                           {artefacts.length} Artefacts
                         </span>
                       </div>
-                      <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                        1 source transformed into {artefacts.length} communication artefacts for <strong className="text-slate-800">{audience}</strong> in <strong className="text-slate-800">{language}</strong>.
+                      <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                        1 source transformed into {artefacts.length} communication artefacts for <strong className="text-slate-800 dark:text-slate-200">{audience}</strong> in <strong className="text-slate-800 dark:text-slate-200">{language}</strong>.
                       </p>
                     </div>
 
@@ -378,7 +446,7 @@ export default function App() {
                         className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-2xs ${
                           copyAllSuccess
                             ? 'bg-emerald-600 text-white'
-                            : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+                            : 'bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
                         }`}
                       >
                         {copyAllSuccess ? (
@@ -397,16 +465,16 @@ export default function App() {
                       <button
                         type="button"
                         onClick={handleDownloadAll}
-                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-colors shadow-2xs"
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-50 dark:bg-indigo-950 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 transition-colors shadow-2xs"
                       >
-                        <Download className="w-3.5 h-3.5 text-indigo-600" />
+                        <Download className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                         <span>Download Bundle</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={handleReset}
-                        className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+                        className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                       >
                         <RotateCcw className="w-3.5 h-3.5" />
                         <span className="hidden sm:inline">New</span>
@@ -426,8 +494,8 @@ export default function App() {
                   </div>
 
                   {/* Human in the loop confirmation notice */}
-                  <div className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-4 flex items-start gap-3 text-xs text-emerald-800">
-                    <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div className="bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 flex items-start gap-3 text-xs text-emerald-800 dark:text-emerald-300">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                     <div>
                       <strong className="font-bold">Human Review Active:</strong> Every generated artefact can be directly edited above before release. All modifications are tracked to guarantee complete editorial control.
                     </div>
@@ -436,24 +504,32 @@ export default function App() {
                 </div>
               ) : (
                 /* Empty State (Before Generation) */
-                <div className="bg-white rounded-2xl border border-dashed border-slate-300 p-8 sm:p-12 text-center max-w-xl mx-auto">
-                  <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-3 shadow-2xs">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800 p-8 sm:p-12 text-center max-w-xl mx-auto shadow-2xs">
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto mb-3 shadow-2xs">
                     <Layers className="w-6 h-6" />
                   </div>
-                  <h3 className="text-base font-bold text-slate-800">
+                  <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
                     Your transformed communication will appear here.
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-500 mt-1.5 max-w-md mx-auto leading-relaxed">
-                    Configure your audience, tone, language and output formats, then click <strong className="text-indigo-600">✦ Transform Content</strong> to see the GenAI engine synthesize your artefacts.
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1.5 max-w-md mx-auto leading-relaxed">
+                    Configure your audience, tone, language and output formats, then click <strong className="text-indigo-600 dark:text-indigo-400">✦ Transform Content</strong> to see the GenAI engine synthesize your artefacts.
                   </p>
-                  <div className="mt-4">
+                  <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('create')}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-2xs"
+                    >
+                      <PlusCircle className="w-3.5 h-3.5" />
+                      <span>Use Module 1 Smart Ingestion</span>
+                    </button>
                     <button
                       type="button"
                       onClick={() => handleLoadScenario(DEMO_SCENARIOS[0])}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-colors"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950 hover:bg-indigo-100 dark:hover:bg-indigo-900 border border-indigo-200 dark:border-indigo-800 transition-colors"
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                      <span>Load Preloaded Weather Emergency Scenario</span>
+                      <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                      <span>Load Weather Demo</span>
                     </button>
                   </div>
                 </div>
@@ -469,6 +545,13 @@ export default function App() {
 
       {/* Footer */}
       <Footer onReset={handleReset} />
+
+      {/* Data Contract Inspection Modal */}
+      <DataContractModal
+        isOpen={showContractModal}
+        onClose={() => setShowContractModal(false)}
+        contractData={ingestedContract}
+      />
 
     </div>
   );
