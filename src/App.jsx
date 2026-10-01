@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import Navbar from './components/Navbar';
 import Module1CreateView from './components/input/Module1CreateView';
+import Module2AnalysisView from './components/analysis/Module2AnalysisView';
 import SourceInput from './components/SourceInput';
 import TransformationControls from './components/TransformationControls';
 import ProgressIndicator from './components/ProgressIndicator';
@@ -11,6 +12,7 @@ import HistoryView from './components/HistoryView';
 import AboutView from './components/AboutView';
 import Footer from './components/Footer';
 import DataContractModal from './components/input/DataContractModal';
+import AnalysisDataContractModal from './components/analysis/AnalysisDataContractModal';
 import { DEMO_SCENARIOS, INITIAL_HISTORY } from './data/demoScenarios';
 import { generateContent } from './services/transformationService';
 import { 
@@ -28,11 +30,12 @@ import {
   FileCheck2,
   Code,
   PlusCircle,
-  ArrowRight
+  ArrowRight,
+  BrainCircuit
 } from 'lucide-react';
 
 export default function App() {
-  // Navigation State: 'create' (Module 1) | 'workspace' (Module 2 & Transformation) | 'history' | 'about'
+  // Navigation State: 'create' (Module 1) | 'understand' (Module 2) | 'workspace' (Module 3 & Transformation) | 'history' | 'about'
   const [activeTab, setActiveTab] = useState('create');
 
   // Input & Configuration State
@@ -49,6 +52,10 @@ export default function App() {
   // Ingested Data Contract from Module 1
   const [ingestedContract, setIngestedContract] = useState(null);
   const [showContractModal, setShowContractModal] = useState(false);
+
+  // Analysis Data Contract from Module 2 (AI Content Understanding)
+  const [analysisData, setAnalysisData] = useState(null);
+  const [showAnalysisContractModal, setShowAnalysisContractModal] = useState(false);
 
   // Generation & Pipeline State
   const [isTransforming, setIsTransforming] = useState(false);
@@ -91,6 +98,7 @@ export default function App() {
     setArtefacts([]);
     setContextSummary(null);
     setIngestedContract(null);
+    setAnalysisData(null);
     setSourceError('');
     setFormatError('');
   };
@@ -108,7 +116,25 @@ export default function App() {
     setSourceError('');
     setFormatError('');
 
-    // Switch to Workspace so user can see Module 2 AI understanding & transformation
+    // Switch to Module 2 AI Understanding tab
+    setActiveTab('understand');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Handle Handoff from Module 2 (AI Content Understanding) to Module 3 (Transformation)
+  const handleContinueToTransform = ({ source: src, analysis }) => {
+    if (analysis) {
+      setAnalysisData(analysis);
+      if (analysis.audience?.detected?.length > 0 && analysis.audience.detected[0] !== 'Not detected') {
+        setAudience(analysis.audience.detected[0]);
+      }
+      if (analysis.tone?.primary) {
+        setTone(analysis.tone.primary);
+      }
+      if (analysis.language?.name && ['English', 'Hindi', 'Marathi'].includes(analysis.language.name)) {
+        setLanguage(analysis.language.name);
+      }
+    }
     setActiveTab('workspace');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -276,6 +302,24 @@ export default function App() {
             initialSource={source}
             onProceedToModule2={handleProceedToModule2}
           />
+        ) : activeTab === 'understand' ? (
+          /* MODULE 2: AI CONTENT UNDERSTANDING & ANALYSIS */
+          <Module2AnalysisView
+            sourceData={ingestedContract || (source ? {
+              sourceId: `src-direct-${Date.now()}`,
+              sourceType: 'text',
+              fileName: 'Pasted Text Source',
+              rawText: source,
+              extractedText: source,
+              metadata: {
+                wordCount: source.split(/\s+/).filter(Boolean).length,
+                characterCount: source.length
+              },
+              createdAt: new Date().toISOString()
+            } : null)}
+            onContinueToTransform={handleContinueToTransform}
+            onBackToInput={() => setActiveTab('create')}
+          />
         ) : activeTab === 'history' ? (
           <HistoryView
             historyItems={historyItems}
@@ -298,7 +342,7 @@ export default function App() {
                     Transformation Workspace & Synthesis
                   </h1>
                   <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1">
-                    Multi-Format GenAI Engine (Module 2: Content Understanding & Multi-Format Synthesis)
+                    Multi-Format GenAI Engine (Module 3) powered by Module 2 AI Content Understanding
                   </p>
                 </div>
 
@@ -310,15 +354,24 @@ export default function App() {
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-2xs transition-colors"
                   >
                     <PlusCircle className="w-3.5 h-3.5" />
-                    <span>New Ingestion (Module 1)</span>
+                    <span>New Input (Mod 1)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('understand')}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-indigo-700 dark:text-indigo-300 border border-slate-200 dark:border-slate-700 shadow-2xs transition-colors"
+                  >
+                    <BrainCircuit className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                    <span>AI Understand (Mod 2)</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => handleLoadScenario(DEMO_SCENARIOS[0])}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-indigo-700 dark:text-indigo-300 border border-slate-200 dark:border-slate-700 shadow-2xs transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-2xs transition-colors"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                     <span>Quick Demo</span>
                   </button>
 
@@ -334,36 +387,62 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Ingested Module 1 notification banner if available */}
+              {/* Ingested Module 1 & Module 2 notification banner if available */}
               {ingestedContract && (
                 <div className="mt-4 p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex flex-wrap items-center justify-between gap-3 text-xs text-emerald-800 dark:text-emerald-200 animate-fade-in">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                     <span>
-                      <strong>Module 1 Ingested Source Active:</strong>{' '}
+                      <strong>Module 1 Source Active:</strong>{' '}
                       <span className="font-semibold text-emerald-900 dark:text-emerald-100">
                         {ingestedContract.fileName || `${ingestedContract.sourceType.toUpperCase()} Document`}
                       </span>{' '}
                       ({ingestedContract.metadata?.wordCount || 0} words)
                     </span>
+                    {analysisData && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                        <BrainCircuit className="w-3 h-3" /> Module 2 Understood
+                      </span>
+                    )}
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowContractModal(true)}
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 font-semibold hover:bg-emerald-200 dark:hover:bg-emerald-800 transition-colors"
-                  >
-                    <Code className="w-3.5 h-3.5" />
-                    <span>Inspect Data Contract</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowContractModal(true)}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 font-semibold hover:bg-emerald-200 dark:hover:bg-emerald-800 transition-colors"
+                    >
+                      <Code className="w-3.5 h-3.5" />
+                      <span>Ingestion Contract</span>
+                    </button>
+                    {analysisData ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowAnalysisContractModal(true)}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-800 dark:text-indigo-200 font-semibold hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors"
+                      >
+                        <BrainCircuit className="w-3.5 h-3.5" />
+                        <span>Analysis Contract</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('understand')}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-colors shadow-2xs"
+                      >
+                        <BrainCircuit className="w-3.5 h-3.5" />
+                        <span>Run Understand (Mod 2)</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
 
               {/* Concept reminder banner */}
               <div className="mt-3 px-4 py-2.5 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex flex-wrap items-center justify-between gap-2 text-xs text-indigo-900 dark:text-indigo-200 font-medium">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-indigo-700 dark:text-indigo-400">SIH26154 Concept Flow:</span>
+                  <span className="font-bold text-indigo-700 dark:text-indigo-400">SIH26154 Pipeline:</span>
                   <span className="text-slate-600 dark:text-slate-400">
-                    1 Source (Module 1) ➔ Context & Intent (Module 2) ➔ Transform ➔ Review ➔ Dispatch
+                    1 Source (Mod 1) ➔ Context & Understanding (Mod 2) ➔ Transform (Mod 3) ➔ Review (Mod 4) ➔ Dispatch (Mod 5)
                   </span>
                 </div>
                 <div className="hidden sm:flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-semibold">
@@ -546,11 +625,18 @@ export default function App() {
       {/* Footer */}
       <Footer onReset={handleReset} />
 
-      {/* Data Contract Inspection Modal */}
+      {/* Ingestion Data Contract Inspection Modal */}
       <DataContractModal
         isOpen={showContractModal}
         onClose={() => setShowContractModal(false)}
         contractData={ingestedContract}
+      />
+
+      {/* Analysis Data Contract Inspection Modal */}
+      <AnalysisDataContractModal
+        isOpen={showAnalysisContractModal}
+        onClose={() => setShowAnalysisContractModal(false)}
+        analysisData={analysisData}
       />
 
     </div>
