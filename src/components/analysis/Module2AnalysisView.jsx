@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import PipelineStepIndicator from '../input/PipelineStepIndicator.jsx';
 import OverviewCard from './OverviewCard.jsx';
 import IntentAudienceCard from './IntentAudienceCard.jsx';
 import KeyFactsCard from './KeyFactsCard.jsx';
@@ -156,11 +155,6 @@ export default function Module2AnalysisView({
               </button>
             )}
           </div>
-        </div>
-
-        {/* Pipeline Indicator (Requirement 11) */}
-        <div className="mt-5">
-          <PipelineStepIndicator activeModule={2} />
         </div>
       </div>
 

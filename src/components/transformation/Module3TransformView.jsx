@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import PipelineStepIndicator from '../input/PipelineStepIndicator.jsx';
 import TransformationProgressTracker from './TransformationProgressTracker.jsx';
 import TransformationDataContractModal from './TransformationDataContractModal.jsx';
 import LinkedInPreview from './previews/LinkedInPreview.jsx';
@@ -389,11 +388,6 @@ export default function Module3TransformView({
               <span>Reset</span>
             </button>
           </div>
-        </div>
-
-        {/* Pipeline Indicator (Requirement 23) */}
-        <div className="mt-5">
-          <PipelineStepIndicator activeModule={3} />
         </div>
       </div>
 

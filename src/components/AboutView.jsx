@@ -11,10 +11,53 @@ import {
   Cpu, 
   ArrowRight,
   CheckCircle2,
-  Share2
+  Share2,
+  FileText,
+  Wand2,
+  DownloadCloud,
+  Check
 } from 'lucide-react';
 
 export default function AboutView({ onStartTransforming }) {
+  const pipelineStages = [
+    {
+      num: '01',
+      title: 'Smart Input & Ingestion',
+      desc: 'Normalizes plain text, documents (PDF, DOCX), images (OCR), and web URLs into validated data contracts.',
+      icon: FileText
+    },
+    {
+      num: '02',
+      title: 'AI Content Understanding',
+      desc: 'Extracts domain, audience, tone, key facts, entities, dates/numbers, and intent vectors via Gemini 3.8 Flash.',
+      icon: BrainCircuit
+    },
+    {
+      num: '03',
+      title: 'Transformation & Output Engine',
+      desc: 'Multi-format generation supporting executive briefs, advisories, infographics, summaries, and presentations.',
+      icon: Wand2
+    },
+    {
+      num: '04',
+      title: 'Social & Communication Generator',
+      desc: 'Channel specialization for LinkedIn, Twitter/X, WhatsApp, Email, SMS, Public Announcements, CTAs, and Hashtags.',
+      icon: Share2
+    },
+    {
+      num: '05',
+      title: 'Review, QA & Human Approval',
+      desc: 'Fact consistency, source grounding, tone/sentiment audit, edit tracking, and mandatory quality-gate approvals.',
+      icon: CheckCircle2
+    },
+    {
+      num: '06',
+      title: 'Export & Distribution Engine',
+      desc: 'Multi-format delivery of human-approved assets: ZIP bundle, JSON manifest, TXT briefs, printable PDF, and clipboard.',
+      icon: DownloadCloud
+    }
+  ];
+
   const capabilities = [
     {
       title: 'Context-Aware Transformation',
@@ -27,25 +70,25 @@ export default function AboutView({ onStartTransforming }) {
       icon: Users
     },
     {
-      title: 'Tone Control',
+      title: 'Tone & Urgency Modulation',
       desc: 'Seamlessly shift between Urgent emergency warnings, Formal memorandums, or Informative bulletins.',
       icon: Sliders
     },
     {
-      title: 'Language Adaptation',
-      desc: 'Vernacular generation supporting authentic English, Hindi, and Marathi terminologies.',
+      title: 'Multilingual Vernacular Adaptation',
+      desc: 'Authentic generation supporting English, Hindi, and Marathi with localized idioms and cultural accuracy.',
       icon: Languages
     },
     {
-      title: 'Multi-Format Generation',
-      desc: 'Parallel synthesis of Social Media posts, Executive Briefs, Emails, Press Releases, and Awareness notices.',
-      icon: LayoutGrid
-    },
-    {
-      title: 'Human Review & Control',
-      desc: 'Built-in edit, audit, and verification gates before final public distribution to ensure responsible AI.',
+      title: 'Human-in-the-Loop Validation',
+      desc: 'Built-in audit, fact consistency checks, and manual approval gates before distribution to ensure responsible AI.',
       icon: ShieldCheck
     },
+    {
+      title: 'Full Lineage & Audit Trail',
+      desc: 'Cryptographic source IDs, transformation hashes, provider attribution, and approval audit timestamps.',
+      icon: LayoutGrid
+    }
   ];
 
   return (
@@ -60,49 +103,93 @@ export default function AboutView({ onStartTransforming }) {
           InfoFlip<span className="text-indigo-600 dark:text-indigo-400">-AI</span>
         </h1>
         <p className="text-base text-slate-600 dark:text-slate-400 mt-2 font-medium">
-          Gen AI Platform for Automated Content Transformation (SIH26154)
+          GenAI Content Transformation Platform (SIH 26154)
         </p>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-3 leading-relaxed">
-          Transforms unstructured information into audience-specific communication artefacts using configurable content transformation workflows.
+          Transforms complex source information into audience-specific, multi-channel communication deliverables using a verified six-stage Human-in-the-Loop AI pipeline.
         </p>
       </div>
 
-      {/* Problem Statement Card */}
+      {/* Problem & Solution Card */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xs mb-8">
         <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-2 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400"></span>
-          Problem Statement: SIH26154
+          <span>The Problem & Solution (SIH26154)</span>
         </h2>
         <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-          In emergencies, public administration, healthcare, and enterprise crises, a single piece of critical information (such as a weather advisory or policy change) must be rapidly communicated to diverse groups: citizens need simple, reassuring directives; field teams need operational SOPs; senior leaders need executive summaries; and media outlets need formal press releases.
+          In emergencies, public administration, healthcare, and enterprise crises, a single piece of critical information (such as a weather advisory or policy change) must be rapidly communicated to diverse groups: citizens need simple directives; field teams need operational SOPs; leaders need executive summaries; and media outlets need formal press releases.
         </p>
-        <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 space-y-1">
-          <div className="font-bold text-slate-900 dark:text-slate-100 mb-1">The Current Bottleneck:</div>
-          <p>• Manual rewriting takes hours and causes response delays.</p>
-          <p>• Information gets distorted or inconsistent across departments.</p>
-          <p>• Translation into vernacular languages introduces critical misinterpretations.</p>
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div className="p-3.5 rounded-xl bg-red-50/60 dark:bg-red-950/20 border border-red-200/80 dark:border-red-900/40 text-red-900 dark:text-red-300">
+            <strong className="block text-red-800 dark:text-red-200 mb-1 font-bold">The Challenge:</strong>
+            Manual rewriting takes hours, introduces departmental inconsistency, and causes catastrophic delays in public communication.
+          </div>
+          <div className="p-3.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-900/40 text-emerald-900 dark:text-emerald-300">
+            <strong className="block text-emerald-800 dark:text-emerald-200 mb-1 font-bold">The InfoFlip-AI Solution:</strong>
+            One ingested source is analyzed for semantic intent and synthesized into 8+ channel deliverables with guaranteed source grounding and human review.
+          </div>
+        </div>
+      </div>
+
+      {/* Six-Stage Transformation Pipeline (Requirement 9) */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xs mb-8">
+        <div className="flex items-center justify-between gap-2 mb-4">
+          <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <span>The Six-Stage Pipeline</span>
+          </h2>
+          <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-2.5 py-0.5 rounded-full border border-indigo-200/60 dark:border-indigo-800">
+            Modules 1 – 6 Complete
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {pipelineStages.map((stage) => {
+            const Icon = stage.icon;
+            return (
+              <div
+                key={stage.num}
+                className="p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="w-6 h-6 rounded-lg bg-indigo-600 text-white font-bold text-xs flex items-center justify-center">
+                      {stage.num}
+                    </span>
+                    <Icon className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100 mb-1">
+                    {stage.title}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                    {stage.desc}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
       {/* Core Capabilities Grid */}
-      <div className="mb-10">
-        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
-          <span>Core Capabilities</span>
+      <div className="mb-8">
+        <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+          <span>Enterprise Capabilities</span>
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
           {capabilities.map((cap, idx) => {
             const Icon = cap.icon;
             return (
               <div 
                 key={idx}
-                className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex items-start gap-3.5"
+                className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex items-start gap-3"
               >
-                <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 shrink-0">
-                  <Icon className="w-5 h-5" />
+                <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 shrink-0">
+                  <Icon className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">{cap.title}</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{cap.desc}</p>
+                  <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100">{cap.title}</h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{cap.desc}</p>
                 </div>
               </div>
             );
@@ -111,26 +198,26 @@ export default function AboutView({ onStartTransforming }) {
       </div>
 
       {/* Production Architecture Roadmap */}
-      <div className="bg-gradient-to-br from-indigo-900 to-slate-900 rounded-2xl p-6 text-white shadow-xl mb-8 border border-indigo-800/50">
+      <div className="bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-900 rounded-2xl p-6 text-white shadow-xl mb-8 border border-indigo-800/50">
         <h3 className="text-base font-bold mb-2 flex items-center gap-2 text-indigo-200">
           <Sparkles className="w-4 h-4 text-indigo-400" />
-          Production-Ready Architecture Roadmap
+          Production-Ready Architecture
         </h3>
         <p className="text-xs text-indigo-100/90 leading-relaxed mb-4">
-          While this prototype runs a self-contained smart transformation engine for reliable, zero-latency judging evaluation, the production system is architected for:
+          Built with an enterprise-grade hybrid pipeline: Google Gemini 3.8 Flash for zero-shot semantic understanding with automatic deterministic fallback guarantees.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
           <div className="p-3 bg-white/10 rounded-xl border border-white/10">
-            <strong className="block text-indigo-300 mb-1">1. LLM Integration</strong>
-            Gemini 1.5 Pro / Flash via Google GenAI SDK for zero-shot semantic parsing.
+            <strong className="block text-indigo-300 mb-1">1. Hybrid GenAI</strong>
+            Gemini 3.8 Flash with 429 quota exhaustion fast-fallback.
           </div>
           <div className="p-3 bg-white/10 rounded-xl border border-white/10">
-            <strong className="block text-indigo-300 mb-1">2. Multimodal Ingestion</strong>
-            Ingest PDFs, audio recordings, press conference streams, and satellite alerts.
+            <strong className="block text-indigo-300 mb-1">2. Human-in-the-Loop</strong>
+            Audit gate prevents unverified distribution of claims.
           </div>
           <div className="p-3 bg-white/10 rounded-xl border border-white/10">
-            <strong className="block text-indigo-300 mb-1">3. Automated Dispatch</strong>
-            Direct API pushes to WhatsApp Business, Twitter/X, SMS gateways, and portals.
+            <strong className="block text-indigo-300 mb-1">3. Multi-Channel Export</strong>
+            ZIP packages, JSON manifests, PDF documents, and clipboard.
           </div>
         </div>
       </div>
@@ -140,9 +227,9 @@ export default function AboutView({ onStartTransforming }) {
         <button
           type="button"
           onClick={onStartTransforming}
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-300 dark:shadow-indigo-950 transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-300 dark:shadow-indigo-950 transition-colors active:scale-[0.98]"
         >
-          <span>Try Demo in Workspace</span>
+          <span>Start Transformation Workflow</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import PipelineStepIndicator from './PipelineStepIndicator';
 import InputMethodTabs from './InputMethodTabs';
 import TextInput from './TextInput';
 import FileUploader from './FileUploader';
@@ -300,11 +299,6 @@ export default function Module1CreateView({
               <span>Reset</span>
             </button>
           </div>
-        </div>
-
-        {/* Transformation Pipeline Tracker (Requirement 23) */}
-        <div className="mt-5">
-          <PipelineStepIndicator activeModule={1} />
         </div>
       </div>
 

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import PipelineStepIndicator from '../components/input/PipelineStepIndicator.jsx';
 import CommunicationProgressTracker from '../components/communication/CommunicationProgressTracker.jsx';
 import CommunicationDataContractModal from '../components/communication/CommunicationDataContractModal.jsx';
 
@@ -296,9 +295,6 @@ export default function Module4CommunicationView({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       
-      {/* Module 4 Pipeline Step Indicator */}
-      <PipelineStepIndicator activeModule={4} />
-
       {/* Header Banner */}
       <div className="bg-gradient-to-r from-indigo-900 via-purple-900 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
         <div className="relative z-10 max-w-3xl space-y-2">

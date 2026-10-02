@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PipelineStepIndicator from '../components/input/PipelineStepIndicator.jsx';
 import ExportSummary from '../components/export/ExportSummary.jsx';
 import ExportActions from '../components/export/ExportActions.jsx';
 import ApprovedAssetList from '../components/export/ApprovedAssetList.jsx';
@@ -67,18 +66,6 @@ export default function Module6ExportView({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fade-in">
       
-      {/* Pipeline Step Indicator (Step 6 Active) */}
-      <PipelineStepIndicator
-        activeStep={6}
-        onStepClick={(step) => {
-          if (step === 1 && onBackToInput) onBackToInput();
-          if (step === 2 && onBackToUnderstand) onBackToUnderstand();
-          if (step === 3 && onBackToTransform) onBackToTransform();
-          if (step === 4 && onBackToCommunicate) onBackToCommunicate();
-          if (step === 5 && onBackToReview) onBackToReview();
-        }}
-      />
-
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
         <div>

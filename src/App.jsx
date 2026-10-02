@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import Navbar from './components/Navbar';
+import PipelineStepIndicator from './components/input/PipelineStepIndicator';
 import Module1CreateView from './components/input/Module1CreateView';
 import Module2AnalysisView from './components/analysis/Module2AnalysisView';
 import Module3TransformView from './components/transformation/Module3TransformView';
@@ -34,8 +35,16 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  // Navigation State: 'create' (Module 1) | 'understand' (Module 2) | 'workspace' (Module 3 & Transformation) | 'history' | 'about'
+  // Navigation State:
+  // Global views: 'history' | 'about'
+  // Workflow pipeline stages: 'create' (01) | 'understand' (02) | 'transform' (03) | 'communicate' (04) | 'review' (05) | 'export' (06) | 'workspace'
   const [activeTab, setActiveTab] = useState('create');
+  
+  // Track last active workflow stage to return smoothly when clicking "Create" in navbar
+  const [lastWorkflowTab, setLastWorkflowTab] = useState('create');
+
+  const WORKFLOW_TABS = ['create', 'understand', 'transform', 'communicate', 'review', 'export', 'workspace'];
+  const isWorkflowActive = WORKFLOW_TABS.includes(activeTab);
 
   // Input & Configuration State
   const [source, setSource] = useState(DEMO_SCENARIOS[0].source);
@@ -85,6 +94,71 @@ export default function App() {
 
   const resultsRef = useRef(null);
 
+  // Unified tab switch with workflow memory
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    if (WORKFLOW_TABS.includes(tabId)) {
+      setLastWorkflowTab(tabId === 'workspace' ? 'transform' : tabId);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // When clicking "Create" in navbar from History or About, return to active workflow stage
+  const handleSelectWorkflow = () => {
+    handleTabChange(lastWorkflowTab || 'create');
+  };
+
+  // Pipeline progress step click handler
+  const handlePipelineStepClick = (stepId) => {
+    const stepTabMap = {
+      1: 'create',
+      2: 'understand',
+      3: 'transform',
+      4: 'communicate',
+      5: 'review',
+      6: 'export'
+    };
+    const target = stepTabMap[stepId];
+    if (target) {
+      handleTabChange(target);
+    }
+  };
+
+  // Check if a pipeline step is accessible (Workflow Guards)
+  const canNavigateToStep = (stepId) => {
+    const stepNumMap = {
+      'create': 1,
+      'understand': 2,
+      'transform': 3,
+      'workspace': 3,
+      'communicate': 4,
+      'review': 5,
+      'export': 6
+    };
+    const currentNum = stepNumMap[activeTab] || 1;
+
+    // Users can always return to completed or current stages
+    if (stepId <= currentNum) return true;
+
+    // Forward progression requires respective prerequisite artifacts
+    switch (stepId) {
+      case 1:
+        return true;
+      case 2:
+        return !!(ingestedContract || source);
+      case 3:
+        return !!analysisData;
+      case 4:
+        return !!transformationResult;
+      case 5:
+        return !!communicationResult;
+      case 6:
+        return !!exportPackage;
+      default:
+        return false;
+    }
+  };
+
   // Load a demo scenario
   const handleLoadScenario = (scenario) => {
     setSource(scenario.source);
@@ -112,6 +186,8 @@ export default function App() {
     setExportPackage(null);
     setSourceError('');
     setFormatError('');
+    setLastWorkflowTab('create');
+    setActiveTab('create');
   };
 
   // Handle Handoff from Module 1 (Smart Input & Ingestion) to Module 2
@@ -127,9 +203,8 @@ export default function App() {
     setSourceError('');
     setFormatError('');
 
-    // Switch to Module 2 AI Understanding tab
-    setActiveTab('understand');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Switch to Module 2 AI Understanding stage
+    handleTabChange('understand');
   };
 
   // Handle Handoff from Module 2 (AI Content Understanding) to Module 3 (Transformation)
@@ -150,8 +225,7 @@ export default function App() {
         setLanguage(analysis.language.name);
       }
     }
-    setActiveTab('transform');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    handleTabChange('transform');
   };
 
   // Handle Handoff from Module 3 (Transformation) to Module 4 (Social & Communication)
@@ -166,8 +240,7 @@ export default function App() {
       setIngestedContract(src);
       setSource(src.extractedText || src.rawText);
     }
-    setActiveTab('communicate');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    handleTabChange('communicate');
   };
 
   // Handle Handoff from Module 4 (Social & Communication) to Module 5 (Review)
@@ -185,8 +258,7 @@ export default function App() {
       setIngestedContract(src);
       setSource(src.extractedText || src.rawText);
     }
-    setActiveTab('review');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    handleTabChange('review');
   };
 
   // Handle Handoff from Module 5 (Review) to Module 6 (Export)
@@ -194,11 +266,10 @@ export default function App() {
     if (pkg) {
       setExportPackage(pkg);
     }
-    setActiveTab('export');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    handleTabChange('export');
   };
 
-  // Run Transformation (Module 2 AI Understanding -> Downstream Formats)
+  // Run Transformation (Legacy Helper)
   const handleTransform = async () => {
     let hasError = false;
 
@@ -235,7 +306,6 @@ export default function App() {
       setContextSummary(result.contextSummary);
       setArtefacts(result.artefacts);
 
-      // Add to session history
       const newHistoryEntry = {
         id: `hist-${Date.now()}`,
         title: `${result.contextSummary.domain} (${result.contextSummary.intent})`,
@@ -253,7 +323,6 @@ export default function App() {
 
       setHistoryItems([newHistoryEntry, ...historyItems]);
 
-      // Scroll to results smoothly
       setTimeout(() => {
         if (resultsRef.current) {
           resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -331,38 +400,72 @@ export default function App() {
     document.body.removeChild(element);
   };
 
-  // Handle clicking a history item
+  // Handle clicking a history item (Requirement 8: Restore corresponding workflow state)
   const handleSelectHistoryItem = (item) => {
-    setSource(item.source || item.sourceSnippet);
-    setAudience(item.audience || 'General Public');
-    setTone(item.tone || 'Informative');
-    setLanguage(item.language || 'English');
-    if (item.formats) {
-      setSelectedFormats(item.formats);
+    if (item.source) setSource(item.source);
+    else if (item.sourceSnippet) setSource(item.sourceSnippet);
+
+    if (item.audience) setAudience(item.audience);
+    if (item.tone) setTone(item.tone);
+    if (item.language) setLanguage(item.language);
+    if (item.formats) setSelectedFormats(item.formats);
+
+    if (item.ingestedContract) setIngestedContract(item.ingestedContract);
+    if (item.analysisData) setAnalysisData(item.analysisData);
+    if (item.transformationResult) setTransformationResult(item.transformationResult);
+    if (item.communicationResult) setCommunicationResult(item.communicationResult);
+    if (item.exportPackage) setExportPackage(item.exportPackage);
+
+    let targetTab = 'create';
+    if (item.targetTab) {
+      targetTab = item.targetTab;
+    } else if (item.exportPackage || item.exportId) {
+      targetTab = 'export';
+    } else if (item.communicationResult) {
+      targetTab = 'review';
+    } else if (item.transformationResult) {
+      targetTab = 'communicate';
+    } else if (item.analysisData) {
+      targetTab = 'transform';
+    } else if (item.source) {
+      targetTab = 'understand';
     }
-    setActiveTab('workspace');
+
+    handleTabChange(targetTab);
   };
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col font-sans text-slate-800 dark:text-slate-100 transition-colors">
       
-      {/* Top Navbar */}
+      {/* 1. Global Navbar: Primary Application Navigation (Create | History | About | Theme) */}
       <Navbar 
         activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
+        setActiveTab={handleTabChange}
+        onSelectWorkflow={handleSelectWorkflow}
         historyCount={historyItems.length}
       />
 
-      {/* Main Content Area */}
+      {/* 2. Content Transformation Pipeline: Workflow Progress (Only visible during Create workflow) */}
+      {isWorkflowActive && (
+        <section aria-label="Content Transformation Workflow Pipeline" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+          <PipelineStepIndicator
+            activeTab={activeTab}
+            onStepClick={handlePipelineStepClick}
+            canNavigateToStep={canNavigateToStep}
+          />
+        </section>
+      )}
+
+      {/* 3. Main Content Area: Active Module Content */}
       <main className="flex-1">
         {activeTab === 'create' ? (
-          /* MODULE 1: SMART INPUT & CONTENT INGESTION */
+          /* MODULE 1: SMART INPUT & CONTENT INGESTION (01 Input) */
           <Module1CreateView
             initialSource={source}
             onProceedToModule2={handleProceedToModule2}
           />
         ) : activeTab === 'understand' ? (
-          /* MODULE 2: AI CONTENT UNDERSTANDING & ANALYSIS */
+          /* MODULE 2: AI CONTENT UNDERSTANDING & ANALYSIS (02 Understand) */
           <Module2AnalysisView
             sourceData={ingestedContract || (source ? {
               sourceId: `src-direct-${Date.now()}`,
@@ -377,20 +480,22 @@ export default function App() {
               createdAt: new Date().toISOString()
             } : null)}
             onContinueToTransform={handleContinueToTransform}
-            onBackToInput={() => setActiveTab('create')}
+            onBackToInput={() => handleTabChange('create')}
           />
         ) : activeTab === 'history' ? (
+          /* GLOBAL: HISTORY & PREVIOUS WORKFLOWS */
           <HistoryView
             historyItems={historyItems}
             onSelectHistoryItem={handleSelectHistoryItem}
-            onBackToWorkspace={() => setActiveTab('transform')}
+            onBackToWorkspace={() => handleTabChange(lastWorkflowTab || 'create')}
           />
         ) : activeTab === 'about' ? (
+          /* GLOBAL: ABOUT & ARCHITECTURE ROADMAP */
           <AboutView 
-            onStartTransforming={() => setActiveTab('create')} 
+            onStartTransforming={() => handleTabChange('create')} 
           />
         ) : activeTab === 'communicate' ? (
-          /* MODULE 4: SOCIAL & COMMUNICATION GENERATOR */
+          /* MODULE 4: SOCIAL & COMMUNICATION GENERATOR (04 Communicate) */
           <Module4CommunicationView
             sourceData={ingestedContract || (source ? {
               sourceId: `src-direct-${Date.now()}`,
@@ -406,9 +511,9 @@ export default function App() {
             } : null)}
             analysisData={analysisData}
             transformationResult={transformationResult}
-            onBackToInput={() => setActiveTab('create')}
-            onBackToUnderstand={() => setActiveTab('understand')}
-            onBackToTransform={() => setActiveTab('transform')}
+            onBackToInput={() => handleTabChange('create')}
+            onBackToUnderstand={() => handleTabChange('understand')}
+            onBackToTransform={() => handleTabChange('transform')}
             onProceedToModule5={handleProceedToModule5}
             onLoadDemo={() => {
               handleLoadScenario(DEMO_SCENARIOS[0]);
@@ -416,7 +521,7 @@ export default function App() {
             }}
           />
         ) : activeTab === 'review' ? (
-          /* MODULE 5: REVIEW, QUALITY ASSURANCE & HUMAN APPROVAL */
+          /* MODULE 5: REVIEW, QUALITY ASSURANCE & HUMAN APPROVAL (05 Review) */
           <Module5ReviewView
             sourceData={ingestedContract || (source ? {
               sourceId: `src-direct-${Date.now()}`,
@@ -433,10 +538,10 @@ export default function App() {
             analysisData={analysisData}
             transformationResult={transformationResult}
             communicationResult={communicationResult}
-            onBackToInput={() => setActiveTab('create')}
-            onBackToUnderstand={() => setActiveTab('understand')}
-            onBackToTransform={() => setActiveTab('transform')}
-            onBackToCommunicate={() => setActiveTab('communicate')}
+            onBackToInput={() => handleTabChange('create')}
+            onBackToUnderstand={() => handleTabChange('understand')}
+            onBackToTransform={() => handleTabChange('transform')}
+            onBackToCommunicate={() => handleTabChange('communicate')}
             onProceedToModule6={handleProceedToModule6}
             onLoadDemo={() => {
               handleLoadScenario(DEMO_SCENARIOS[0]);
@@ -444,14 +549,14 @@ export default function App() {
             }}
           />
         ) : activeTab === 'export' ? (
-          /* MODULE 6: EXPORT & DISTRIBUTION */
+          /* MODULE 6: EXPORT & DISTRIBUTION (06 Export) */
           <Module6ExportView
             exportPackage={exportPackage}
-            onBackToInput={() => setActiveTab('create')}
-            onBackToUnderstand={() => setActiveTab('understand')}
-            onBackToTransform={() => setActiveTab('transform')}
-            onBackToCommunicate={() => setActiveTab('communicate')}
-            onBackToReview={() => setActiveTab('review')}
+            onBackToInput={() => handleTabChange('create')}
+            onBackToUnderstand={() => handleTabChange('understand')}
+            onBackToTransform={() => handleTabChange('transform')}
+            onBackToCommunicate={() => handleTabChange('communicate')}
+            onBackToReview={() => handleTabChange('review')}
             onLoadDemo={() => {
               handleLoadScenario(DEMO_SCENARIOS[0]);
               setAnalysisData(SAMPLE_ANALYSIS);
@@ -459,21 +564,36 @@ export default function App() {
             onRecordHistory={(record) => {
               setHistoryItems(prev => [
                 {
-                  id: record.exportId,
+                  id: record.exportId || `hist-${Date.now()}`,
+                  title: `Export Deliverable (${record.exportId || 'pkg'})`,
+                  category: 'Multi-Channel Export',
+                  sourceId: record.sourceId || (ingestedContract?.sourceId || 'src-direct'),
+                  exportId: record.exportId,
+                  stage: '06 Export',
+                  approvedCount: record.approvedCount || exportPackage?.approvedOutputs?.length || 4,
+                  qualityGate: record.qualityGate || 'PASSED',
+                  exportStatus: 'Exported',
                   timestamp: 'Just now',
-                  sourceSnippet: (source || '').substring(0, 80) + '...',
+                  createdDate: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+                  sourceSnippet: (source || '').substring(0, 110) + '...',
+                  source: source,
                   audience,
                   tone,
                   language,
                   formats: record.formats,
-                  deliverableCount: record.approvedCount
+                  exportPackage: exportPackage,
+                  ingestedContract: ingestedContract,
+                  analysisData: analysisData,
+                  transformationResult: transformationResult,
+                  communicationResult: communicationResult,
+                  verified: true
                 },
                 ...prev
               ]);
             }}
           />
         ) : (
-          /* MODULE 3: TRANSFORMATION & OUTPUT ENGINE (activeTab === 'transform' || 'workspace') */
+          /* MODULE 3: TRANSFORMATION & OUTPUT ENGINE (03 Transform) */
           <Module3TransformView
             sourceData={ingestedContract || (source ? {
               sourceId: `src-direct-${Date.now()}`,
@@ -488,8 +608,8 @@ export default function App() {
               createdAt: new Date().toISOString()
             } : null)}
             analysisData={analysisData}
-            onBackToInput={() => setActiveTab('create')}
-            onBackToUnderstand={() => setActiveTab('understand')}
+            onBackToInput={() => handleTabChange('create')}
+            onBackToUnderstand={() => handleTabChange('understand')}
             onProceedToModule4={handleProceedToModule4}
             onLoadDemo={() => {
               handleLoadScenario(DEMO_SCENARIOS[0]);

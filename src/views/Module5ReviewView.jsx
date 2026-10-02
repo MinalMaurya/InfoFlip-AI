@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import PipelineStepIndicator from '../components/input/PipelineStepIndicator.jsx';
 import ReviewSummary from '../components/review/ReviewSummary.jsx';
 import ReviewOutputCard from '../components/review/ReviewOutputCard.jsx';
 import ReviewProgressTracker from '../components/review/ReviewProgressTracker.jsx';
@@ -215,17 +214,6 @@ export default function Module5ReviewView({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fade-in">
       
-      {/* Step Indicator */}
-      <PipelineStepIndicator
-        activeStep={5}
-        onStepClick={(step) => {
-          if (step === 1 && onBackToInput) onBackToInput();
-          if (step === 2 && onBackToUnderstand) onBackToUnderstand();
-          if (step === 3 && onBackToTransform) onBackToTransform();
-          if (step === 4 && onBackToCommunicate) onBackToCommunicate();
-        }}
-      />
-
       {/* Top Header & Context */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
         <div>
