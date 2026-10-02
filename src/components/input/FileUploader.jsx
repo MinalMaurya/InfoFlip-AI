@@ -198,29 +198,29 @@ export default function FileUploader({
               </span>
             </p>
 
-            <div className="mt-4 pt-4 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-400 dark:text-slate-500">
-              <span>Supported: <strong className="text-slate-600 dark:text-slate-300">PDF • DOCX • TXT • JPG • PNG</strong></span>
-              <span>•</span>
-              <span>Maximum size: <strong className="text-slate-600 dark:text-slate-300">10 MB</strong></span>
+            <div className="mt-4 pt-4 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-[11px] text-slate-500 dark:text-slate-400">
+              <span>Supported: <strong className="text-slate-700 dark:text-slate-200">PDF · DOCX · TXT · Images</strong></span>
+              <span className="text-slate-300 dark:text-slate-700">•</span>
+              <span>Max file size: <strong className="text-slate-700 dark:text-slate-200">10 MB</strong></span>
             </div>
           </div>
         ) : (
           /* Uploaded File Card */
           <div className="space-y-4">
-            <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3.5 min-w-0">
+            <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3.5">
+              <div className="flex items-center gap-3.5 min-w-0 flex-1">
                 {getFileIcon(file.name)}
-                <div className="min-w-0">
-                  <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate" title={file.name}>
                     {file.name}
                   </h4>
                   <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-                    <span>{formatFileSize(file.size)}</span>
-                    <span>•</span>
+                    <span className="font-mono">{formatFileSize(file.size)}</span>
+                    <span className="text-slate-300 dark:text-slate-700">•</span>
                     {isProcessing ? (
-                      <span className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400 font-semibold">
-                        <Loader2 className="w-3 h-3 animate-spin" />
-                        <span>Processing & extracting...</span>
+                      <span className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 font-semibold" aria-live="polite">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Processing your content...</span>
                       </span>
                     ) : (
                       <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
@@ -232,11 +232,11 @@ export default function FileUploader({
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={triggerFileInput}
-                  className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                   title="Replace file"
                 >
                   Replace
@@ -245,7 +245,7 @@ export default function FileUploader({
                 <button
                   type="button"
                   onClick={onRemoveFile}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
                   title="Remove file"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -255,24 +255,24 @@ export default function FileUploader({
             </div>
 
             {/* Instruction footnote */}
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
-              <span>✓</span>
-              <span>Client-side sandbox isolation active. No sensitive document data leaves your browser unencrypted.</span>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+              <span className="text-emerald-500">✓</span>
+              <span>Client-side sandbox isolation active. Document data is extracted safely in your browser.</span>
             </p>
           </div>
         )}
 
         {/* Friendly Error Display */}
         {error && (
-          <div className="mt-3 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-start gap-2.5 text-xs text-rose-700 dark:text-rose-300 animate-fade-in">
-            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+          <div role="alert" className="mt-3.5 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-start gap-2.5 text-xs text-rose-700 dark:text-rose-300 animate-fade-in">
+            <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
             <div className="flex-1">
               <p className="font-semibold">{error}</p>
             </div>
             <button
               type="button"
               onClick={triggerFileInput}
-              className="text-[11px] underline font-bold text-rose-700 dark:text-rose-300 shrink-0"
+              className="text-[11px] underline font-bold text-rose-700 dark:text-rose-300 hover:text-rose-900 dark:hover:text-rose-100 shrink-0 ml-2"
             >
               Try Another
             </button>

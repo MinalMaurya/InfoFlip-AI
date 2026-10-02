@@ -152,16 +152,16 @@ export default function ImageUploader({
               </span>
             </p>
 
-            <div className="mt-4 pt-4 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-400 dark:text-slate-500">
-              <span>Supported: <strong className="text-slate-600 dark:text-slate-300">PNG • JPG • JPEG • WEBP</strong></span>
-              <span>•</span>
-              <span>Maximum size: <strong className="text-slate-600 dark:text-slate-300">10 MB</strong></span>
+            <div className="mt-4 pt-4 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-[11px] text-slate-500 dark:text-slate-400">
+              <span>Supported: <strong className="text-slate-700 dark:text-slate-200">PNG · JPG · JPEG · WEBP</strong></span>
+              <span className="text-slate-300 dark:text-slate-700">•</span>
+              <span>Max file size: <strong className="text-slate-700 dark:text-slate-200">10 MB</strong></span>
             </div>
           </div>
         ) : (
           /* Image Preview Card */
           <div className="space-y-4">
-            <div className="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-slate-50/50 dark:bg-slate-800/40">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-slate-50/60 dark:bg-slate-800/40">
               <div className="relative aspect-video max-h-56 bg-slate-950 flex items-center justify-center overflow-hidden">
                 <img
                   src={imagePreview}
@@ -175,20 +175,20 @@ export default function ImageUploader({
               </div>
 
               {/* Image Info Bar */}
-              <div className="p-3.5 flex flex-wrap items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <h4 className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 truncate">
+              <div className="p-3.5 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 truncate" title={imageFile?.name || 'Image source'}>
                     {imageFile?.name || 'Image source'}
                   </h4>
                   <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-                    <span>{imageFile ? formatFileSize(imageFile.size) : 'Ready'}</span>
+                    <span className="font-mono">{imageFile ? formatFileSize(imageFile.size) : 'Ready'}</span>
                     {imageMetadata?.dimensions && (
                       <>
-                        <span>•</span>
+                        <span className="text-slate-300 dark:text-slate-700">•</span>
                         <span>{imageMetadata.dimensions.width} × {imageMetadata.dimensions.height} px</span>
                       </>
                     )}
-                    <span>•</span>
+                    <span className="text-slate-300 dark:text-slate-700">•</span>
                     <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>Ready</span>
@@ -196,18 +196,18 @@ export default function ImageUploader({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60 dark:border-slate-800">
                   <button
                     type="button"
                     onClick={triggerFileInput}
-                    className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                   >
                     Change
                   </button>
                   <button
                     type="button"
                     onClick={onRemoveImage}
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Remove</span>
@@ -216,16 +216,17 @@ export default function ImageUploader({
               </div>
             </div>
 
-            <p className="text-[11px] text-slate-400 dark:text-slate-500">
-              ✓ Image pixel buffer and metadata staged for Module 2 Multimodal AI Analysis.
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+              <span className="text-emerald-500">✓</span>
+              <span>Image pixel buffer and metadata staged for Module 2 Multimodal AI Analysis.</span>
             </p>
           </div>
         )}
 
         {/* Error message */}
         {error && (
-          <div className="mt-3 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-start gap-2.5 text-xs text-rose-700 dark:text-rose-300 animate-fade-in">
-            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+          <div role="alert" className="mt-3.5 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-start gap-2.5 text-xs text-rose-700 dark:text-rose-300 animate-fade-in">
+            <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
             <p className="font-semibold flex-1">{error}</p>
           </div>
         )}

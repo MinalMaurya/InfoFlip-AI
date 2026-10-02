@@ -13,13 +13,19 @@ export default function DatesNumbersCard({ importantDates = [], importantNumbers
       {/* Important Dates & Deadlines */}
       {hasDates && (
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-2xs space-y-3">
-          <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800/80">
-            <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-              <Calendar className="w-4 h-4" />
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                <Calendar className="w-4 h-4" />
+              </div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                Timelines & Deadlines
+              </h3>
             </div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-              Timelines & Deadlines
-            </h3>
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span>Detected</span>
+            </span>
           </div>
 
           <div className="space-y-2">
@@ -50,13 +56,19 @@ export default function DatesNumbersCard({ importantDates = [], importantNumbers
       {/* Important Numbers & Metrics */}
       {hasNumbers && (
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-2xs space-y-3">
-          <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800/80">
-            <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-              <Hash className="w-4 h-4" />
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                <Hash className="w-4 h-4" />
+              </div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                Key Figures & Metrics
+              </h3>
             </div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-              Quantitative Metrics & Key Figures
-            </h3>
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span>Detected</span>
+            </span>
           </div>
 
           <div className="grid grid-cols-2 gap-2">

@@ -258,23 +258,24 @@ export default function Module1CreateView({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 animate-fade-in">
       
-      {/* Page Heading & Header (Requirement 7) */}
+      {/* Page Heading & Header (Pass 2 UI Refinement) */}
       <div className="mb-6 sm:mb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900/50">
-                Module 1
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900/50">
+                INPUT
               </span>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+              <span className="text-slate-300 dark:text-slate-700">•</span>
+              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
                 SIH 2026 Problem Statement ID 26154
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
-              Create New Transformation
+              Import your source content
             </h1>
-            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1">
-              Add your source content and let InfoFlip-AI transform it into the format you need.
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1 max-w-2xl leading-relaxed">
+              Upload a document or image, or paste text to begin the content transformation workflow.
             </p>
           </div>
 
@@ -283,7 +284,7 @@ export default function Module1CreateView({
             <button
               type="button"
               onClick={() => handleLoadScenario(DEMO_SCENARIOS[0])}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Load Weather Demo</span>
@@ -292,7 +293,7 @@ export default function Module1CreateView({
             <button
               type="button"
               onClick={handleResetAll}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
               title="Reset all inputs"
             >
               <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
@@ -381,15 +382,19 @@ export default function Module1CreateView({
             onLoadQuickDemo={() => handleLoadScenario(DEMO_SCENARIOS[0])}
           />
 
-          {/* Primary Action Card (Requirement 14) */}
+          {/* Primary Action Card (Pass 2 Refined) */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-2xs space-y-4">
             
             <div className="flex items-center justify-between text-xs font-semibold">
               <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
                 <FileCheck2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                <span>Next Stage: Module 2 (Context & Intent)</span>
+                <span>Next Stage: Module 2 (AI Content Understanding)</span>
               </span>
-              <span className="text-slate-400 dark:text-slate-500 font-mono text-[11px]">
+              <span className={`font-mono text-[11px] px-2 py-0.5 rounded-full ${
+                hasValidInput 
+                  ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' 
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+              }`}>
                 {hasValidInput ? 'Input Verified' : 'Awaiting Input'}
               </span>
             </div>
@@ -407,10 +412,17 @@ export default function Module1CreateView({
                   : 'bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 hover:from-indigo-700 hover:via-indigo-700 hover:to-purple-700 shadow-indigo-300/40 dark:shadow-indigo-950/50 hover:shadow-indigo-400/50 active:scale-[0.99]'
               }`}
             >
-              <Sparkles className={`w-4 h-4 sm:w-5 sm:h-5 ${isIngesting ? 'animate-spin' : 'group-hover:scale-110 transition-transform'}`} />
-              <span>
-                {isIngesting ? 'Analyzing...' : 'Analyze Content →'}
-              </span>
+              {isIngesting ? (
+                <>
+                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                  <span>Processing content...</span>
+                </>
+              ) : (
+                <>
+                  <span>Continue to Understand</span>
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
             </button>
 
             {!hasValidInput && (

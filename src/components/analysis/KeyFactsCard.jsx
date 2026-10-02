@@ -57,7 +57,11 @@ export default function KeyFactsCard({ keyFacts }) {
               </p>
             </div>
 
-            <div className="shrink-0 flex items-center gap-1.5">
+            <div className="shrink-0 flex flex-wrap items-center gap-1.5 justify-end">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span>Detected</span>
+              </span>
               <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${getImportanceBadge(factItem.importance)}`}>
                 {factItem.importance}
               </span>
