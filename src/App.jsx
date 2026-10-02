@@ -3,6 +3,9 @@ import Navbar from './components/Navbar';
 import Module1CreateView from './components/input/Module1CreateView';
 import Module2AnalysisView from './components/analysis/Module2AnalysisView';
 import Module3TransformView from './components/transformation/Module3TransformView';
+import Module4CommunicationView from './views/Module4CommunicationView';
+import Module5ReviewView from './views/Module5ReviewView';
+import Module6ExportView from './views/Module6ExportView';
 import HistoryView from './components/HistoryView';
 import AboutView from './components/AboutView';
 import Footer from './components/Footer';
@@ -53,6 +56,15 @@ export default function App() {
   const [analysisData, setAnalysisData] = useState(null);
   const [showAnalysisContractModal, setShowAnalysisContractModal] = useState(false);
 
+  // Transformation Data Contract from Module 3 (Transformation & Output Engine)
+  const [transformationResult, setTransformationResult] = useState(null);
+
+  // Communication Data Contract from Module 4 (Social & Communication Generator)
+  const [communicationResult, setCommunicationResult] = useState(null);
+
+  // Export Deliverable Package from Module 5 (Review, QA & Human Approval)
+  const [exportPackage, setExportPackage] = useState(null);
+
   // Generation & Pipeline State
   const [isTransforming, setIsTransforming] = useState(false);
   const [progressState, setProgressState] = useState({
@@ -95,6 +107,9 @@ export default function App() {
     setContextSummary(null);
     setIngestedContract(null);
     setAnalysisData(null);
+    setTransformationResult(null);
+    setCommunicationResult(null);
+    setExportPackage(null);
     setSourceError('');
     setFormatError('');
   };
@@ -136,6 +151,50 @@ export default function App() {
       }
     }
     setActiveTab('transform');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Handle Handoff from Module 3 (Transformation) to Module 4 (Social & Communication)
+  const handleProceedToModule4 = ({ source: src, analysis, transformation }) => {
+    if (transformation) {
+      setTransformationResult(transformation);
+    }
+    if (analysis) {
+      setAnalysisData(analysis);
+    }
+    if (src) {
+      setIngestedContract(src);
+      setSource(src.extractedText || src.rawText);
+    }
+    setActiveTab('communicate');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Handle Handoff from Module 4 (Social & Communication) to Module 5 (Review)
+  const handleProceedToModule5 = ({ source: src, analysis, transformation, communication }) => {
+    if (communication) {
+      setCommunicationResult(communication);
+    }
+    if (transformation) {
+      setTransformationResult(transformation);
+    }
+    if (analysis) {
+      setAnalysisData(analysis);
+    }
+    if (src) {
+      setIngestedContract(src);
+      setSource(src.extractedText || src.rawText);
+    }
+    setActiveTab('review');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Handle Handoff from Module 5 (Review) to Module 6 (Export)
+  const handleProceedToModule6 = (pkg) => {
+    if (pkg) {
+      setExportPackage(pkg);
+    }
+    setActiveTab('export');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -330,6 +389,89 @@ export default function App() {
           <AboutView 
             onStartTransforming={() => setActiveTab('create')} 
           />
+        ) : activeTab === 'communicate' ? (
+          /* MODULE 4: SOCIAL & COMMUNICATION GENERATOR */
+          <Module4CommunicationView
+            sourceData={ingestedContract || (source ? {
+              sourceId: `src-direct-${Date.now()}`,
+              sourceType: 'text',
+              fileName: 'Active Source Document',
+              rawText: source,
+              extractedText: source,
+              metadata: {
+                wordCount: source.split(/\s+/).filter(Boolean).length,
+                characterCount: source.length
+              },
+              createdAt: new Date().toISOString()
+            } : null)}
+            analysisData={analysisData}
+            transformationResult={transformationResult}
+            onBackToInput={() => setActiveTab('create')}
+            onBackToUnderstand={() => setActiveTab('understand')}
+            onBackToTransform={() => setActiveTab('transform')}
+            onProceedToModule5={handleProceedToModule5}
+            onLoadDemo={() => {
+              handleLoadScenario(DEMO_SCENARIOS[0]);
+              setAnalysisData(SAMPLE_ANALYSIS);
+            }}
+          />
+        ) : activeTab === 'review' ? (
+          /* MODULE 5: REVIEW, QUALITY ASSURANCE & HUMAN APPROVAL */
+          <Module5ReviewView
+            sourceData={ingestedContract || (source ? {
+              sourceId: `src-direct-${Date.now()}`,
+              sourceType: 'text',
+              fileName: 'Active Source Document',
+              rawText: source,
+              extractedText: source,
+              metadata: {
+                wordCount: source.split(/\s+/).filter(Boolean).length,
+                characterCount: source.length
+              },
+              createdAt: new Date().toISOString()
+            } : null)}
+            analysisData={analysisData}
+            transformationResult={transformationResult}
+            communicationResult={communicationResult}
+            onBackToInput={() => setActiveTab('create')}
+            onBackToUnderstand={() => setActiveTab('understand')}
+            onBackToTransform={() => setActiveTab('transform')}
+            onBackToCommunicate={() => setActiveTab('communicate')}
+            onProceedToModule6={handleProceedToModule6}
+            onLoadDemo={() => {
+              handleLoadScenario(DEMO_SCENARIOS[0]);
+              setAnalysisData(SAMPLE_ANALYSIS);
+            }}
+          />
+        ) : activeTab === 'export' ? (
+          /* MODULE 6: EXPORT & DISTRIBUTION */
+          <Module6ExportView
+            exportPackage={exportPackage}
+            onBackToInput={() => setActiveTab('create')}
+            onBackToUnderstand={() => setActiveTab('understand')}
+            onBackToTransform={() => setActiveTab('transform')}
+            onBackToCommunicate={() => setActiveTab('communicate')}
+            onBackToReview={() => setActiveTab('review')}
+            onLoadDemo={() => {
+              handleLoadScenario(DEMO_SCENARIOS[0]);
+              setAnalysisData(SAMPLE_ANALYSIS);
+            }}
+            onRecordHistory={(record) => {
+              setHistoryItems(prev => [
+                {
+                  id: record.exportId,
+                  timestamp: 'Just now',
+                  sourceSnippet: (source || '').substring(0, 80) + '...',
+                  audience,
+                  tone,
+                  language,
+                  formats: record.formats,
+                  deliverableCount: record.approvedCount
+                },
+                ...prev
+              ]);
+            }}
+          />
         ) : (
           /* MODULE 3: TRANSFORMATION & OUTPUT ENGINE (activeTab === 'transform' || 'workspace') */
           <Module3TransformView
@@ -348,6 +490,7 @@ export default function App() {
             analysisData={analysisData}
             onBackToInput={() => setActiveTab('create')}
             onBackToUnderstand={() => setActiveTab('understand')}
+            onProceedToModule4={handleProceedToModule4}
             onLoadDemo={() => {
               handleLoadScenario(DEMO_SCENARIOS[0]);
               setAnalysisData(SAMPLE_ANALYSIS);

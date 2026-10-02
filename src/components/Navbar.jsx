@@ -10,7 +10,10 @@ import {
   PlusCircle,
   ShieldCheck,
   BrainCircuit,
-  Wand2
+  Wand2,
+  Share2,
+  CheckCircle2,
+  DownloadCloud
 } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 
@@ -21,6 +24,9 @@ export default function Navbar({ activeTab, setActiveTab, historyCount = 0 }) {
     { id: 'create', label: 'Create', icon: PlusCircle, badge: 'Mod 1' },
     { id: 'understand', label: 'Understand', icon: BrainCircuit, badge: 'Mod 2' },
     { id: 'transform', label: 'Transform', icon: Wand2, badge: 'Mod 3' },
+    { id: 'communicate', label: 'Communicate', icon: Share2, badge: 'Mod 4' },
+    { id: 'review', label: 'Review', icon: CheckCircle2, badge: 'Mod 5' },
+    { id: 'export', label: 'Export', icon: DownloadCloud, badge: 'Mod 6' },
     { id: 'history', label: 'History', icon: History, count: historyCount },
     { id: 'about', label: 'About', icon: Info },
   ];
@@ -156,7 +162,7 @@ export default function Navbar({ activeTab, setActiveTab, historyCount = 0 }) {
           </div>
 
           <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-2">
-            <span>SIH26154 Modules 1, 2 & 3 Active</span>
+            <span>SIH26154 Modules 1, 2, 3 & 4 Active</span>
             <span className="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5" /> Human in the Loop
             </span>

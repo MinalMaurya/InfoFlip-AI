@@ -13,11 +13,13 @@ import {
 } from '../../utils/hallucinationGuard.js';
 import { calculateTextMetrics } from '../../utils/textNormalization.js';
 import { DeterministicTransformer } from '../transformation/deterministicTransformer.js';
+import { DeterministicCommunicationProvider } from '../communication/deterministicCommunicationProvider.js';
 
 export class DeterministicNLPProvider extends AIProviderInterface {
   constructor() {
     super('DeterministicNLPProvider');
     this.transformer = new DeterministicTransformer();
+    this.communicator = new DeterministicCommunicationProvider();
   }
 
   async isAvailable() {
@@ -26,6 +28,10 @@ export class DeterministicNLPProvider extends AIProviderInterface {
 
   async transform(request, options = {}) {
     return this.transformer.transform(request, options);
+  }
+
+  async communicate(request, options = {}) {
+    return this.communicator.generate(request, options);
   }
 
   async analyze(sourceData, options = {}) {

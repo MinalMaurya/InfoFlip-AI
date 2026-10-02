@@ -28,6 +28,16 @@ export class AIProviderInterface {
   }
 
   /**
+   * Generates channel-specific communication outputs from Module 3 structured results
+   * @param {object} communicationRequest - Module 4 communication request
+   * @param {object} options - Options including timeout, temperature, onProgress
+   * @returns {Promise<Array<object>>} - Generated communication outputs array
+   */
+  async communicate(communicationRequest, options = {}) {
+    throw new Error(`Method communicate() not implemented on provider: ${this.name}`);
+  }
+
+  /**
    * Health check to test provider readiness
    */
   async isAvailable() {

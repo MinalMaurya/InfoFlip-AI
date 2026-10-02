@@ -2,6 +2,9 @@ import { AIProviderInterface } from './aiProviderInterface.js';
 import { DeterministicNLPProvider } from './deterministicNLPProvider.js';
 import { buildTransformationSystemPrompt, buildTransformationUserPrompt } from '../transformation/transformationPrompts.js';
 import { createOutputItem } from '../../types/transformation.js';
+import { buildCommunicationSystemPrompt, buildCommunicationUserPrompt } from '../communication/communicationPrompts.js';
+import { createCommunicationOutputItem } from '../../types/communication.js';
+import { DeterministicCommunicationProvider } from '../communication/deterministicCommunicationProvider.js';
 
 /**
  * Global quota exhaustion tracker within the active browser session.
@@ -697,6 +700,125 @@ ${sourceData.extractedText || sourceData.rawText}`;
         ...options,
         fallbackReason: isQuota ? 'Gemini quota exhausted' : undefined
       });
+    }
+  }
+
+  /**
+   * Generates channel-specific communication outputs using Gemini 3.8 Flash.
+   * On failure, quota exhaustion, or timeout, gracefully falls back to DeterministicCommunicationProvider.
+   */
+  async communicate(request, options = {}) {
+    const deterministicProvider = new DeterministicCommunicationProvider();
+
+    // If no API key configured, use deterministic provider gracefully
+    if (!this.apiKey) {
+      const fallbackOutputs = deterministicProvider.generate(request, {
+        ...options,
+        fallbackReason: 'Missing API key'
+      });
+      return fallbackOutputs.map(out => ({
+        ...out,
+        metadata: {
+          ...out.metadata,
+          provider: 'DeterministicFallback',
+          isFallback: true,
+          fallbackReason: 'Missing API key'
+        }
+      }));
+    }
+
+    // Fast-path: if quota is already known to be exhausted in this session, avoid doomed network call
+    if ((this.isQuotaExhausted || isGlobalQuotaExhausted) && !options.bypassQuotaCache) {
+      console.warn('Gemini API:\nHTTP 429\nCategory: QUOTA_EXHAUSTED\nProvider fallback: DeterministicFallback\nMessage: Fast-falling back due to session quota exhaustion.');
+      const fallbackOutputs = deterministicProvider.generate(request, {
+        ...options,
+        fallbackReason: 'Gemini quota exhausted'
+      });
+      return fallbackOutputs.map(out => ({
+        ...out,
+        metadata: {
+          ...out.metadata,
+          provider: 'DeterministicFallback',
+          isFallback: true,
+          fallbackReason: 'Gemini quota exhausted'
+        }
+      }));
+    }
+
+    try {
+      const systemInstruction = buildCommunicationSystemPrompt();
+      const userPrompt = buildCommunicationUserPrompt(request);
+
+      const { json } = await callGeminiGenerateContent({
+        apiKey: this.apiKey,
+        model: this.model,
+        systemInstruction,
+        prompt: userPrompt,
+        jsonMode: true,
+        thinkingLevel: 'low',
+        temperature: 0.2,
+        timeoutMs: Math.min(options.timeoutMs || 20000, 20000),
+        retries: options.retries ?? 1,
+        retryDelayMs: Math.min(options.retryDelayMs || 800, 1000),
+        fetchFn: options.fetchFn
+      });
+
+      const rawOutputs = Array.isArray(json?.outputs) ? json.outputs : [];
+      if (rawOutputs.length === 0) {
+        throw new Error('No communication outputs produced by Gemini API.');
+      }
+
+      return rawOutputs.map(out => {
+        const contentStr = typeof out.content === 'string' ? out.content : JSON.stringify(out.content);
+        const wordCount = contentStr.split(/\s+/).filter(Boolean).length;
+        const characterCount = contentStr.length;
+
+        return createCommunicationOutputItem({
+          channelId: out.channelId,
+          title: out.title,
+          content: contentStr,
+          structuredData: out.structuredData || null,
+          metadata: {
+            provider: 'Gemini 3.8 Flash',
+            isFallback: false,
+            fallbackReason: null,
+            generatedAt: new Date().toISOString(),
+            wordCount,
+            characterCount
+          },
+          sourceTraceability: Array.isArray(out.sourceTraceability) && out.sourceTraceability.length > 0
+            ? out.sourceTraceability
+            : [{ fact: request.analysis?.keyFacts?.[0] || 'Source verified fact', sourceId: request.sourceId, origin: 'analysis.keyFacts' }]
+        });
+      });
+    } catch (err) {
+      const safeErrMessage = redactApiKey(err.message, this.apiKey);
+      console.warn('Gemini communication generation failed or timed out. Falling back to Deterministic Engine:', safeErrMessage);
+
+      const isQuota = err.isQuotaExhausted || isQuotaExhaustionError(err.status, err.errorStatus, safeErrMessage);
+      if (isQuota) {
+        this.isQuotaExhausted = true;
+        isGlobalQuotaExhausted = true;
+      }
+
+      const fallbackReason = isQuota
+        ? 'Gemini quota exhausted'
+        : (err.isTimeout ? 'Gemini timeout' : 'Gemini unavailable');
+
+      const fallbackOutputs = deterministicProvider.generate(request, {
+        ...options,
+        fallbackReason
+      });
+
+      return fallbackOutputs.map(out => ({
+        ...out,
+        metadata: {
+          ...out.metadata,
+          provider: 'DeterministicFallback',
+          isFallback: true,
+          fallbackReason
+        }
+      }));
     }
   }
 }

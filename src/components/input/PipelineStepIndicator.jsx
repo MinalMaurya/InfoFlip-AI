@@ -6,18 +6,22 @@ import {
   CheckCircle, 
   DownloadCloud,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Share2
 } from 'lucide-react';
 
 const PIPELINE_STEPS = [
   { id: 1, number: '01', title: 'Input', subtitle: 'Ingest & Normalize', icon: FileText, current: true, module: 'Module 1' },
   { id: 2, number: '02', title: 'Understand', subtitle: 'Context & Intent', icon: BrainCircuit, current: false, module: 'Module 2' },
   { id: 3, number: '03', title: 'Transform', subtitle: 'Multi-Format GenAI', icon: Wand2, current: false, module: 'Module 3' },
-  { id: 4, number: '04', title: 'Review', subtitle: 'Human in the Loop', icon: CheckCircle, current: false, module: 'Module 4' },
-  { id: 5, number: '05', title: 'Export', subtitle: 'Multi-Channel Dispatch', icon: DownloadCloud, current: false, module: 'Module 5' },
+  { id: 4, number: '04', title: 'Communicate', subtitle: 'Social & Channels', icon: Share2, current: false, module: 'Module 4' },
+  { id: 5, number: '05', title: 'Review', subtitle: 'Human in the Loop', icon: CheckCircle, current: false, module: 'Module 5' },
+  { id: 6, number: '06', title: 'Export', subtitle: 'Multi-Channel Dispatch', icon: DownloadCloud, current: false, module: 'Module 6' },
 ];
 
-export default function PipelineStepIndicator({ activeModule = 1 }) {
+export default function PipelineStepIndicator({ activeModule, activeStep, onStepClick }) {
+  const currentStep = activeStep || activeModule || 1;
+
   return (
     <div className="w-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-3 sm:p-4 shadow-2xs mb-6">
       <div className="flex items-center justify-between gap-2 mb-2 sm:mb-3 px-1">
@@ -32,21 +36,24 @@ export default function PipelineStepIndicator({ activeModule = 1 }) {
         </div>
         <div className="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2.5 py-0.5 rounded-full border border-indigo-100 dark:border-indigo-900/50">
           <Sparkles className="w-3 h-3" />
-          <span>Active: {PIPELINE_STEPS.find(s => s.id === activeModule)?.module || `Module ${activeModule}`} ({PIPELINE_STEPS.find(s => s.id === activeModule)?.subtitle || PIPELINE_STEPS.find(s => s.id === activeModule)?.title})</span>
+          <span>Active: {PIPELINE_STEPS.find(s => s.id === currentStep)?.module || `Module ${currentStep}`} ({PIPELINE_STEPS.find(s => s.id === currentStep)?.subtitle || PIPELINE_STEPS.find(s => s.id === currentStep)?.title})</span>
         </div>
       </div>
 
       {/* Steps bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 relative">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 relative">
         {PIPELINE_STEPS.map((step, idx) => {
           const Icon = step.icon;
-          const isCurrent = step.id === activeModule;
-          const isPast = step.id < activeModule;
+          const isCurrent = step.id === currentStep;
+          const isPast = step.id < currentStep;
 
           return (
             <div
               key={step.id}
+              onClick={() => onStepClick && onStepClick(step.id)}
               className={`relative flex items-center gap-2.5 p-2.5 rounded-xl border transition-all ${
+                onStepClick ? 'cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-700' : ''
+              } ${
                 isCurrent
                   ? 'bg-indigo-50/90 dark:bg-indigo-950/40 border-indigo-400 dark:border-indigo-600/80 shadow-2xs ring-1 ring-indigo-400/20'
                   : isPast
