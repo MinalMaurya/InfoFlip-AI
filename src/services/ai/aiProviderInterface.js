@@ -18,6 +18,16 @@ export class AIProviderInterface {
   }
 
   /**
+   * Transforms source data and Module 2 analysis according to user configuration
+   * @param {object} transformationRequest - Module 3 transformation request
+   * @param {object} options - Options including timeout, temperature, onProgress
+   * @returns {Promise<Array<object>>} - Generated outputs array
+   */
+  async transform(transformationRequest, options = {}) {
+    throw new Error(`Method transform() not implemented on provider: ${this.name}`);
+  }
+
+  /**
    * Health check to test provider readiness
    */
   async isAvailable() {

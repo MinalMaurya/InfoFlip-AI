@@ -12,14 +12,20 @@ import {
   validateClaims 
 } from '../../utils/hallucinationGuard.js';
 import { calculateTextMetrics } from '../../utils/textNormalization.js';
+import { DeterministicTransformer } from '../transformation/deterministicTransformer.js';
 
 export class DeterministicNLPProvider extends AIProviderInterface {
   constructor() {
     super('DeterministicNLPProvider');
+    this.transformer = new DeterministicTransformer();
   }
 
   async isAvailable() {
     return true; // Always available in any offline or online browser environment
+  }
+
+  async transform(request, options = {}) {
+    return this.transformer.transform(request, options);
   }
 
   async analyze(sourceData, options = {}) {

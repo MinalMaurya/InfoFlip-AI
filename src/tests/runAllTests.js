@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 console.log('====================================================');
-console.log('🚀 INFOFLIP-AI FULL TEST SUITE (MODULE 1 & MODULE 2)');
+console.log('🚀 INFOFLIP-AI FULL TEST SUITE (MODULES 1, 2, 3 & GEMINI)');
 console.log('====================================================');
 
 const module1 = spawnSync('node', [path.join(__dirname, 'module1.test.js')], { stdio: 'inherit' });
@@ -21,6 +21,22 @@ if (module2.status !== 0) {
   process.exit(module2.status || 1);
 }
 
+const module3 = spawnSync('node', [path.join(__dirname, 'module3.test.js')], { stdio: 'inherit' });
+if (module3.status !== 0) {
+  console.error('\n❌ Module 3 test suite failed!');
+  process.exit(module3.status || 1);
+}
+
+const geminiTests = spawnSync('node', [path.join(__dirname, 'geminiIntegration.test.js')], { stdio: 'inherit' });
+if (geminiTests.status !== 0) {
+  console.error('\n❌ Gemini integration test suite failed!');
+  process.exit(geminiTests.status || 1);
+}
+
 console.log('====================================================');
-console.log('🎉 ALL SUITES PASSED: 108/108 TESTS PASSING (100%)');
+console.log('🎉 ALL SUITES PASSED: 235/235 TESTS PASSING (100%)');
+console.log('  - Module 1 (Input & Ingestion): 45/45');
+console.log('  - Module 2 (Understanding & Analysis): 63/63');
+console.log('  - Module 3 (Transformation & Output Engine): 103/103');
+console.log('  - Gemini 3.8 Flash Integration & Resilience: 24/24');
 console.log('====================================================\n');

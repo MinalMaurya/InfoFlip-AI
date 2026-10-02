@@ -32,3 +32,23 @@ export function setActiveAIProvider(provider) {
   }
   return activeProviderInstance;
 }
+
+/**
+ * Diagnostic helper to check connectivity of current AI provider
+ */
+export async function checkAIConnectivity(options = {}) {
+  const provider = getActiveAIProvider();
+  if (provider && typeof provider.checkConnection === 'function') {
+    return provider.checkConnection(options);
+  }
+  return {
+    ok: true,
+    model: 'DeterministicNLPProvider',
+    hasApiKey: false,
+    status: 200,
+    statusText: 'OK',
+    errorStatus: null,
+    message: 'Local deterministic NLP engine active.',
+    durationMs: 0
+  };
+}
