@@ -94,8 +94,16 @@ export default function AboutView({ onStartTransforming }) {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 animate-fade-in">
       
-      {/* Hero Badge */}
+      {/* Hero Badge & Mascot */}
       <div className="text-center max-w-2xl mx-auto mb-10">
+        <div className="w-20 h-20 mx-auto mb-4 rounded-2xl overflow-hidden shadow-sm border border-indigo-200 dark:border-indigo-900 bg-white dark:bg-slate-900 flex items-center justify-center">
+          <img 
+            src="/infoflip-logo.png" 
+            alt="InfoFlip-AI Mascot" 
+            className="w-full h-full object-cover"
+            loading="eager"
+          />
+        </div>
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 mb-3">
           <Cpu className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" /> SIH Problem Statement: SIH26154
         </div>

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { 
-  Sparkles, 
   History, 
   Info, 
   Menu, 
@@ -62,20 +61,27 @@ export default function Navbar({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-18">
           
-          {/* Brand Logo & Title */}
+          {/* Brand Area: InfoFlip Mascot Logo & Title */}
           <div className="flex items-center gap-3">
             <button 
               type="button"
               onClick={() => handleNavClick('create')}
-              className="flex items-center gap-2.5 text-left group focus:outline-none"
+              className="flex items-center gap-3 text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-xl"
               title="InfoFlip-AI GenAI Platform"
             >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center shadow-md shadow-indigo-200 dark:shadow-indigo-950 group-hover:scale-105 transition-transform duration-200">
-                <Sparkles className="w-5 h-5 text-white" />
+              {/* Mascot Logo Badge */}
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden shadow-xs border border-indigo-200/80 dark:border-indigo-900/80 bg-white dark:bg-slate-900 flex items-center justify-center group-hover:scale-105 transition-transform duration-200 shrink-0">
+                <img 
+                  src="/infoflip-logo.png" 
+                  alt="InfoFlip-AI Logo" 
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                />
               </div>
+
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xl font-bold bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-700 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent">
+                  <span className="text-xl font-extrabold bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-700 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent tracking-tight">
                     InfoFlip<span className="text-indigo-600 dark:text-indigo-400">-AI</span>
                   </span>
                   <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80">
@@ -90,7 +96,7 @@ export default function Navbar({
           </div>
 
           {/* Desktop Global Navigation (Create | History | About) */}
-          <nav className="hidden md:flex items-center gap-1.5 bg-slate-100/80 dark:bg-slate-800/70 p-1 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
+          <nav className="hidden md:flex items-center gap-1.5" aria-label="Global Navigation">
             {navItems.map((item) => {
               const Icon = item.icon;
               const active = item.isActive;
@@ -99,10 +105,10 @@ export default function Navbar({
                   key={item.id}
                   type="button"
                   onClick={() => handleNavClick(item.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150 ${
+                  className={`relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                     active
-                      ? 'bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-400 shadow-2xs border border-slate-200/70 dark:border-slate-800'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-white/60 dark:hover:bg-slate-800/60'
+                      ? 'text-indigo-700 dark:text-indigo-300 bg-indigo-50/80 dark:bg-indigo-950/60 shadow-2xs border border-indigo-100 dark:border-indigo-900/50'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100/70 dark:hover:bg-slate-800/60'
                   }`}
                 >
                   <Icon className={`w-4 h-4 ${active ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'}`} />
@@ -111,6 +117,9 @@ export default function Navbar({
                     <span className="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
                       {item.count}
                     </span>
+                  )}
+                  {active && (
+                    <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-indigo-600 dark:bg-indigo-400 rounded-full" />
                   )}
                 </button>
               );
@@ -132,7 +141,7 @@ export default function Navbar({
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 md:hidden focus:outline-none"
+              className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
               aria-label="Toggle mobile menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -157,7 +166,7 @@ export default function Navbar({
                   key={item.id}
                   type="button"
                   onClick={() => handleNavClick(item.id)}
-                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                     active
                       ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold'
                       : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
