@@ -157,7 +157,7 @@ export default function ReviewOutputCard({
           <button
             type="button"
             onClick={() => setActiveTab('overview')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
               activeTab === 'overview'
                 ? 'bg-slate-100 dark:bg-slate-800 text-indigo-700 dark:text-indigo-400 shadow-2xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -169,7 +169,7 @@ export default function ReviewOutputCard({
           <button
             type="button"
             onClick={() => setActiveTab('checks')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
               activeTab === 'checks'
                 ? 'bg-slate-100 dark:bg-slate-800 text-indigo-700 dark:text-indigo-400 shadow-2xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -184,7 +184,7 @@ export default function ReviewOutputCard({
           <button
             type="button"
             onClick={() => setActiveTab('traceability')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
               activeTab === 'traceability'
                 ? 'bg-slate-100 dark:bg-slate-800 text-indigo-700 dark:text-indigo-400 shadow-2xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -197,7 +197,7 @@ export default function ReviewOutputCard({
           <button
             type="button"
             onClick={() => setActiveTab('edit')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
               activeTab === 'edit'
                 ? 'bg-slate-100 dark:bg-slate-800 text-indigo-700 dark:text-indigo-400 shadow-2xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -212,7 +212,7 @@ export default function ReviewOutputCard({
         <button
           type="button"
           onClick={handleCopy}
-          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
         >
           {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
           <span>{copied ? 'Copied' : 'Copy'}</span>
@@ -234,26 +234,30 @@ export default function ReviewOutputCard({
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
               <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
                 <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Factual Audit</span>
-                <span className="font-semibold text-slate-700 dark:text-slate-300">
-                  {checks.factualConsistency?.status === 'PASS' ? '100% Grounded' : checks.factualConsistency?.message || 'Checked'}
+                <span className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span className="truncate">{checks.factualConsistency?.status === 'PASS' ? '100% Grounded' : checks.factualConsistency?.message || 'Checked'}</span>
                 </span>
               </div>
               <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
                 <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Tone Check</span>
-                <span className="font-semibold text-slate-700 dark:text-slate-300">
-                  {checks.toneConsistency?.status || 'PASS'}
+                <span className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>{checks.toneConsistency?.status || 'PASS'}</span>
                 </span>
               </div>
               <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
                 <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Audience Fit</span>
-                <span className="font-semibold text-slate-700 dark:text-slate-300">
-                  {checks.audienceFit?.status || 'PASS'}
+                <span className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>{checks.audienceFit?.status || 'PASS'}</span>
                 </span>
               </div>
               <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
-                <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Platform Compliance</span>
-                <span className="font-semibold text-slate-700 dark:text-slate-300">
-                  {checks.platformCompliance?.status || 'PASS'}
+                <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Platform Limits</span>
+                <span className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>{checks.platformCompliance?.status || 'PASS'}</span>
                 </span>
               </div>
             </div>

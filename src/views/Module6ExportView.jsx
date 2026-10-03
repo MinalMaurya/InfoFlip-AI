@@ -63,53 +63,90 @@ export default function Module6ExportView({
     }
   };
 
+  const approvedCount = exportPackage?.approvedOutputs?.length || 0;
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fade-in">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8 animate-fade-in">
       
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
-        <div>
-          <div className="flex items-center gap-3">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-              MODULE 6
-            </span>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-              Deliverable Packaging & Multi-Channel Distribution
-            </span>
+      {/* Page Heading & Header (Pass 4 UI Refinement) */}
+      <div className="mb-2 sm:mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900/50">
+                EXPORT
+              </span>
+              <span className="text-slate-300 dark:text-slate-700">•</span>
+              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                SIH 2026 Problem Statement ID 26154
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+              Export your approved content
+            </h1>
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1 max-w-2xl leading-relaxed">
+              Download, copy, and distribute the content that has passed human review.
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 mt-1">
-            Export Center & Distribution Engine
-          </h1>
-          <p className="text-sm text-slate-600 dark:text-slate-400 max-w-3xl mt-1">
-            Download certified, human-approved communication deliverables in TXT, JSON, PDF, or ZIP archive format with complete upstream lineage and review metadata.
-          </p>
-        </div>
 
-        {/* Global Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2">
-          {onBackToReview && (
-            <button
-              type="button"
-              onClick={onBackToReview}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back to Review (Mod 5)</span>
-            </button>
-          )}
+          {/* Quick Header Actions */}
+          <div className="flex flex-wrap items-center gap-2">
+            {onBackToReview && (
+              <button
+                type="button"
+                onClick={onBackToReview}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Back to Review (Mod 5)</span>
+              </button>
+            )}
 
-          {!isBlocked && (
-            <button
-              type="button"
-              onClick={() => setShowContractModal(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs"
-            >
-              <Code className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-              <span>Inspect Contracts</span>
-            </button>
-          )}
+            {!isBlocked && (
+              <button
+                type="button"
+                onClick={() => setShowContractModal(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-indigo-700 dark:text-indigo-300 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                title="Inspect Module 6 Export Package Contract"
+              >
+                <Code className="w-3.5 h-3.5" />
+                <span>Export JSON</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Quality Gate Trust Banner */}
+      {!isBlocked ? (
+        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50/80 via-teal-50/50 to-slate-50 dark:from-emerald-950/40 dark:via-teal-950/20 dark:to-slate-900 border border-emerald-200 dark:border-emerald-800/80 shadow-2xs flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-emerald-600 text-white shadow-xs shrink-0 mt-0.5 sm:mt-0">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">
+                  QUALITY GATE PASSED · HUMAN CERTIFIED
+                </span>
+                <span className="px-2 py-0.2 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200">
+                  Verified
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 max-w-2xl leading-relaxed">
+                {approvedCount} deliverable{approvedCount !== 1 ? 's' : ''} verified and approved. Only human-approved content is available for export.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Ready for Distribution</span>
+            </span>
+          </div>
+        </div>
+      ) : null}
 
       {/* Toast Notification */}
       {toastMessage && (
@@ -170,7 +207,7 @@ export default function Module6ExportView({
 
       {/* ACTIVE DASHBOARD: When export package is valid */}
       {!isBlocked && (
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           {/* Summary Stat Cards */}
           <ExportSummary exportPackage={exportPackage} />
 

@@ -125,12 +125,23 @@ export default function ReviewCheckList({ checks }) {
     }
   };
 
+  const passCount = Object.keys(DIMENSION_CONFIG).filter(k => checks[k]?.status === CHECK_STATUSES.PASS).length;
+  const warnCount = Object.keys(DIMENSION_CONFIG).filter(k => checks[k]?.status === CHECK_STATUSES.WARNING).length;
+  const failCount = Object.keys(DIMENSION_CONFIG).filter(k => checks[k]?.status === CHECK_STATUSES.FAIL).length;
+
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between px-1 pb-1">
-        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-          10-Dimension Quality Audit
-        </h4>
+      <div className="flex flex-wrap items-center justify-between gap-2 px-1 pb-1">
+        <div className="flex items-center gap-2">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            10-Dimension Quality Audit
+          </h4>
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+            <span className="text-emerald-600 dark:text-emerald-400 font-bold">{passCount} Passed</span>
+            {warnCount > 0 && <span className="text-amber-600 dark:text-amber-400 font-bold">• {warnCount} Warn</span>}
+            {failCount > 0 && <span className="text-rose-600 dark:text-rose-400 font-bold">• {failCount} Fail</span>}
+          </span>
+        </div>
         <span className="text-[11px] text-slate-400 dark:text-slate-500">
           Click any check for telemetry
         </span>

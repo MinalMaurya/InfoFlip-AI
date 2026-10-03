@@ -37,7 +37,7 @@ export default function ApprovedAssetList({ exportPackage }) {
           <button
             type="button"
             onClick={() => setActiveChannel('ALL')}
-            className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${
+            className={`px-3 py-1 rounded-xl text-xs font-bold transition-all outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
               activeChannel === 'ALL'
                 ? 'bg-indigo-600 text-white shadow-2xs'
                 : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700'
@@ -46,20 +46,23 @@ export default function ApprovedAssetList({ exportPackage }) {
             All ({items.length})
           </button>
 
-          {channels.map(ch => (
-            <button
-              key={ch}
-              type="button"
-              onClick={() => setActiveChannel(ch)}
-              className={`capitalize px-3 py-1 rounded-xl text-xs font-semibold transition-all ${
-                activeChannel === ch
-                  ? 'bg-indigo-600 text-white shadow-2xs'
-                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700'
-              }`}
-            >
-              {ch}
-            </button>
-          ))}
+          {channels.map(ch => {
+            const count = items.filter(i => i.channelId === ch).length;
+            return (
+              <button
+                key={ch}
+                type="button"
+                onClick={() => setActiveChannel(ch)}
+                className={`capitalize px-3 py-1 rounded-xl text-xs font-semibold transition-all outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+                  activeChannel === ch
+                    ? 'bg-indigo-600 text-white shadow-2xs font-bold'
+                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700'
+                }`}
+              >
+                {ch} ({count})
+              </button>
+            );
+          })}
         </div>
       </div>
 

@@ -212,71 +212,150 @@ export default function Module5ReviewView({
   const isExportReady = approvedCount > 0;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fade-in">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8 animate-fade-in">
       
-      {/* Top Header & Context */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
-        <div>
-          <div className="flex items-center gap-3">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-              MODULE 5
-            </span>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-              SIH 2026 Quality Gate & Verification
-            </span>
+      {/* Page Heading & Header (Pass 4 UI Refinement) */}
+      <div className="mb-2 sm:mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900/50">
+                REVIEW
+              </span>
+              <span className="text-slate-300 dark:text-slate-700">•</span>
+              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                SIH 2026 Problem Statement ID 26154
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+              Review & approve your content
+            </h1>
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1 max-w-2xl leading-relaxed">
+              Validate AI-generated content, inspect its grounding, make human edits, and approve it for export.
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 mt-1">
-            Review, Quality Assurance & Human Approval
-          </h1>
-          <p className="text-sm text-slate-600 dark:text-slate-400 max-w-3xl mt-1">
-            Perform deterministic, explainable quality auditing across 10 dimensions. Review factual consistency, source grounding, platform constraints, and provide human-in-the-loop sign-off before downstream export.
-          </p>
+
+          {/* Quick Header Actions */}
+          <div className="flex flex-wrap items-center gap-2">
+            {onBackToCommunicate && (
+              <button
+                type="button"
+                onClick={onBackToCommunicate}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Back to Communicate</span>
+              </button>
+            )}
+
+            {reviewResult && (
+              <button
+                type="button"
+                onClick={() => setShowContractModal(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-indigo-700 dark:text-indigo-300 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                title="Inspect Module 5 Review Contract"
+              >
+                <Code className="w-3.5 h-3.5" />
+                <span>Review JSON</span>
+              </button>
+            )}
+
+            {passedCount > 0 && (
+              <button
+                type="button"
+                onClick={handleApproveAllPassed}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+              >
+                <Check className="w-3.5 h-3.5" />
+                <span>Approve All Passed ({passedCount})</span>
+              </button>
+            )}
+
+            {reviewResult && (
+              <button
+                type="button"
+                onClick={handleRunReview}
+                disabled={isReviewing}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+                title="Re-run all quality checks"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isReviewing ? 'animate-spin' : ''}`} />
+                <span>Re-run Checks</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Human Review Required Trust Banner (Phase 1 Requirement) */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-indigo-50/80 via-blue-50/50 to-slate-50 dark:from-indigo-950/40 dark:via-blue-950/20 dark:to-slate-900 border border-indigo-100 dark:border-indigo-900/60 shadow-2xs flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-start sm:items-center gap-3">
+          <div className="p-2.5 rounded-xl bg-indigo-600 text-white shadow-xs shrink-0 mt-0.5 sm:mt-0">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
+                HUMAN REVIEW REQUIRED
+              </span>
+              <span className="px-2 py-0.2 rounded-full text-[10px] font-bold bg-indigo-100 dark:bg-indigo-900/80 text-indigo-800 dark:text-indigo-200">
+                Quality Gate
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 max-w-2xl leading-relaxed">
+              Automated checks verify grounding, consistency, safety, readability, and platform compliance. Final approval remains with a human reviewer.
+            </p>
+          </div>
         </div>
 
-        {/* Global Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2">
-          {onBackToCommunicate && (
-            <button
-              type="button"
-              onClick={onBackToCommunicate}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back to Communicate</span>
-            </button>
+        {/* Live Gate Status Pill */}
+        <div className="flex items-center gap-2">
+          {approvedCount > 0 ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <span>{approvedCount} of {items.length} Approved</span>
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+              <span>Awaiting Human Sign-Off</span>
+            </span>
           )}
+        </div>
+      </div>
 
-          {reviewResult && (
+      {/* Upstream Transformation & Communication Context Strip */}
+      <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs text-slate-600 dark:text-slate-400">
+          <div className="flex items-center gap-1.5">
+            <span className="font-semibold text-slate-900 dark:text-slate-100">Topic:</span>
+            <span className="px-2.5 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 font-semibold text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/50">
+              {analysisData?.overview?.mainTopic || 'General Document'}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="font-semibold text-slate-900 dark:text-slate-100">Evaluated Outputs:</span>
+            <span className="font-medium text-slate-800 dark:text-slate-200">{items.length} channel assets</span>
+          </div>
+          <div>
+            <span className="font-semibold text-slate-900 dark:text-slate-100">Target Audience:</span>{' '}
+            <span>{communicationResult?.config?.targetAudience || 'General Public'}</span>
+          </div>
+          <div>
+            <span className="font-semibold text-slate-900 dark:text-slate-100">Tone:</span>{' '}
+            <span>{communicationResult?.config?.tone || 'Informative'}</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {(!communicationResult || communicationResult.outputs?.length === 0) && onLoadDemo && (
             <button
               type="button"
-              onClick={() => setShowContractModal(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs"
+              onClick={onLoadDemo}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 transition-colors"
             >
-              <Code className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-              <span>Inspect Contracts</span>
-            </button>
-          )}
-
-          {passedCount > 0 && (
-            <button
-              type="button"
-              onClick={handleApproveAllPassed}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800 transition-colors shadow-2xs"
-            >
-              <Check className="w-3.5 h-3.5" />
-              <span>Approve All Passed</span>
-            </button>
-          )}
-
-          {reviewResult && (
-            <button
-              type="button"
-              onClick={handleRunReview}
-              disabled={isReviewing}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isReviewing ? 'animate-spin' : ''}`} />
-              <span>Re-run All Checks</span>
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Load Demo Scenario</span>
             </button>
           )}
         </div>
@@ -332,6 +411,7 @@ export default function Module5ReviewView({
           <ReviewSummary
             summary={reviewResult.summary}
             currentFilter={filterStatus}
+            activeFilter={filterStatus}
             onFilterChange={setFilterStatus}
           />
 

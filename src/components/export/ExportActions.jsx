@@ -118,7 +118,7 @@ export default function ExportActions({
           <button
             type="button"
             onClick={onInspectContracts}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
           >
             <Code className="w-3.5 h-3.5 text-indigo-500" />
             <span>Inspect Contracts JSON</span>
@@ -127,19 +127,22 @@ export default function ExportActions({
       </div>
 
       {/* Button Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         {/* Copy All */}
         <button
           type="button"
           onClick={handleCopyAll}
-          className={`flex items-center justify-center gap-2 p-3 rounded-2xl text-xs font-bold transition-all shadow-2xs ${
+          className={`flex flex-col items-center justify-center p-3.5 rounded-2xl text-xs font-bold transition-all shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
             copiedAll
               ? 'bg-emerald-600 text-white'
               : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 active:scale-[0.98]'
           }`}
         >
-          {copiedAll ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4 text-indigo-500" />}
-          <span>{copiedAll ? 'Copied to Clipboard' : 'Copy All Content'}</span>
+          <div className="flex items-center gap-1.5 mb-0.5">
+            {copiedAll ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4 text-indigo-500" />}
+            <span className="font-bold">{copiedAll ? 'Copied to Clipboard' : 'Copy All'}</span>
+          </div>
+          <span className="text-[10px] opacity-75 font-normal">All channel deliverables</span>
         </button>
 
         {/* Download TXT */}
@@ -147,14 +150,17 @@ export default function ExportActions({
           type="button"
           onClick={handleDownloadTxt}
           disabled={downloadingFormat === 'txt'}
-          className="flex items-center justify-center gap-2 p-3 rounded-2xl text-xs font-bold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-all shadow-2xs active:scale-[0.98] disabled:opacity-50"
+          className="flex flex-col items-center justify-center p-3.5 rounded-2xl text-xs font-bold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-all shadow-2xs active:scale-[0.98] disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
         >
-          {downloadingFormat === 'txt' ? (
-            <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
-          ) : (
-            <FileText className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-          )}
-          <span>Download .TXT</span>
+          <div className="flex items-center gap-1.5 mb-0.5">
+            {downloadingFormat === 'txt' ? (
+              <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
+            ) : (
+              <FileText className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            )}
+            <span className="font-bold">Download .TXT</span>
+          </div>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Plain text deliverable</span>
         </button>
 
         {/* Download JSON */}
@@ -162,14 +168,17 @@ export default function ExportActions({
           type="button"
           onClick={handleDownloadJson}
           disabled={downloadingFormat === 'json'}
-          className="flex items-center justify-center gap-2 p-3 rounded-2xl text-xs font-bold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-all shadow-2xs active:scale-[0.98] disabled:opacity-50"
+          className="flex flex-col items-center justify-center p-3.5 rounded-2xl text-xs font-bold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-all shadow-2xs active:scale-[0.98] disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
         >
-          {downloadingFormat === 'json' ? (
-            <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
-          ) : (
-            <Code className="w-4 h-4 text-amber-500" />
-          )}
-          <span>Download .JSON</span>
+          <div className="flex items-center gap-1.5 mb-0.5">
+            {downloadingFormat === 'json' ? (
+              <Loader2 className="w-4 h-4 animate-spin text-amber-600" />
+            ) : (
+              <Code className="w-4 h-4 text-amber-500" />
+            )}
+            <span className="font-bold">Download .JSON</span>
+          </div>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Full schema & metadata</span>
         </button>
 
         {/* Download PDF */}
@@ -177,14 +186,17 @@ export default function ExportActions({
           type="button"
           onClick={handleDownloadPdf}
           disabled={downloadingFormat === 'pdf'}
-          className="flex items-center justify-center gap-2 p-3 rounded-2xl text-xs font-bold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-all shadow-2xs active:scale-[0.98] disabled:opacity-50"
+          className="flex flex-col items-center justify-center p-3.5 rounded-2xl text-xs font-bold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-all shadow-2xs active:scale-[0.98] disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
         >
-          {downloadingFormat === 'pdf' ? (
-            <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
-          ) : (
-            <Printer className="w-4 h-4 text-rose-500" />
-          )}
-          <span>Download .PDF</span>
+          <div className="flex items-center gap-1.5 mb-0.5">
+            {downloadingFormat === 'pdf' ? (
+              <Loader2 className="w-4 h-4 animate-spin text-rose-600" />
+            ) : (
+              <Printer className="w-4 h-4 text-rose-500" />
+            )}
+            <span className="font-bold">Download .PDF</span>
+          </div>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Print-optimized format</span>
         </button>
 
         {/* Download Package (.zip) */}
@@ -192,14 +204,17 @@ export default function ExportActions({
           type="button"
           onClick={handleDownloadPackage}
           disabled={downloadingFormat === 'package'}
-          className="flex items-center justify-center gap-2 p-3 rounded-2xl text-xs font-bold bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white transition-all shadow-md shadow-indigo-200 dark:shadow-indigo-950 active:scale-[0.98] disabled:opacity-50"
+          className="flex flex-col items-center justify-center p-3.5 rounded-2xl text-xs font-bold bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white transition-all shadow-md shadow-indigo-200 dark:shadow-indigo-950 active:scale-[0.98] disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
         >
-          {downloadingFormat === 'package' ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Archive className="w-4 h-4" />
-          )}
-          <span>Download Package (.zip)</span>
+          <div className="flex items-center gap-1.5 mb-0.5">
+            {downloadingFormat === 'package' ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Archive className="w-4 h-4" />
+            )}
+            <span className="font-bold">Package (.zip)</span>
+          </div>
+          <span className="text-[10px] text-indigo-100 font-normal">Archive + Manifest</span>
         </button>
       </div>
     </div>

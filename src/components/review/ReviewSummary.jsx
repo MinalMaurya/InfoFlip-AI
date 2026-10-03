@@ -8,8 +8,10 @@ import {
   FileText 
 } from 'lucide-react';
 
-export default function ReviewSummary({ summary, onFilterChange, activeFilter = 'ALL' }) {
+export default function ReviewSummary({ summary, onFilterChange, activeFilter, currentFilter }) {
   if (!summary) return null;
+
+  const selected = activeFilter || currentFilter || 'ALL';
 
   const cards = [
     {
@@ -45,7 +47,7 @@ export default function ReviewSummary({ summary, onFilterChange, activeFilter = 
       badgeBg: 'bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300'
     },
     {
-      id: 'NEEDS_REVIEW',
+      id: 'PENDING',
       label: 'Needs Review',
       count: summary.needsHumanReview || 0,
       icon: Clock,
@@ -63,32 +65,45 @@ export default function ReviewSummary({ summary, onFilterChange, activeFilter = 
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-      {cards.map((card) => {
-        const Icon = card.icon;
-        const isSelected = activeFilter === card.id;
+    <div className="space-y-3">
+      <div className="flex items-center justify-between px-1">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          Quality Audit Summary
+        </h3>
+        <span className="text-[11px] text-slate-400 dark:text-slate-500">
+          Click a metric card to filter outputs
+        </span>
+      </div>
 
-        return (
-          <button
-            key={card.id}
-            type="button"
-            onClick={() => onFilterChange && onFilterChange(card.id)}
-            className={`p-4 rounded-2xl border text-left transition-all ${card.badgeBg} ${
-              isSelected ? 'ring-2 ring-indigo-500 shadow-md scale-[1.02]' : 'hover:shadow-sm'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold uppercase tracking-wider opacity-80">
-                {card.label}
-              </span>
-              <Icon className="w-4 h-4 opacity-80" />
-            </div>
-            <div className="text-2xl font-extrabold tracking-tight">
-              {card.count}
-            </div>
-          </button>
-        );
-      })}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        {cards.map((card) => {
+          const Icon = card.icon;
+          const isSelected = selected === card.id;
+
+          return (
+            <button
+              key={card.id}
+              type="button"
+              onClick={() => onFilterChange && onFilterChange(card.id)}
+              className={`p-3.5 sm:p-4 rounded-2xl border text-left transition-all cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${card.badgeBg} ${
+                isSelected
+                  ? 'ring-2 ring-indigo-500 shadow-md scale-[1.02] font-semibold'
+                  : 'hover:shadow-sm hover:scale-[1.01] opacity-90 hover:opacity-100'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider opacity-85">
+                  {card.label}
+                </span>
+                <Icon className="w-4 h-4 opacity-80 shrink-0" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                {card.count}
+              </div>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -161,7 +161,7 @@ export default function ContentEditor({
           type="button"
           onClick={handleResetToOriginal}
           disabled={!isDifferentFromOriginal}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-40 disabled:pointer-events-none"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-40 disabled:pointer-events-none outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           <span>Reset to Original</span>
@@ -172,7 +172,7 @@ export default function ContentEditor({
             <button
               type="button"
               onClick={onCancel}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
             >
               Cancel
             </button>
@@ -182,7 +182,7 @@ export default function ContentEditor({
             type="button"
             onClick={handleSave}
             disabled={!hasUnsavedChanges && !isDifferentFromOriginal}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold text-white transition-all shadow-xs ${
+            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold text-white transition-all shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
               savedSuccess
                 ? 'bg-emerald-600'
                 : 'bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98]'

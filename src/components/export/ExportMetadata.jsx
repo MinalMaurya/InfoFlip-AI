@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Cpu, CheckCircle2, ShieldCheck, Clock } from 'lucide-react';
+import { FileText, Type, Layers, ShieldCheck } from 'lucide-react';
 
 export default function ExportMetadata({ exportPackage }) {
   if (!exportPackage) return null;
@@ -16,26 +16,46 @@ export default function ExportMetadata({ exportPackage }) {
 
   return (
     <div className="p-5 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-3 text-xs">
-      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-        Deliverable Telemetry & Specifications
-      </h4>
+      <div className="flex items-center justify-between pb-1 border-b border-slate-100 dark:border-slate-800">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          Deliverable Telemetry & Specifications
+        </h4>
+        <span className="text-[11px] text-slate-400 dark:text-slate-500">
+          Verified metrics across approved channels
+        </span>
+      </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/80">
-          <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Total Words</span>
-          <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{totalWords}</span>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-850/80 border border-slate-100 dark:border-slate-800 space-y-1">
+          <div className="flex items-center justify-between text-slate-400">
+            <span className="text-[10px] uppercase tracking-wider font-semibold">Total Words</span>
+            <FileText className="w-3.5 h-3.5 text-indigo-500" />
+          </div>
+          <div className="text-lg font-extrabold text-slate-800 dark:text-slate-100">{totalWords}</div>
         </div>
-        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/80">
-          <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Total Characters</span>
-          <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{totalChars}</span>
+
+        <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-850/80 border border-slate-100 dark:border-slate-800 space-y-1">
+          <div className="flex items-center justify-between text-slate-400">
+            <span className="text-[10px] uppercase tracking-wider font-semibold">Total Characters</span>
+            <Type className="w-3.5 h-3.5 text-indigo-500" />
+          </div>
+          <div className="text-lg font-extrabold text-slate-800 dark:text-slate-100">{totalChars}</div>
         </div>
-        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/80">
-          <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Deliverable Count</span>
-          <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{approvedOutputs.length} channels</span>
+
+        <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-850/80 border border-slate-100 dark:border-slate-800 space-y-1">
+          <div className="flex items-center justify-between text-slate-400">
+            <span className="text-[10px] uppercase tracking-wider font-semibold">Deliverable Count</span>
+            <Layers className="w-3.5 h-3.5 text-indigo-500" />
+          </div>
+          <div className="text-lg font-extrabold text-slate-800 dark:text-slate-100">{approvedOutputs.length} channels</div>
         </div>
-        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/80">
-          <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Integrity Hash</span>
-          <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">VERIFIED</span>
+
+        <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-850/80 border border-slate-100 dark:border-slate-800 space-y-1">
+          <div className="flex items-center justify-between text-slate-400">
+            <span className="text-[10px] uppercase tracking-wider font-semibold">Integrity Hash</span>
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+          </div>
+          <div className="text-sm font-mono font-bold text-emerald-600 dark:text-emerald-400 pt-0.5">VERIFIED</div>
         </div>
       </div>
     </div>
