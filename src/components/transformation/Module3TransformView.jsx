@@ -53,7 +53,10 @@ import {
   CheckCircle2,
   Sparkles,
   RefreshCw,
-  ArrowRight
+  ArrowRight,
+  ArrowLeft,
+  Users,
+  Layers
 } from 'lucide-react';
 
 const ICON_MAP = {
@@ -344,23 +347,24 @@ export default function Module3TransformView({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 animate-fade-in">
       
-      {/* Page Header (Requirement 23) */}
+      {/* Page Heading & Header (Pass 3 UI Refinement) */}
       <div className="mb-6 sm:mb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900/50">
-                Module 3
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900/50">
+                TRANSFORM
               </span>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+              <span className="text-slate-300 dark:text-slate-700">•</span>
+              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
                 SIH 2026 Problem Statement ID 26154
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
-              Transform Content Into Multiple Outputs
+              Transform your content
             </h1>
-            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1">
-              Synthesize your understood source into tailored formats (LinkedIn, X/Twitter, Executive Briefs, Advisories, Infographics, Decks & Scripts).
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1 max-w-2xl leading-relaxed">
+              Turn the analyzed source into audience-ready content across multiple formats.
             </p>
           </div>
 
@@ -370,7 +374,7 @@ export default function Module3TransformView({
               <button
                 type="button"
                 onClick={() => setShowContractModal(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-indigo-700 dark:text-indigo-300 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-indigo-700 dark:text-indigo-300 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                 title="Inspect Module 3 Output Contract"
               >
                 <Code className="w-3.5 h-3.5" />
@@ -381,12 +385,27 @@ export default function Module3TransformView({
             <button
               type="button"
               onClick={handleResetFormats}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
               title="Reset configuration defaults"
             >
               <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
               <span>Reset</span>
             </button>
+
+            {transformationResult && onProceedToModule4 && (
+              <button
+                type="button"
+                onClick={() => onProceedToModule4({
+                  source: sourceData,
+                  analysis: analysisData,
+                  transformation: transformationResult
+                })}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+              >
+                <span>Continue to Communicate</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -453,229 +472,278 @@ export default function Module3TransformView({
         </div>
       ) : (
         /* MAIN TRANSFORMATION INTERFACE */
-        <div className="space-y-8">
+        <div className="space-y-6">
           
-          {/* Active Context Banner */}
-          <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex flex-wrap items-center justify-between gap-3 text-xs">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <span className="font-bold text-indigo-900 dark:text-indigo-200">
-                Grounding Source:
-              </span>
-              <span className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 font-semibold text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800">
-                {sourceData.fileName || `${sourceData.sourceType.toUpperCase()} Document`} ({sourceData.metadata?.wordCount || sourceData.extractedText?.split(/\s+/).length || 0} words)
-              </span>
-              <span className="text-slate-400">•</span>
-              <span className="text-slate-600 dark:text-slate-300">
-                Topic: <strong className="text-slate-800 dark:text-slate-100">{analysisData.overview?.mainTopic}</strong>
-              </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
-                {analysisData.keyFacts?.length || 0} Verified Facts
-              </span>
+          {/* Compact Source / Analysis Context Strip */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs text-slate-600 dark:text-slate-400">
+              <div className="flex items-center gap-1.5">
+                <span className="font-semibold text-slate-900 dark:text-slate-100">Topic:</span>
+                <span className="px-2.5 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 font-semibold text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/50">
+                  {analysisData.overview?.mainTopic || 'General Document'}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-semibold text-slate-900 dark:text-slate-100">Status:</span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                  {analysisData.keyFacts?.length || 0} Facts Verified
+                </span>
+              </div>
+              <div>
+                <span className="font-semibold text-slate-900 dark:text-slate-100">Language:</span>{' '}
+                <span>{analysisData.language?.name || 'English'}</span>
+              </div>
+              <div>
+                <span className="font-semibold text-slate-900 dark:text-slate-100">Audience:</span>{' '}
+                <span>{analysisData.audience?.detected?.[0] || 'General Public'}</span>
+              </div>
+              <div>
+                <span className="font-semibold text-slate-900 dark:text-slate-100">Source:</span>{' '}
+                <span>{sourceData.fileName || `${sourceData.sourceType.toUpperCase()} Document`} ({sourceData.metadata?.wordCount || sourceData.extractedText?.split(/\s+/).filter(Boolean).length || 0} words)</span>
+              </div>
             </div>
 
-            <button
-              type="button"
-              onClick={onBackToUnderstand}
-              className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
-            >
-              <span>View Full Module 2 Understanding</span>
-              <span>→</span>
-            </button>
+            <div className="flex items-center gap-2">
+              {onBackToUnderstand && (
+                <button
+                  type="button"
+                  onClick={onBackToUnderstand}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>View Analysis</span>
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Configuration & Output Format Selection Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
             {/* Left Column: User Configuration Panel (5 cols) */}
-            <div className="lg:col-span-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-2xs space-y-5">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
-                <Sliders className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
-                  User Transformation Parameters
-                </h3>
-              </div>
-
-              {/* 1. Target Audience */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                    Target Audience
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setShowCustomAudienceInput(!showCustomAudienceInput)}
-                    className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
-                  >
-                    {showCustomAudienceInput ? 'Choose from list' : '+ Custom Cohort'}
-                  </button>
+            <div className="lg:col-span-5 space-y-4">
+              
+              {/* Group 1: Audience, Tone & Language */}
+              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-2xs space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs">
+                      <Users className="w-3.5 h-3.5" />
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">
+                        Audience & Voice
+                      </h3>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                        Group 1 • Target cohort, tone & language
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
-                {showCustomAudienceInput ? (
-                  <input
-                    type="text"
-                    value={customAudience}
-                    onChange={(e) => setCustomAudience(e.target.value)}
-                    placeholder="Enter custom audience (e.g. Healthcare Staff)..."
-                    className="w-full p-2.5 rounded-xl border border-indigo-300 dark:border-indigo-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                ) : (
+                {/* 1. Target Audience */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                      Target Audience
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowCustomAudienceInput(!showCustomAudienceInput)}
+                      className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+                    >
+                      {showCustomAudienceInput ? 'Choose from list' : '+ Custom Cohort'}
+                    </button>
+                  </div>
+
+                  {showCustomAudienceInput ? (
+                    <input
+                      type="text"
+                      value={customAudience}
+                      onChange={(e) => setCustomAudience(e.target.value)}
+                      placeholder="Enter custom audience (e.g. Healthcare Staff)..."
+                      className="w-full p-2.5 rounded-xl border border-indigo-300 dark:border-indigo-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5">
+                      {TARGET_AUDIENCES.map((aud) => (
+                        <button
+                          key={aud}
+                          type="button"
+                          onClick={() => setTargetAudience(aud)}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+                            targetAudience === aud
+                              ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                          }`}
+                        >
+                          {aud}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* 2. Tone */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                    Tone of Voice
+                  </label>
                   <div className="flex flex-wrap gap-1.5">
-                    {TARGET_AUDIENCES.map((aud) => (
+                    {TRANSFORMATION_TONES.map((t) => (
                       <button
-                        key={aud}
+                        key={t}
                         type="button"
-                        onClick={() => setTargetAudience(aud)}
+                        onClick={() => setTone(t)}
                         className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
-                          targetAudience === aud
+                          tone === t
                             ? 'bg-indigo-600 text-white font-bold shadow-xs'
                             : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                         }`}
                       >
-                        {aud}
+                        {t}
                       </button>
                     ))}
                   </div>
-                )}
-              </div>
-
-              {/* 2. Tone */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                  Tone of Voice
-                </label>
-                <div className="flex flex-wrap gap-1.5">
-                  {TRANSFORMATION_TONES.map((t) => (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => setTone(t)}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
-                        tone === t
-                          ? 'bg-indigo-600 text-white font-bold shadow-xs'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                      }`}
-                    >
-                      {t}
-                    </button>
-                  ))}
                 </div>
-              </div>
 
-              {/* 3. Output Language */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                  Output Language
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {TRANSFORMATION_LANGUAGES.map((lang) => (
-                    <button
-                      key={lang.id}
-                      type="button"
-                      onClick={() => setLanguage(lang.id)}
-                      className={`p-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all ${
-                        language === lang.id
-                          ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 ring-2 ring-indigo-400/20'
-                          : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-                      }`}
-                    >
-                      <span>{lang.flag}</span>
-                      <span>{lang.label.split(' ')[0]}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* 4. Level of Detail (Concise ── Balanced ── Detailed) */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
+                {/* 3. Output Language */}
+                <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                    Level of Detail
+                    Output Language
                   </label>
-                  <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">
-                    {detailLevel}
-                  </span>
-                </div>
-                <div className="grid grid-cols-3 gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-                  {Object.values(DETAIL_LEVELS).map((lvl) => (
-                    <button
-                      key={lvl}
-                      type="button"
-                      onClick={() => setDetailLevel(lvl)}
-                      className={`py-1.5 rounded-lg text-xs font-bold transition-all ${
-                        detailLevel === lvl
-                          ? 'bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-300 shadow-2xs'
-                          : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-                      }`}
-                    >
-                      {lvl}
-                    </button>
-                  ))}
+                  <div className="grid grid-cols-3 gap-2">
+                    {TRANSFORMATION_LANGUAGES.map((lang) => (
+                      <button
+                        key={lang.id}
+                        type="button"
+                        onClick={() => setLanguage(lang.id)}
+                        className={`p-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all ${
+                          language === lang.id
+                            ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 ring-2 ring-indigo-400/20'
+                            : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+                        }`}
+                      >
+                        <span>{lang.flag}</span>
+                        <span>{lang.label.split(' ')[0]}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              {/* 5. Communication Objective & Style */}
-              <div className="grid grid-cols-2 gap-3 pt-1">
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
-                    Objective:
-                  </label>
-                  <select
-                    value={objective}
-                    onChange={(e) => setObjective(e.target.value)}
-                    className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none"
-                  >
-                    {COMMUNICATION_OBJECTIVES.map((obj) => (
-                      <option key={obj} value={obj}>{obj}</option>
-                    ))}
-                  </select>
+              {/* Group 2: Detail Level, Objective & Content Style */}
+              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-2xs space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs">
+                      <Sliders className="w-3.5 h-3.5" />
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">
+                        Detail & Structure
+                      </h3>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                        Group 2 • Depth level, objective & style
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
-                    Content Style:
-                  </label>
-                  <select
-                    value={contentStyle}
-                    onChange={(e) => setContentStyle(e.target.value)}
-                    className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none"
-                  >
-                    {CONTENT_STYLES.map((st) => (
-                      <option key={st} value={st}>{st}</option>
+                {/* 4. Level of Detail */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                      Level of Detail
+                    </label>
+                    <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                      {detailLevel}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                    {Object.values(DETAIL_LEVELS).map((lvl) => (
+                      <button
+                        key={lvl}
+                        type="button"
+                        onClick={() => setDetailLevel(lvl)}
+                        className={`py-1.5 rounded-lg text-xs font-bold transition-all ${
+                          detailLevel === lvl
+                            ? 'bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-300 shadow-2xs'
+                            : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                        }`}
+                      >
+                        {lvl}
+                      </button>
                     ))}
-                  </select>
+                  </div>
+                </div>
+
+                {/* 5. Communication Objective & Style */}
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                      Objective:
+                    </label>
+                    <select
+                      value={objective}
+                      onChange={(e) => setObjective(e.target.value)}
+                      className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      {COMMUNICATION_OBJECTIVES.map((obj) => (
+                        <option key={obj} value={obj}>{obj}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                      Content Style:
+                    </label>
+                    <select
+                      value={contentStyle}
+                      onChange={(e) => setContentStyle(e.target.value)}
+                      className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      {CONTENT_STYLES.map((st) => (
+                        <option key={st} value={st}>{st}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 
             </div>
 
             {/* Right Column: Output Format Selection Cards (7 cols) */}
-            <div className="lg:col-span-7 space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-2xs space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
                 <div>
                   <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                    <span>Select Transformation Outputs</span>
+                    <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                    <span>Select Output Formats</span>
                     <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
-                      {selectedFormats.length} of 7 Selected
+                      {selectedFormats.length} of {getAllOutputFormats().length} Selected
                     </span>
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     One source synthesized simultaneously into multiple audience-ready formats.
                   </p>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={handleSelectAllFormats}
-                    className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+                    className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline px-2 py-1"
                   >
                     Select All
                   </button>
-                  <span className="text-slate-300">•</span>
+                  <span className="text-slate-300 dark:text-slate-700">|</span>
                   <button
                     type="button"
                     onClick={handleResetFormats}
-                    className="text-xs font-semibold text-slate-500 hover:underline"
+                    className="text-xs font-semibold text-slate-500 hover:underline px-2 py-1"
                   >
                     Defaults
                   </button>
@@ -691,8 +759,17 @@ export default function Module3TransformView({
                   return (
                     <div
                       key={fmt.id}
+                      role="checkbox"
+                      aria-checked={isSelected}
+                      tabIndex={0}
                       onClick={() => handleToggleFormat(fmt.id)}
-                      className={`cursor-pointer p-4 rounded-2xl border transition-all select-none flex flex-col justify-between ${
+                      onKeyDown={(e) => {
+                        if (e.key === ' ' || e.key === 'Enter') {
+                          e.preventDefault();
+                          handleToggleFormat(fmt.id);
+                        }
+                      }}
+                      className={`cursor-pointer p-4 rounded-2xl border transition-all select-none flex flex-col justify-between outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                         isSelected
                           ? 'border-indigo-500 dark:border-indigo-500/80 bg-indigo-50/70 dark:bg-indigo-950/40 shadow-xs ring-2 ring-indigo-400/20'
                           : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50/50'
@@ -708,7 +785,7 @@ export default function Module3TransformView({
                             <Icon className="w-4 h-4" />
                           </div>
 
-                          <div className={`w-5 h-5 rounded-md border flex items-center justify-center ${
+                          <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
                             isSelected
                               ? 'bg-indigo-600 border-indigo-600 text-white'
                               : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
@@ -748,13 +825,22 @@ export default function Module3TransformView({
                 <button
                   type="button"
                   onClick={handleGenerate}
-                  disabled={isGenerating}
-                  className="w-full py-3.5 px-6 rounded-2xl font-bold text-sm text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-700 hover:to-purple-700 shadow-md shadow-indigo-300/40 dark:shadow-indigo-950 transition-all flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-50"
+                  disabled={isGenerating || selectedFormats.length === 0}
+                  className="w-full py-3.5 px-6 rounded-2xl font-bold text-sm text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-700 hover:to-purple-700 shadow-md shadow-indigo-300/40 dark:shadow-indigo-950 transition-all flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                 >
-                  <Wand2 className="w-4 h-4" />
-                  <span>
-                    ✦ Generate {selectedFormats.length} Output {selectedFormats.length > 1 ? 'Formats' : 'Format'}
-                  </span>
+                  {isGenerating ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Transforming Content...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="w-4 h-4" />
+                      <span>
+                        ✦ Generate {selectedFormats.length} {selectedFormats.length === 1 ? 'Output' : 'Outputs'} →
+                      </span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
