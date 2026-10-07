@@ -82,10 +82,21 @@ export default function TextInput({
   const [showDemoMenu, setShowDemoMenu] = useState(false);
   const [pasteSuccess, setPasteSuccess] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [showCleanupPreview, setShowCleanupPreview] = useState(false);
   const textareaRef = useRef(null);
 
   const metrics = calculateTextMetrics(value);
   const smartInsights = useMemo(() => deriveSmartInsights(value), [value]);
+  const cleanedText = useMemo(
+    () => value
+      .replace(/\r\n?/g, '\n')
+      .split('\n')
+      .map((line) => line.trimEnd())
+      .join('\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim(),
+    [value]
+  );
 
   const handleCopyInsights = async () => {
     if (!smartInsights) return;
@@ -158,6 +169,17 @@ export default function TextInput({
           >
             <Clipboard className="w-3.5 h-3.5 text-slate-500" />
             <span>{pasteSuccess ? 'Pasted!' : 'Paste'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowCleanupPreview((visible) => !visible)}
+            disabled={!value.trim()}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200 dark:border-slate-700 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Preview whitespace cleanup"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{showCleanupPreview ? 'Hide cleanup' : 'Tidy text'}</span>
           </button>
 
           {/* Load Sample Content Dropdown */}
@@ -246,6 +268,45 @@ export default function TextInput({
               : 'border-slate-200 dark:border-slate-800 focus:border-indigo-400 dark:focus:border-indigo-500'
           }`}
         />
+
+        {showCleanupPreview && (
+          <div className="mt-3 rounded-xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/60 dark:bg-indigo-950/20 p-3.5">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Text cleanup preview</p>
+                <p className="mt-1 text-[11px] text-slate-600 dark:text-slate-400">
+                  Trims trailing spaces, normalizes line endings, and reduces excess blank lines. Your source stays unchanged until applied.
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCleanupPreview(false)}
+                  className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={cleanedText === value}
+                  onClick={() => {
+                    onChange(cleanedText);
+                    setShowCleanupPreview(false);
+                  }}
+                  className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Apply cleanup
+                </button>
+              </div>
+            </div>
+            <pre className="mt-3 max-h-40 overflow-y-auto whitespace-pre-wrap break-words rounded-lg border border-indigo-100 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 p-3 text-xs leading-relaxed text-slate-700 dark:text-slate-300">
+              {cleanedText || 'Nothing to preview.'}
+            </pre>
+            {cleanedText === value && (
+              <p className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">This text is already tidy.</p>
+            )}
+          </div>
+        )}
 
         {error && (
           <div role="alert" className="mt-2.5 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-start gap-2 text-xs font-semibold text-rose-700 dark:text-rose-300 animate-fade-in">
