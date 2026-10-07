@@ -98,11 +98,11 @@ export default function CTASection({
           {variants.map((v, idx) => (
             <div
               key={idx}
-              className="p-4 rounded-xl border border-rose-100 dark:border-rose-950/60 bg-rose-50/40 dark:bg-rose-950/20 hover:border-rose-300 transition-all flex flex-col justify-between gap-3 group"
+              className="p-4 rounded-xl border border-rose-100 dark:border-slate-700 bg-rose-50/40 dark:bg-slate-800 hover:border-rose-300 dark:hover:border-rose-700 transition-all flex flex-col justify-between gap-3 group"
             >
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-300">
                     {v.type || `CTA ${idx + 1}`}
                   </span>
                   <button
@@ -114,12 +114,12 @@ export default function CTASection({
                     {copiedIndex === idx ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                 </div>
-                <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
+                <p className="text-xs text-slate-800 dark:text-slate-100 leading-relaxed font-semibold">
                   {v.text}
                 </p>
               </div>
 
-              <div className="flex items-center gap-1 text-[11px] text-rose-600 dark:text-rose-400 font-semibold group-hover:translate-x-0.5 transition-transform">
+              <div className="flex items-center gap-1 text-[11px] text-rose-600 dark:text-rose-300 font-semibold group-hover:translate-x-0.5 transition-transform">
                 <span>Deploy CTA</span>
                 <ArrowRight className="w-3 h-3" />
               </div>
@@ -127,7 +127,7 @@ export default function CTASection({
           ))}
         </div>
       ) : (
-        <div className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-line leading-relaxed font-sans">
+        <div className="text-sm text-slate-800 dark:text-slate-100 whitespace-pre-line leading-relaxed font-sans">
           {text}
         </div>
       )}
