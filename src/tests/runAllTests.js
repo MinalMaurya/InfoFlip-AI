@@ -52,8 +52,8 @@ if (geminiTests.status !== 0) {
 }
 
 console.log('====================================================');
-console.log('🎉 ALL SUITES PASSED: 609/609 TESTS PASSING (100%)');
-console.log('  - Module 1 (Input & Ingestion): 45/45');
+console.log('🎉 ALL SUITES PASSED: 621/621 TESTS PASSING (100%)');
+console.log('  - Module 1 (Input & Ingestion): 57/57');
 console.log('  - Module 2 (Understanding & Analysis): 63/63');
 console.log('  - Module 3 (Transformation & Output Engine): 103/103');
 console.log('  - Module 4 (Social & Communication Generator): 240/240');

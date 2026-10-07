@@ -3,6 +3,7 @@ import { normalizeText, calculateTextMetrics } from '../utils/textNormalization.
 import { extractContent } from '../utils/contentExtractor.js';
 import { processIngestion, validateInput, SAMPLE_PRESETS } from '../services/ingestionService.js';
 import { createSourcePayload, MAX_FILE_SIZE_BYTES } from '../types/source.js';
+import { deriveQuickInsights } from '../utils/quickInsights.js';
 
 let passed = 0;
 let failed = 0;
@@ -88,6 +89,33 @@ console.log('\n--- Suite 2: Text Normalization & Metrics ---');
   const marathiText = "हवामान विभागाने जोरदार पावसाचा इशारा दिला आहे. सर्व नागरिकांनी सुरक्षित ठिकाणी राहावे.";
   const marathiMetrics = calculateTextMetrics(marathiText);
   assert(marathiMetrics.detectedLanguage === 'Marathi', 'Correctly identifies Marathi text');
+}
+
+// TEST SUITE 2A: QUICK INSIGHTS
+console.log('\n--- Suite 2A: Quick Insights ---');
+{
+  assert(deriveQuickInsights('   ') === null, 'Returns no insights for blank text');
+
+  const englishInsights = deriveQuickInsights(
+    'Severe flooding is expected in coastal districts. Residents must avoid travel and follow official guidance.'
+  );
+  assert(englishInsights.focus === 'Weather safety response', 'Recognizes a weather-related topic');
+  assert(englishInsights.urgency === 'Potential urgency cue found', 'Marks explicit urgency terms as potential cues');
+  assert(englishInsights.actions.length === 1, 'Extracts an action sentence when action language is present');
+  assert(deriveQuickInsights('The team completed training on career documents.').focus === 'No clear topic match', 'Avoids topic matches inside unrelated words');
+  assert(deriveQuickInsights('Residents attended a community meeting.').actions.length === 0, 'Does not invent action phrases when none are found');
+
+  const negatedInsights = deriveQuickInsights('No emergency warning has been issued.');
+  assert(negatedInsights.urgency === 'No clear urgency cue found', 'Does not flag a negated emergency warning');
+
+  const nonEnglishInsights = deriveQuickInsights('मौसम विभाग ने भारी बारिश की चेतावनी जारी की है। नागरिकों को सतर्क रहने की सलाह दी जाती है।');
+  assert(nonEnglishInsights.headline.includes('चेतावनी'), 'Splits Hindi sentences at danda punctuation');
+  assert(!nonEnglishInsights.englishHeuristicsSupported, 'Discloses English-focused extraction for Devanagari input');
+  assert(nonEnglishInsights.keywords.length === 0 && nonEnglishInsights.actions.length === 0, 'Avoids misleading English keyword/action extraction for Hindi');
+
+  const longInsights = deriveQuickInsights(`Emergency alert. ${'Repeated source content. '.repeat(1000)}`);
+  assert(longInsights.isTruncated, 'Reports when insights are generated from a bounded source excerpt');
+  assert(longInsights.headline.length <= 111 && longInsights.summary.length <= 421, 'Bounds headline and summary lengths');
 }
 
 // TEST SUITE 3: DATA CONTRACT GENERATION

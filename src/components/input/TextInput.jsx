@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { 
   FileText, 
   Trash2, 
@@ -12,65 +12,7 @@ import {
 } from 'lucide-react';
 import { DEMO_SCENARIOS } from '../../data/demoScenarios';
 import { calculateTextMetrics } from '../../utils/textNormalization';
-
-const STOP_WORDS = new Set([
-  'about', 'after', 'again', 'against', 'around', 'been', 'before', 'being', 'below', 'between', 'both',
-  'could', 'from', 'into', 'just', 'more', 'most', 'must', 'over', 'same', 'should', 'that', 'their', 'them',
-  'there', 'these', 'they', 'this', 'those', 'through', 'under', 'very', 'with', 'your', 'have', 'will',
-  'been', 'where', 'when', 'what', 'which', 'while', 'would', 'upon', 'than', 'then', 'only', 'once', 'also',
-  'across', 'among', 'within', 'without', 'during', 'because', 'public', 'state', 'official', 'information',
-  'people', 'alert', 'notice', 'advisory', 'update', 'issued', 'following', 'according', 'report', 'reports',
-  'due', 'said', 'team', 'teams', 'today', 'tomorrow', 'safety', 'citizens', 'residents', 'department', 'authorities'
-]);
-
-function deriveSmartInsights(text) {
-  if (!text || !text.trim()) return null;
-
-  const normalized = text.replace(/\s+/g, ' ').trim();
-  const sentenceMatches = normalized.split(/(?<=[.!?])\s+/).filter(Boolean);
-  const words = normalized.toLowerCase().match(/[a-zA-ZÀ-ž0-9]+/g) || [];
-  const filteredWords = words.filter((word) => word.length > 3 && !STOP_WORDS.has(word));
-
-  const keywordCounts = {};
-  filteredWords.forEach((word) => {
-    keywordCounts[word] = (keywordCounts[word] || 0) + 1;
-  });
-
-  const keywords = Object.entries(keywordCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 6)
-    .map(([word]) => word);
-
-  const actionItems = sentenceMatches
-    .filter((sentence) => /must|should|required|avoid|ensure|report|call|dial|monitor|verify|immediately|follow|remain|activate/i.test(sentence))
-    .slice(0, 3)
-    .map((sentence) => sentence.replace(/\s+/g, ' ').trim());
-
-  const summary = sentenceMatches.slice(0, 2).join(' ').trim();
-  const headline = sentenceMatches[0]
-    ? sentenceMatches[0].replace(/\s+/g, ' ').slice(0, 110)
-    : 'Source content ready for transformation';
-  const urgency = /urgent|emergency|critical|alert|warning|warning|immediate|risk|attack|cyclone|flood|phishing/i.test(normalized)
-    ? 'High priority'
-    : 'Routine update';
-
-  const focus = /rain|flood|storm|cyclone|weather|disaster|warning/i.test(normalized)
-    ? 'Weather safety response'
-    : /health|fever|dengue|medical|clinic|hospital|virus|care/i.test(normalized)
-    ? 'Public health alert'
-    : /security|cyber|phishing|mfa|password|attack|breach/i.test(normalized)
-    ? 'Security compliance brief'
-    : 'Policy communication brief';
-
-  return {
-    headline,
-    summary: summary || normalized.slice(0, 220),
-    keywords,
-    actions: actionItems.length ? actionItems : ['Review the source, identify the main request, and prepare audience-specific messaging.'],
-    focus,
-    urgency
-  };
-}
+import { deriveQuickInsights } from '../../utils/quickInsights';
 
 export default function TextInput({
   value,
@@ -83,10 +25,24 @@ export default function TextInput({
   const [pasteSuccess, setPasteSuccess] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
   const [showCleanupPreview, setShowCleanupPreview] = useState(false);
+  const [insightsState, setInsightsState] = useState(null);
   const textareaRef = useRef(null);
 
   const metrics = calculateTextMetrics(value);
-  const smartInsights = useMemo(() => deriveSmartInsights(value), [value]);
+  useEffect(() => {
+    if (!value.trim()) {
+      setInsightsState(null);
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setInsightsState({ source: value, insights: deriveQuickInsights(value) });
+    }, 250);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [value]);
+  const smartInsights = insightsState?.source === value ? insightsState.insights : null;
+
   const cleanedText = useMemo(
     () => value
       .replace(/\r\n?/g, '\n')
@@ -108,8 +64,8 @@ export default function TextInput({
       '',
       `Summary: ${smartInsights.summary}`,
       '',
-      `Keywords: ${smartInsights.keywords.join(', ')}`,
-      `Actions: ${smartInsights.actions.join(' • ')}`
+      `Keywords: ${smartInsights.keywords.length ? smartInsights.keywords.join(', ') : 'No keyword cues detected'}`,
+      `Actions: ${smartInsights.actions.length ? smartInsights.actions.join(' • ') : 'No clear action phrases detected'}`
     ].join('\n');
 
     try {
@@ -346,7 +302,7 @@ export default function TextInput({
             <div className="flex items-center justify-between gap-3 mb-3">
               <div className="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-slate-200">
                 <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                <span>AI Quick Insights</span>
+                <span>Quick Insights</span>
               </div>
 
               <button
@@ -358,6 +314,12 @@ export default function TextInput({
                 <span>{copySuccess ? 'Copied!' : 'Copy summary'}</span>
               </button>
             </div>
+
+            <p className="mb-3 text-[11px] text-slate-500 dark:text-slate-400">
+              Rule-based estimates. Verify these cues before using them.
+              {!smartInsights.englishHeuristicsSupported && ' Keyword and action extraction is currently English-focused.'}
+              {smartInsights.isTruncated && ' Insights use only the first 20,000 characters.'}
+            </p>
 
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="rounded-xl bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 p-3">
@@ -384,6 +346,9 @@ export default function TextInput({
                       {keyword}
                     </span>
                   ))}
+                  {smartInsights.keywords.length === 0 && (
+                    <span className="text-xs text-slate-500 dark:text-slate-400">No supported keyword cues detected.</span>
+                  )}
                 </div>
               </div>
 
@@ -397,6 +362,9 @@ export default function TextInput({
                     </li>
                   ))}
                 </ul>
+                {smartInsights.actions.length === 0 && (
+                  <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">No clear action phrases detected.</p>
+                )}
               </div>
             </div>
           </div>
