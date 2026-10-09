@@ -23,6 +23,8 @@ import {
   Bot
 } from 'lucide-react';
 import { CHECK_STATUSES, APPROVAL_STATUSES } from '../../types/review.js';
+import ContentStatusBadge from '../common/ContentStatusBadge.jsx';
+import { CONTENT_STATUS_FLAGS } from '../../types/contentConfidence.js';
 import ReviewCheckList from './ReviewCheckList.jsx';
 import TraceabilityViewer from './TraceabilityViewer.jsx';
 import ContentEditor from './ContentEditor.jsx';
@@ -107,6 +109,28 @@ export default function ReviewOutputCard({
     }
   };
 
+  // Compute unresolved warnings across all 10 checks
+  const unresolvedWarnings = Object.entries(checks || {})
+    .filter(([_, c]) => c?.status === CHECK_STATUSES.WARNING || c?.status === CHECK_STATUSES.FAIL)
+    .map(([name, c]) => c?.message || c?.explanation || `${name} warning`);
+
+  // Determine non-interchangeable content status flag
+  const getContentStatus = () => {
+    if (approvalStatus === APPROVAL_STATUSES.APPROVED) {
+      return CONTENT_STATUS_FLAGS.APPROVED_FOR_EXPORT;
+    }
+    if (isEdited) {
+      return CONTENT_STATUS_FLAGS.HUMAN_REVIEWED;
+    }
+    if (unresolvedWarnings.length > 0 || overallStatus === CHECK_STATUSES.WARNING || overallStatus === CHECK_STATUSES.FAIL) {
+      return CONTENT_STATUS_FLAGS.POTENTIAL_ISSUE_DETECTED;
+    }
+    if (metadata.isFallback) {
+      return CONTENT_STATUS_FLAGS.RULE_BASED_FALLBACK;
+    }
+    return CONTENT_STATUS_FLAGS.AI_GENERATED;
+  };
+
   return (
     <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden flex flex-col transition-all">
       
@@ -146,7 +170,11 @@ export default function ReviewOutputCard({
         </div>
 
         {/* Status badges */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <ContentStatusBadge
+            status={getContentStatus()}
+            size="xs"
+          />
           {getOverallStatusBadge()}
         </div>
       </div>
@@ -236,7 +264,7 @@ export default function ReviewOutputCard({
                 <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Factual Audit</span>
                 <span className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1 mt-0.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  <span className="truncate">{checks.factualConsistency?.status === 'PASS' ? '100% Grounded' : checks.factualConsistency?.message || 'Checked'}</span>
+                  <span className="truncate">{checks.factualConsistency?.status === 'PASS' ? 'Source Grounded' : checks.factualConsistency?.message || 'Checked'}</span>
                 </span>
               </div>
               <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
@@ -295,6 +323,7 @@ export default function ReviewOutputCard({
           reviewerNotes={reviewerNotes}
           reviewedAt={reviewedAt}
           isEdited={isEdited}
+          unresolvedWarnings={unresolvedWarnings}
           onApprove={(notes) => onApprove(outputId, notes)}
           onReject={(notes) => onReject(outputId, notes)}
           onRegenerate={onRegenerate ? () => onRegenerate(outputId) : null}

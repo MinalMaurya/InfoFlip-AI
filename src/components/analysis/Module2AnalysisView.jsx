@@ -11,9 +11,11 @@ import SourceTraceabilityCard from './SourceTraceabilityCard.jsx';
 import ContextOverview from './ContextOverview.jsx';
 import AnalysisLoadingTracker from './AnalysisLoadingTracker.jsx';
 import AnalysisDataContractModal from './AnalysisDataContractModal.jsx';
+import GeneralDisclaimerNotice from '../common/GeneralDisclaimerNotice.jsx';
 import { analyzeContent, SAMPLE_ANALYSIS } from '../../services/analysisService.js';
 import { SAMPLE_PRESETS } from '../../services/ingestionService.js';
 import { getActiveAIProvider } from '../../services/ai/providerRegistry.js';
+import { getQualitativeConfidenceLabel } from '../../types/contentConfidence.js';
 import { createSourcePayload } from '../../types/source.js';
 import { 
   ArrowRight, 
@@ -251,7 +253,7 @@ export default function Module2AnalysisView({
           
           {/* Analysis Status Bar (Section 3.2) */}
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-wrap items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2.5">
+            <div className="flex flex-wrap items-center gap-2.5">
               <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
                 <CheckCircle2 className="w-4 h-4" />
               </div>
@@ -259,8 +261,14 @@ export default function Module2AnalysisView({
                 Analysis completed
               </span>
               {typeof analysis.confidence?.overall === 'number' && (
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                  {Math.round(analysis.confidence.overall * 100)}% Confidence
+                <span 
+                  title={getQualitativeConfidenceLabel(analysis.confidence.overall).note}
+                  className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 flex items-center gap-1"
+                >
+                  <span>{getQualitativeConfidenceLabel(analysis.confidence.overall).label}</span>
+                  <span className="text-[10px] text-indigo-500 dark:text-indigo-400 font-normal">
+                    (AI Probability; not verified)
+                  </span>
                 </span>
               )}
             </div>
@@ -271,6 +279,18 @@ export default function Module2AnalysisView({
               </span>
             </div>
           </div>
+
+          {/* General Transparency Notice */}
+          <GeneralDisclaimerNotice 
+            compact 
+            isEmergency={
+              analysis.overview?.category === 'Meteorological / Disaster Management' ||
+              analysis.urgency?.level === 'high' ||
+              /cyclone|flood|storm|rainfall|weather warning|emergency|evacuat/i.test(
+                `${analysis.overview?.title || ''} ${analysis.overview?.mainTopic || ''} ${analysis.overview?.summary || ''}`
+              )
+            }
+          />
 
           {/* Section 1: Summary — Strongest Primary Hero Card (Section 3.3) */}
           <OverviewCard 
@@ -313,6 +333,7 @@ export default function Module2AnalysisView({
             />
             <ClaimsCard 
               claims={analysis.claims} 
+              sourceText={sourceData?.extractedText || sourceData?.rawText || ''}
             />
           </div>
 
@@ -333,12 +354,12 @@ export default function Module2AnalysisView({
             <div>
               <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <span>Ready for Content Transformation (Module 3)</span>
-                <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
-                  Verified
+                <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+                  Context Analyzed
                 </span>
               </h4>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Pass structured source context and verified facts to Module 3 for multi-format synthesis.
+                Pass structured source context and extracted facts to Module 3 for multi-format synthesis.
               </p>
             </div>
 

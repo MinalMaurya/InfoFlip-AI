@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, ShieldCheck, AlertCircle } from 'lucide-react';
+import { CheckCircle2, FileText, AlertCircle } from 'lucide-react';
 
 export default function KeyFactsCard({ keyFacts }) {
   if (!keyFacts || keyFacts.length === 0) return null;
@@ -29,14 +29,14 @@ export default function KeyFactsCard({ keyFacts }) {
               Grounded Key Facts ({keyFacts.length})
             </h3>
             <span className="text-[10px] text-slate-400 dark:text-slate-500">
-              Zero-hallucination verified extractions
+              Extracted from provided source
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span>Source Verified</span>
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+          <FileText className="w-3.5 h-3.5" />
+          <span>Extracted from source</span>
         </div>
       </div>
 

@@ -3,6 +3,7 @@ import ReviewSummary from '../components/review/ReviewSummary.jsx';
 import ReviewOutputCard from '../components/review/ReviewOutputCard.jsx';
 import ReviewProgressTracker from '../components/review/ReviewProgressTracker.jsx';
 import ReviewDataContractModal from '../components/review/ReviewDataContractModal.jsx';
+import GeneralDisclaimerNotice from '../components/common/GeneralDisclaimerNotice.jsx';
 
 import { 
   reviewCommunicationOutputs, 
@@ -323,6 +324,9 @@ export default function Module5ReviewView({
           )}
         </div>
       </div>
+
+      {/* General Transparency Notice */}
+      <GeneralDisclaimerNotice compact />
 
       {/* Upstream Transformation & Communication Context Strip */}
       <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-wrap items-center justify-between gap-4">

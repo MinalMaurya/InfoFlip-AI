@@ -642,20 +642,25 @@ export class GeminiAIProvider extends AIProviderInterface {
 
     try {
       const prompt = `You are the Content Understanding Engine of InfoFlip-AI.
+CRITICAL RULES:
+1. Grounding: Extract facts, numbers, dates, and entities strictly present in the source text. Do NOT invent people, places, or official announcements.
+2. Safety Instructions: NEVER strengthen safety directives beyond what the source states (e.g. do NOT turn "avoid unnecessary travel" into "stay indoors" or mandatory evacuation orders).
+3. Verification: Source extraction is NOT independent verification. Claims remain unverified unless authoritative external proof is provided.
+
 Analyze the following source content and output strictly valid JSON matching this schema:
 {
   "overview": { "title": string, "summary": string, "mainTopic": string, "category": string, "contentType": string },
   "intent": { "primary": string, "secondary": string[] },
   "language": { "name": string, "code": string },
   "tone": { "primary": string, "secondary": string[] },
-  "audience": { "detected": string[], "confidence": number, "evidenceLevel": "Detected"|"Inferred" },
+  "audience": { "detected": string[], "confidence": number, "evidenceLevel": "Detected"|"Inferred", "explicitSignals": string[], "inferredSignals": string[] },
   "keyFacts": [ { "fact": string, "importance": "high"|"medium"|"low", "evidenceLevel": "Detected" } ],
   "entities": { "people": string[], "organizations": string[], "locations": string[], "products": string[], "technologies": string[], "dates": string[], "other": string[] },
   "topics": string[],
   "keywords": { "primary": string[], "secondary": string[] },
   "importantDates": [ { "date": string, "context": string, "isDeadline": boolean } ],
   "importantNumbers": [ { "value": string, "label": string, "context": string } ],
-  "claims": [ { "statement": string, "type": "source-stated"|"ai-inferred" } ],
+  "claims": [ { "claimText": string, "sourceExcerpt": string|null, "origin": "source-extracted"|"AI-inferred", "riskLevel": "high"|"medium"|"low", "verificationStatus": "verification required"|"not checked" } ],
   "urgency": { "level": "high"|"medium"|"low"|"not_detected", "reasons": string[] },
   "confidence": { "overall": number, "topicConfidence": number, "intentConfidence": number, "audienceConfidence": number }
 }

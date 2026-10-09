@@ -14,10 +14,98 @@ import {
   createTransformationRequest, 
   createTransformationResult,
   createOutputItem,
-  OUTPUT_STATUSES
+  OUTPUT_STATUSES,
+  OUTPUT_FORMAT_IDS
 } from '../../types/transformation.js';
 import { validateOutput } from './transformationValidator.js';
 import { getOutputFormatById } from './outputFormatRegistry.js';
+import { 
+  sanitizeLinkedInPost, 
+  isEmergencyContent 
+} from '../communication/linkedInPostBuilder.js';
+
+/**
+ * Normalizes and post-processes transformation output items.
+ * Ensures consistent quality across AI and deterministic providers:
+ * - Truthful metrics and findings labeling ("Key figures from the source")
+ * - Sanitization of emergency content (no corporate jargon or engagement bait)
+ * - Preservation of user manual edits (never overwrites if isEdited is true)
+ * 
+ * @param {object} item 
+ * @param {object} request 
+ * @returns {object}
+ */
+export function normalizeTransformationOutputItem(item, request) {
+  if (!item || !item.content) return item;
+
+  // Preserve user edits
+  if (item.metadata?.isEdited) {
+    return item;
+  }
+
+  const analysis = request?.analysis || {};
+  const config = request?.configuration || {};
+  const source = request?.source || {};
+  const lang = config.language || 'English';
+  const isVerified = Boolean(
+    analysis.verification?.isVerified || 
+    analysis.verification?.status === 'verified' ||
+    analysis.claims?.some(c => c.isVerified) ||
+    source.isVerified ||
+    item.metadata?.isVerified
+  );
+
+  const isEmergency = isEmergencyContent({
+    analysis,
+    config,
+    sourceContent: source,
+    mainTopic: analysis.overview?.mainTopic || '',
+    summary: analysis.overview?.summary || ''
+  });
+
+  let updatedItem = { ...item };
+
+  if (item.format === OUTPUT_FORMAT_IDS.LINKEDIN) {
+    if (typeof item.content === 'object' && item.content.text) {
+      const sanitizedText = sanitizeLinkedInPost(item.content.text, {
+        isEmergency,
+        lang,
+        mainTopic: analysis.overview?.mainTopic || '',
+        analysis,
+        rawText: source.extractedText || source.rawText || '',
+        isVerified
+      });
+      updatedItem = {
+        ...updatedItem,
+        content: {
+          ...item.content,
+          text: sanitizedText
+        }
+      };
+    }
+  }
+
+  // Truthful labeling across any format if not verified
+  if (!isVerified && typeof updatedItem.content === 'object') {
+    let jsonStr = JSON.stringify(updatedItem.content);
+    if (/Verified Key Metrics|Verified Facts|VERIFIED FINDINGS/i.test(jsonStr)) {
+      jsonStr = jsonStr
+        .replace(/Verified Key Metrics/g, 'Key figures from the source')
+        .replace(/Verified Facts/g, 'Source-Grounded Facts')
+        .replace(/VERIFIED FINDINGS/g, 'KEY FINDINGS');
+      try {
+        updatedItem = {
+          ...updatedItem,
+          content: JSON.parse(jsonStr)
+        };
+      } catch (e) {
+        // preserve
+      }
+    }
+  }
+
+  return updatedItem;
+}
 
 /**
  * Validates a transformation request before dispatch
@@ -159,19 +247,20 @@ export async function transformContent(rawRequest, options = {}) {
       continue;
     }
 
-    const check = validateOutput(item.format, item.content);
+    const normalizedItem = normalizeTransformationOutputItem(item, structuredRequest);
+    const check = validateOutput(normalizedItem.format, normalizedItem.content);
     if (!check.isValid) {
       validatedOutputs.push({
-        ...item,
+        ...normalizedItem,
         status: OUTPUT_STATUSES.NEEDS_REGENERATION,
         metadata: {
-          ...item.metadata,
+          ...normalizedItem.metadata,
           errorReason: check.error || 'Output failed structural validation.'
         }
       });
     } else {
       validatedOutputs.push({
-        ...item,
+        ...normalizedItem,
         status: OUTPUT_STATUSES.GENERATED
       });
     }
@@ -218,13 +307,14 @@ export async function regenerateSingleOutput(baseRequest, outputId, formatId, op
     throw new Error(`Failed to regenerate output for format ${formatId}.`);
   }
 
-  const check = validateOutput(formatId, regeneratedItem.content);
+  const normalizedItem = normalizeTransformationOutputItem(regeneratedItem, singleRequest);
+  const check = validateOutput(formatId, normalizedItem.content);
   return {
-    ...regeneratedItem,
-    outputId: outputId || regeneratedItem.outputId,
+    ...normalizedItem,
+    outputId: outputId || normalizedItem.outputId,
     status: check.isValid ? OUTPUT_STATUSES.GENERATED : OUTPUT_STATUSES.NEEDS_REGENERATION,
     metadata: {
-      ...regeneratedItem.metadata,
+      ...normalizedItem.metadata,
       generatedAt: new Date().toISOString(),
       errorReason: check.isValid ? null : check.error
     }

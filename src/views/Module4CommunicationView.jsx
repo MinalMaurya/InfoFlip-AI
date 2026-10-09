@@ -25,6 +25,9 @@ import {
   COMMUNICATION_CHANNEL_IDS, 
   ALL_COMMUNICATION_CHANNELS 
 } from '../types/communication.js';
+import ContentStatusBadge from '../components/common/ContentStatusBadge.jsx';
+import GeneralDisclaimerNotice from '../components/common/GeneralDisclaimerNotice.jsx';
+import { CONTENT_STATUS_FLAGS } from '../types/contentConfidence.js';
 
 import { 
   Share2, 
@@ -625,15 +628,16 @@ export default function Module4CommunicationView({
                   {activeChannelDef?.name || activeOutputItem.channelId}
                 </span>
 
-                {/* Provider Badge */}
-                <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                  activeOutputItem.metadata?.isFallback
-                    ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
-                    : 'bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
-                }`}>
-                  Provider: {activeOutputItem.metadata?.provider}
-                  {activeOutputItem.metadata?.fallbackReason && ` (${activeOutputItem.metadata.fallbackReason})`}
-                </span>
+                {/* Content Status Flag */}
+                <ContentStatusBadge
+                  status={
+                    activeOutputItem.metadata?.isFallback
+                      ? CONTENT_STATUS_FLAGS.RULE_BASED_FALLBACK
+                      : CONTENT_STATUS_FLAGS.AI_GENERATED
+                  }
+                  sublabel={activeOutputItem.metadata?.provider}
+                  size="xs"
+                />
 
                 {/* Character & Word count metrics */}
                 <span className="text-xs text-slate-500 dark:text-slate-400">
@@ -700,6 +704,9 @@ export default function Module4CommunicationView({
               </div>
             </div>
           )}
+
+          {/* General Transparency Disclaimer */}
+          <GeneralDisclaimerNotice compact />
 
           {/* Warnings Callout if output has warnings */}
           {activeOutputItem?.validation?.warnings?.length > 0 && (

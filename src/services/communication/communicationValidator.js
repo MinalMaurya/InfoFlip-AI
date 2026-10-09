@@ -171,6 +171,34 @@ export function validateCommunicationOutput(channelId, item) {
     }
   }
 
+  if (channelId === COMMUNICATION_CHANNEL_IDS.LINKEDIN) {
+    if (charCount > 3000) {
+      warnings.push(`LinkedIn content exceeds recommended 3000-character limit (${charCount} characters).`);
+    }
+
+    // Check repetitive headings
+    const lowerContent = item.content.toLowerCase();
+    if (lowerContent.includes('key development') && lowerContent.includes('strategic update')) {
+      warnings.push('LinkedIn post contains repetitive headings ("Key Development" and "Strategic Update").');
+    }
+
+    // Check generic engagement questions on emergency content
+    const isEmerg = item.structuredData?.isEmergency || 
+      /urgent|emergency|cyclon|weather alert|flood|disaster|public safety/i.test(item.content);
+    if (isEmerg && /(?:what are your thoughts on this|how is your organization addressing this|join the conversation below)/i.test(item.content)) {
+      warnings.push('Emergency LinkedIn post contains generic engagement questions instead of direct safety instructions.');
+    }
+
+    // Check hashtag quality
+    const tags = item.content.match(/#[^\s#]+/g) || [];
+    if (tags.some(t => t.length > 25)) {
+      warnings.push('LinkedIn post contains excessively long hashtags (>25 characters). Prefer readable hashtags.');
+    }
+    if (tags.length > 0 && tags.length < 3) {
+      warnings.push('LinkedIn post contains fewer than recommended 3 hashtags.');
+    }
+  }
+
   return {
     isValid: errors.length === 0,
     errors,

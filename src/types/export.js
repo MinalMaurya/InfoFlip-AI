@@ -67,6 +67,12 @@ export function createExportItem(item = {}, lineage = {}) {
     reviewedAt,
     reviewerRemarks,
 
+    // Verification & Transparency Telemetry
+    contentStatusFlag: item.metadata?.contentStatusFlag || 'Approved for export',
+    verificationStatus: item.verificationStatus || (item.metadata?.isIndependentlyVerified ? 'Independently verified' : 'Source not independently verified'),
+    hasHumanOverride: Boolean(reviewerInfo.hasHumanOverride),
+    unresolvedWarnings: Array.isArray(reviewerInfo.unresolvedWarnings) ? reviewerInfo.unresolvedWarnings : [],
+
     // Metrics
     wordCount,
     characterCount

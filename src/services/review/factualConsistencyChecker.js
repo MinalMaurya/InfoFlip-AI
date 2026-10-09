@@ -78,7 +78,7 @@ export function checkFactualConsistency(outputItem, context = {}) {
     };
   }
 
-  const passMsg = 'All identified dates, numbers, and facts are verified against source records.';
+  const passMsg = 'All identified dates, numbers, and facts are grounded in provided source records.';
   return {
     status: CHECK_STATUSES.PASS,
     message: passMsg,

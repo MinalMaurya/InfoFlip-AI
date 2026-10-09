@@ -8,6 +8,9 @@ import AdvisoryPreview from './previews/AdvisoryPreview.jsx';
 import InfographicPreview from './previews/InfographicPreview.jsx';
 import PresentationPreview from './previews/PresentationPreview.jsx';
 import VideoScriptPreview from './previews/VideoScriptPreview.jsx';
+import ContentStatusBadge from '../common/ContentStatusBadge.jsx';
+import GeneralDisclaimerNotice from '../common/GeneralDisclaimerNotice.jsx';
+import { CONTENT_STATUS_FLAGS } from '../../types/contentConfidence.js';
 
 import { 
   transformContent, 
@@ -918,21 +921,16 @@ export default function Module3TransformView({
                   </div>
                 </div>
 
-                {/* Engine Provenance Badge */}
+                {/* Content Status Flag & Actions */}
                 <div className="flex items-center gap-2">
-                  <span className={`px-2.5 py-1 rounded-xl text-xs font-bold border flex items-center gap-1.5 ${
-                    transformationResult.outputs?.[0]?.metadata?.isFallback
-                      ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-900'
-                      : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-900'
-                  }`}>
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>Provider: {transformationResult.outputs?.[0]?.metadata?.provider}</span>
-                    {transformationResult.outputs?.[0]?.metadata?.reason && (
-                      <span className="text-[11px] font-medium pl-1.5 border-l border-amber-300 dark:border-amber-700">
-                        Reason: {transformationResult.outputs[0].metadata.reason}
-                      </span>
-                    )}
-                  </span>
+                  <ContentStatusBadge
+                    status={
+                      transformationResult.outputs?.[0]?.metadata?.isFallback
+                        ? CONTENT_STATUS_FLAGS.RULE_BASED_FALLBACK
+                        : CONTENT_STATUS_FLAGS.AI_GENERATED
+                    }
+                    sublabel={`Provider: ${transformationResult.outputs?.[0]?.metadata?.provider || 'DeterministicFallback'}`}
+                  />
 
                   <button
                     type="button"
@@ -944,6 +942,9 @@ export default function Module3TransformView({
                   </button>
                 </div>
               </div>
+
+              {/* General Transparency Notice */}
+              <GeneralDisclaimerNotice compact />
 
               {/* Format Tabs Bar (Requirement 17) */}
               <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200 dark:border-slate-800">

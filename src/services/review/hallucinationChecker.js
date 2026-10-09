@@ -27,10 +27,22 @@ export function checkHallucinationRisk(outputItem, context = {}) {
     }
   }
 
-  // Check 2: Absolute statistical certainty claims not found in source
+  // Check 2: Absolute statistical certainty or false verification claims
   const certaintyPhrases = [
     'guaranteed to',
     '100% guaranteed',
+    '100% accurate',
+    '100% verified',
+    'guaranteed correct',
+    'verified key metrics',
+    'verified facts',
+    'officially confirmed',
+    'verified data',
+    'real-time official feed',
+    'official source telemetry',
+    'zero-hallucination',
+    'zero hallucination',
+    'source verified',
     'without exception',
     'completely demolished',
     'every single resident',
@@ -40,7 +52,7 @@ export function checkHallucinationRisk(outputItem, context = {}) {
 
   for (const phrase of certaintyPhrases) {
     if (text.toLowerCase().includes(phrase) && !rawSource.includes(phrase)) {
-      unsupportedSignals.push(`Unsupported absolute claim: "${phrase}"`);
+      unsupportedSignals.push(`Unsupported absolute or unverified certainty claim: "${phrase}"`);
     }
   }
 

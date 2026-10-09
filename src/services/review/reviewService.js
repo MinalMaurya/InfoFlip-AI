@@ -15,6 +15,10 @@ import {
   CHECK_STATUSES, 
   APPROVAL_STATUSES 
 } from '../../types/review.js';
+import { 
+  CONTENT_STATUS_FLAGS, 
+  CLAIM_VERIFICATION_STATUSES 
+} from '../../types/contentConfidence.js';
 import { evaluateOutputItem } from './reviewRules.js';
 import { validateReviewInput, validateExportPackage } from './reviewValidator.js';
 import { regenerateSingleChannel } from '../communication/communicationService.js';
@@ -65,6 +69,9 @@ export async function reviewCommunicationOutputs(payload, options = {}) {
   for (const item of commOutputs) {
     const evalResult = evaluateOutputItem(item, context);
 
+    const isFallback = Boolean(item.metadata?.isFallback);
+    const isIndependentlyVerified = Boolean(item.metadata?.isIndependentlyVerified);
+
     reviewedOutputs.push(
       createReviewItem({
         outputId: item.outputId,
@@ -77,7 +84,16 @@ export async function reviewCommunicationOutputs(payload, options = {}) {
         approvalStatus: APPROVAL_STATUSES.PENDING_REVIEW,
         checks: evalResult.checks,
         summary: evalResult.summary,
-        metadata: item.metadata || {},
+        metadata: {
+          ...item.metadata,
+          contentStatusFlag: isFallback 
+            ? CONTENT_STATUS_FLAGS.RULE_BASED_FALLBACK 
+            : CONTENT_STATUS_FLAGS.AI_GENERATED,
+          verificationStatus: isIndependentlyVerified 
+            ? CLAIM_VERIFICATION_STATUSES.INDEPENDENTLY_VERIFIED 
+            : 'Source not independently verified',
+          isIndependentlyVerified
+        },
         sourceTraceability: item.sourceTraceability || [],
         reviewedAt: new Date().toISOString(),
         requiresHumanReview: true
@@ -184,7 +200,9 @@ function editSingleItem(reviewItem, newContent, context = {}) {
       ...reviewItem.metadata,
       characterCount: updatedContent.length,
       wordCount: updatedContent.split(/\s+/).filter(Boolean).length,
-      isEdited: true
+      isEdited: true,
+      contentStatusFlag: CONTENT_STATUS_FLAGS.HUMAN_REVIEWED,
+      isIndependentlyVerified: Boolean(reviewItem.metadata?.isIndependentlyVerified)
     }
   };
 
@@ -225,19 +243,49 @@ export function approveOutput(target, arg2, arg3) {
 
 function approveSingleItem(reviewItem, notes = '') {
   const noteStr = typeof notes === 'string' ? notes : (notes?.notes || notes?.reviewerNotes || '');
+  const hasWarnings = (reviewItem.summary?.warnings || 0) > 0 || reviewItem.overallStatus === CHECK_STATUSES.WARNING;
+
+  // Collect unresolved warnings
+  const unresolvedWarnings = [];
+  if (reviewItem.checks) {
+    for (const [key, check] of Object.entries(reviewItem.checks)) {
+      if (check?.status === CHECK_STATUSES.WARNING || check?.status === CHECK_STATUSES.FAIL) {
+        unresolvedWarnings.push(check.message || check.explanation || `${key} warning`);
+      }
+    }
+  }
+
+  // Preserve existing verification metadata - human override NEVER changes unverified to independently verified
+  const isIndependentlyVerified = Boolean(reviewItem.metadata?.isIndependentlyVerified);
+
   return {
     ...reviewItem,
     approvalStatus: APPROVAL_STATUSES.APPROVED,
     requiresHumanReview: false,
     reviewerNotes: noteStr || reviewItem.reviewerNotes || '',
     reviewedAt: new Date().toISOString(),
+    metadata: {
+      ...reviewItem.metadata,
+      contentStatusFlag: CONTENT_STATUS_FLAGS.APPROVED_FOR_EXPORT,
+      humanReviewed: true,
+      // CRITICAL: human approval does NOT turn an unverified claim into independently verified!
+      isIndependentlyVerified,
+      verificationStatus: isIndependentlyVerified 
+        ? CLAIM_VERIFICATION_STATUSES.INDEPENDENTLY_VERIFIED 
+        : 'Source not independently verified'
+    },
     approvalInfo: {
       approvedBy: 'Human Reviewer',
       approvedAt: new Date().toISOString(),
       rejectedBy: null,
       rejectedAt: null,
       rejectionReason: null,
-      hasHumanOverride: reviewItem.overallStatus !== CHECK_STATUSES.PASS
+      hasHumanOverride: reviewItem.overallStatus !== CHECK_STATUSES.PASS,
+      unresolvedWarnings,
+      isIndependentlyVerified,
+      verificationNote: hasWarnings
+        ? 'Approved with human override acknowledging unresolved warnings. Factual claims not independently verified.'
+        : 'Human reviewed and approved for export.'
     }
   };
 }
@@ -282,6 +330,10 @@ function rejectSingleItem(reviewItem, reason = 'Quality standards not met') {
     requiresHumanReview: true,
     reviewerNotes: reasonStr,
     reviewedAt: new Date().toISOString(),
+    metadata: {
+      ...reviewItem.metadata,
+      contentStatusFlag: CONTENT_STATUS_FLAGS.POTENTIAL_ISSUE_DETECTED
+    },
     approvalInfo: {
       ...reviewItem.approvalInfo,
       rejectedBy: 'Human Reviewer',

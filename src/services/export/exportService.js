@@ -191,6 +191,8 @@ export function generateTXT(pkg) {
     sections.push(subDivider);
     sections.push(`[${index + 1}] ${item.channelId.toUpperCase()}  --  ${item.title}`);
     sections.push(`Status:        ${item.status}`);
+    sections.push(`Verification:  ${item.verificationStatus || 'Source not independently verified'}`);
+    sections.push(`Content Flag:  ${item.contentStatusFlag || 'Approved for export'}`);
     sections.push(`Reviewer:      ${item.reviewer} (${new Date(item.reviewedAt).toLocaleString()})`);
     sections.push(`Telemetry:     ${item.wordCount} words | ${item.characterCount} characters`);
     sections.push(`Remarks:       ${item.reviewerRemarks}`);
@@ -204,13 +206,13 @@ export function generateTXT(pkg) {
   sections.push(divider);
   sections.push('AUDIT TRAIL & LINEAGE VERIFICATION');
   sections.push(divider);
-  sections.push('1. Ingestion (Module 1):        Source Verified & Ingested [' + sourceId + ']');
+  sections.push('1. Ingestion (Module 1):        Source Ingested & Normalized [' + sourceId + ']');
   sections.push('2. Understanding (Module 2):    Context & Fact Extraction [' + analysisId + ']');
   sections.push('3. Transformation (Module 3):   Multi-Format Synthesis [' + transformationId + ']');
   sections.push('4. Communication (Module 4):    Channel Adaptation Generated [' + communicationId + ']');
-  sections.push('5. Quality Assurance (Mod 5):   10-Dimension Audit Passed');
-  sections.push('6. Human Approval (Mod 5):      Certified by Human-in-the-Loop Reviewer');
-  sections.push('7. Final Export (Module 6):     Delivered as Certified Package [' + exportId + ']');
+  sections.push('5. Quality Assurance (Mod 5):   10-Dimension Audit Evaluated');
+  sections.push('6. Human Approval (Mod 5):      Human Review Completed & Approved for Export');
+  sections.push('7. Final Export (Module 6):     Delivered as Approved Package [' + exportId + ']');
   sections.push(divider);
 
   return sections.join('\n');
@@ -369,6 +371,9 @@ export function createExportManifest(pkg) {
       title: item.title,
       wordCount: item.wordCount,
       characterCount: item.characterCount,
+      verificationStatus: item.verificationStatus,
+      contentStatusFlag: item.contentStatusFlag,
+      hasHumanOverride: item.hasHumanOverride,
       reviewer: item.reviewer,
       reviewedAt: item.reviewedAt
     })),

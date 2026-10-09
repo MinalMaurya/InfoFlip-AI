@@ -17,6 +17,8 @@ import {
   UserCheck
 } from 'lucide-react';
 import { copyItem, downloadFile, generateFileName } from '../../services/export/exportService.js';
+import ContentStatusBadge from '../common/ContentStatusBadge.jsx';
+import { CONTENT_STATUS_FLAGS } from '../../types/contentConfidence.js';
 
 const CHANNEL_ICONS = {
   linkedin: Share2,
@@ -72,10 +74,14 @@ export default function ExportAssetCard({ item, exportPackage }) {
             <ChannelIcon className="w-5 h-5" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
                 {title || channelId.toUpperCase()}
               </h3>
+              <ContentStatusBadge
+                status={item.contentStatusFlag || CONTENT_STATUS_FLAGS.APPROVED_FOR_EXPORT}
+                size="xs"
+              />
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
                 <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                 {status || 'APPROVED'}
@@ -129,17 +135,21 @@ export default function ExportAssetCard({ item, exportPackage }) {
         </div>
 
         {/* Human Review Audit Lineage Bar */}
-        <div className="p-2.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 flex flex-wrap items-center justify-between gap-2 text-[11px] text-emerald-900 dark:text-emerald-300">
-          <div className="flex items-center gap-2">
-            <UserCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+        <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-700 dark:text-slate-300">
+          <div className="flex flex-wrap items-center gap-2">
+            <UserCheck className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
             <span className="font-semibold">{reviewer}</span>
-            <span className="text-emerald-600/70 dark:text-emerald-400/70">&bull;</span>
-            <span className="text-slate-500 dark:text-slate-400 font-mono text-[10px]">
+            <span className="text-slate-400">&bull;</span>
+            <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400">
               {new Date(reviewedAt).toLocaleString()}
+            </span>
+            <span className="text-slate-400">&bull;</span>
+            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
+              {item.verificationStatus || 'Source not independently verified'}
             </span>
           </div>
           {reviewerRemarks && (
-            <div className="italic text-slate-600 dark:text-slate-400 text-[11px]">
+            <div className="italic text-slate-500 dark:text-slate-400 text-[10px]">
               "{reviewerRemarks}"
             </div>
           )}

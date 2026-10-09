@@ -5,6 +5,8 @@
  * Module 2: AI Content Understanding & Analysis
  */
 
+import { createStructuredClaim } from './contentConfidence.js';
+
 export const ANALYSIS_CATEGORIES = [
   'Technology',
   'Healthcare',
@@ -114,7 +116,9 @@ export function createAnalysisPayload({
         ? audience.detected 
         : ['General Public'],
       confidence: typeof audience.confidence === 'number' ? audience.confidence : 0.85,
-      evidenceLevel: audience.evidenceLevel || EVIDENCE_LEVELS.INFERRED
+      evidenceLevel: audience.evidenceLevel || EVIDENCE_LEVELS.INFERRED,
+      explicitSignals: Array.isArray(audience.explicitSignals) ? audience.explicitSignals : (audience.evidenceLevel === EVIDENCE_LEVELS.DETECTED ? (audience.detected || []) : []),
+      inferredSignals: Array.isArray(audience.inferredSignals) ? audience.inferredSignals : (audience.evidenceLevel !== EVIDENCE_LEVELS.DETECTED ? (audience.detected || []) : [])
     },
 
     keyFacts: Array.isArray(keyFacts) 
@@ -146,10 +150,12 @@ export function createAnalysisPayload({
 
     importantNumbers: Array.isArray(importantNumbers) ? importantNumbers : [],
 
-    claims: Array.isArray(claims) ? claims.map(c => ({
-      statement: typeof c === 'string' ? c : c.statement,
-      type: c.type === 'ai-inferred' ? 'ai-inferred' : 'source-stated'
-    })) : [],
+    claims: Array.isArray(claims) ? claims.map(c => {
+      if (typeof c === 'object' && c !== null && c.claimText && c.verificationStatus) {
+        return c;
+      }
+      return createStructuredClaim(c, sourceTraceability?.rawText || sourceTraceability?.extractedText || '');
+    }) : [],
 
     urgency: {
       level: urgency.level || URGENCY_LEVELS.NOT_DETECTED,

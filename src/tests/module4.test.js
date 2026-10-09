@@ -27,6 +27,14 @@ import {
 import { DeterministicCommunicationProvider } from '../services/communication/deterministicCommunicationProvider.js';
 import { GeminiAIProvider } from '../services/ai/geminiProvider.js';
 import { SAMPLE_ANALYSIS } from '../services/analysisService.js';
+import { 
+  isEmergencyContent, 
+  generateReadableHashtags, 
+  sanitizeLinkedInPost, 
+  removeRepetitiveHeadings,
+  extractHelpline,
+  buildLinkedInPost
+} from '../services/communication/linkedInPostBuilder.js';
 
 let passed = 0;
 let failed = 0;
@@ -566,6 +574,313 @@ console.log('\n--- Suite 24: Continue to Module 5 Handoff ---');
     assert(Array.isArray(item.sourceTraceability), `Item ${item.channelId} has sourceTraceability array`);
     assert(typeof item.validation?.isValid === 'boolean', `Item ${item.channelId} has validation.isValid`);
   }
+}
+
+// 25. REGRESSION: DUPLICATE HEADINGS PREVENTION
+console.log('\n--- Suite 25: Regression - Duplicate Headings Prevention ---');
+{
+  const provider = new DeterministicCommunicationProvider();
+  const outputs = provider.generate({
+    ...sampleBaseRequest,
+    requestedChannels: [COMMUNICATION_CHANNEL_IDS.LINKEDIN]
+  });
+  const li = outputs[0];
+
+  // Case 1: Must never contain both "Key Development" and "Strategic Update"
+  const lower = li.content.toLowerCase();
+  const hasBoth = lower.includes('key development') && lower.includes('strategic update');
+  assert(!hasBoth, 'Does NOT contain repetitive headings ("Key Development" followed by "Strategic Update")');
+
+  // Case 2: Must have a single authoritative headline hook
+  assert(li.content.startsWith('🚨 Severe Weather Warning'), 'Begins with a single relevant emergency headline');
+
+  // Case 3: Title is not immediately duplicated in intro paragraph
+  const paragraphs = li.content.split('\n\n');
+  assert(!paragraphs[1].startsWith('🚨 Severe Weather Warning'), 'Introduction does not redundantly repeat the headline hook');
+
+  // Case 4: removeRepetitiveHeadings utility cleans dual headings properly
+  const sampleDuplicate = `📌 Key Development: Severe Cyclonic Storm Warning\n\n🚨 Strategic Update on Severe Cyclonic Storm Warning | Key Directives\n\nDeep depression intensified into severe cyclonic storm.`;
+  const cleaned = removeRepetitiveHeadings(sampleDuplicate);
+  assert(!cleaned.includes('Strategic Update'), 'removeRepetitiveHeadings eliminates redundant second heading');
+  assert(cleaned.includes('Deep depression intensified'), 'Preserves substantive summary text');
+
+  // Case 5: Validator flags warning if repetitive headings exist
+  const badItem = createCommunicationOutputItem({
+    channelId: 'linkedin',
+    title: 'LinkedIn Post',
+    content: '📌 Key Development: Advisory\n\n🚨 Strategic Update on Advisory\n\nDetails.',
+    metadata: { characterCount: 65, wordCount: 9, provider: 'Test', isFallback: true },
+    sourceTraceability: [{ fact: 'Fact', sourceId: 'src-1' }]
+  });
+  const valRes = validateCommunicationOutput('linkedin', badItem);
+  assert(valRes.warnings.some(w => w.includes('repetitive headings')), 'Validator warns on repetitive headings in LinkedIn post');
+}
+
+// 26. REGRESSION: GENERIC EMERGENCY ENGAGEMENT QUESTIONS AVOIDANCE
+console.log('\n--- Suite 26: Regression - Generic Emergency Engagement Questions Avoidance ---');
+{
+  const provider = new DeterministicCommunicationProvider();
+  const outputs = provider.generate({
+    ...sampleBaseRequest,
+    requestedChannels: [COMMUNICATION_CHANNEL_IDS.LINKEDIN]
+  });
+  const li = outputs[0];
+
+  // Case 1: Prohibit generic engagement questions in emergency content
+  assert(!li.content.includes('What are your thoughts on this?'), 'Avoids "What are your thoughts on this?" for emergency content');
+  assert(!li.content.includes('How is your organization addressing this?'), 'Avoids "How is your organization addressing this?" for emergency content');
+  assert(!li.content.includes('Join the conversation below'), 'Avoids "Join the conversation below" for emergency content');
+  assert(!li.content.toLowerCase().includes('share your thoughts'), 'Avoids promotional "share your thoughts" language for emergency content');
+
+  // Case 2: Prioritizes clear emergency directives and safety instructions
+  assert(li.content.includes('⚠️ Urgent Public Safety Directive') || li.content.includes('Directive:'), 'Includes clear public safety directive instead of promotional engagement');
+  assert(li.content.includes('local administration instructions') || li.content.includes('safety'), 'Instructs adherence to local administration directives');
+
+  // Case 3: sanitizeLinkedInPost strips generic questions and adds directive
+  const genericText = `🚨 Weather Alert: Cyclone\n\nSevere storm approaching.\n\nVerified Directives:\n• Wind speeds 100 km/h\n\nWhat are your thoughts on this? How is your organization addressing this? Join the conversation below.\n\n#WeatherAlert #PublicSafety #DisasterPreparedness`;
+  const sanitized = sanitizeLinkedInPost(genericText, {
+    isEmergency: true,
+    lang: 'English',
+    mainTopic: 'Cyclone',
+    helpline: '112'
+  });
+  assert(!sanitized.includes('What are your thoughts on this?'), 'sanitizeLinkedInPost strips generic engagement questions');
+  assert(sanitized.includes('Urgent Public Safety Directive'), 'sanitizeLinkedInPost injects actionable safety directive');
+  assert(sanitized.includes('Helpline 112'), 'Preserves verified helpline in injected safety directive');
+
+  // Case 4: Non-emergency standard content retains appropriate professional discussion CTA
+  const corporateRequest = {
+    sourceId: 'src-corp-gov',
+    sourceContent: { rawText: 'Corporate governance quarterly report highlighting audit committees and compliance disclosures.' },
+    analysis: {
+      analysisId: 'ana-corp-gov',
+      overview: { mainTopic: 'Corporate Governance Review', summary: 'Quarterly review of audit committees and compliance disclosures.', category: 'Corporate Finance & Compliance' },
+      urgency: { level: 'low', reasons: [] },
+      tone: { primary: 'Formal' },
+      intent: { primary: 'Inform', secondary: ['Review'] },
+      keyFacts: ['Audit committee charters updated.', 'Quarterly compliance review completed.']
+    },
+    transformationOutputs: [],
+    config: {
+      targetAudience: 'Professionals',
+      tone: 'Formal',
+      language: 'English',
+      detailLevel: 'Balanced'
+    },
+    requestedChannels: [COMMUNICATION_CHANNEL_IDS.LINKEDIN]
+  };
+  const corpOutputs = provider.generate(corporateRequest);
+  const corpLi = corpOutputs[0];
+  assert(!corpLi.content.includes('Urgent Public Safety Directive'), 'Non-emergency content does NOT inject emergency public safety directive');
+  assert(corpLi.content.includes('professional discussion') || corpLi.content.includes('strategies'), 'Non-emergency content uses relevant professional discussion call-to-action');
+
+  // Case 5: Validator flags warning on emergency content with generic engagement questions
+  const badEmergencyItem = createCommunicationOutputItem({
+    channelId: 'linkedin',
+    title: 'LinkedIn Post',
+    content: '🚨 Severe Cyclone Alert! What are your thoughts on this? Join the conversation below. #WeatherAlert #PublicSafety #DisasterPreparedness',
+    structuredData: { isEmergency: true },
+    metadata: { characterCount: 120, wordCount: 16, provider: 'Test', isFallback: true },
+    sourceTraceability: [{ fact: 'Fact', sourceId: 'src-1' }]
+  });
+  const emergValRes = validateCommunicationOutput('linkedin', badEmergencyItem);
+  assert(emergValRes.warnings.some(w => w.includes('generic engagement questions')), 'Validator flags generic questions on emergency LinkedIn content');
+}
+
+// 27. REGRESSION: HASHTAG QUALITY & READABILITY
+console.log('\n--- Suite 27: Regression - Hashtag Quality & Readability ---');
+{
+  const provider = new DeterministicCommunicationProvider();
+  const outputs = provider.generate({
+    ...sampleBaseRequest,
+    requestedChannels: [COMMUNICATION_CHANNEL_IDS.LINKEDIN, COMMUNICATION_CHANNEL_IDS.HASHTAGS]
+  });
+  const li = outputs.find(o => o.channelId === 'linkedin');
+  const ht = outputs.find(o => o.channelId === 'hashtags');
+
+  const tagsInContent = li.content.match(/#[^\s#]+/g) || [];
+  assert(tagsInContent.length >= 3 && tagsInContent.length <= 5, `LinkedIn contains 3 to 5 hashtags (found ${tagsInContent.length})`);
+  assert(tagsInContent.every(t => t.startsWith('#')), 'All hashtags begin with #');
+
+  // Verify readable lengths (no hashtag > 25 characters)
+  const overlyLong = tagsInContent.filter(t => t.length > 25);
+  assert(overlyLong.length === 0, `No excessively long hashtags (>25 chars) found in LinkedIn post (found: ${overlyLong.join(', ') || 'none'})`);
+
+  // Explicitly check absence of monster concatenations
+  assert(!li.content.includes('#SevereWeatherWarningEmergencyFlashFloodResponse'), 'Does NOT produce monster concatenated hashtag #SevereWeatherWarningEmergencyFlashFloodResponse');
+  assert(!li.content.includes('#IMDSevereCyclonicStormAdvisoryDeepDepressionIntensified'), 'Does NOT produce monster concatenated hashtag #IMDSevereCyclonicStormAdvisoryDeepDepressionIntensified');
+
+  // Verify presence of preferred readable hashtags
+  assert(
+    tagsInContent.includes('#WeatherAlert') || 
+    tagsInContent.includes('#PublicSafety') || 
+    tagsInContent.includes('#DisasterPreparedness') ||
+    tagsInContent.includes('#CycloneAlert'),
+    'Includes preferred readable hashtags like #WeatherAlert, #PublicSafety, #DisasterPreparedness'
+  );
+
+  // Dedicated hashtags channel also respects length limit
+  const htTags = ht.structuredData?.tags || [];
+  assert(htTags.every(t => t.length <= 25), 'Dedicated hashtags channel limits tag length to <= 25 chars');
+
+  // Validator warning for long hashtags
+  const badHashtagItem = createCommunicationOutputItem({
+    channelId: 'linkedin',
+    title: 'LinkedIn Post',
+    content: 'Cyclone advisory update. #SuperExtremelyLongConcatenatedUnreadableHashtagForWeatherAlert',
+    metadata: { characterCount: 90, wordCount: 4, provider: 'Test', isFallback: true },
+    sourceTraceability: [{ fact: 'Fact', sourceId: 'src-1' }]
+  });
+  const tagValRes = validateCommunicationOutput('linkedin', badHashtagItem);
+  assert(tagValRes.warnings.some(w => w.includes('excessively long hashtags')), 'Validator warns on excessively long hashtags (>25 chars)');
+}
+
+// 28. REGRESSION: MULTILINGUAL FALLBACK (ENGLISH, HINDI, MARATHI)
+console.log('\n--- Suite 28: Regression - Multilingual Fallback ---');
+{
+  const provider = new DeterministicCommunicationProvider();
+
+  // Case 1: Hindi Emergency Post
+  const hindiOutputs = provider.generate({
+    ...sampleBaseRequest,
+    config: { ...sampleBaseRequest.config, language: 'Hindi' },
+    requestedChannels: [COMMUNICATION_CHANNEL_IDS.LINKEDIN]
+  });
+  const hindiLi = hindiOutputs[0];
+  assert(hindiLi.content.includes('🚨') && (hindiLi.content.includes('मौसम चेतावनी') || hindiLi.content.includes('सुरक्षा')), 'Hindi emergency post contains Devanagari headline');
+  assert(hindiLi.content.includes('सुरक्षा निर्देश एवं मुख्य जानकारी:'), 'Hindi post contains Devanagari directives header');
+  assert(hindiLi.content.includes('⚠️ आपातकालीन सुरक्षा निर्देश:'), 'Hindi post contains Devanagari emergency directive');
+  assert(!hindiLi.content.includes('What are your thoughts on this?'), 'Hindi post has NO English generic engagement questions');
+  assert(!hindiLi.content.includes('अपनी राय साझा करें'), 'Hindi post does NOT ask for opinions during emergency');
+  assert(hindiLi.structuredData?.hashtags?.some(t => /[\u0900-\u097F]/.test(t) || t === '#WeatherAlert'), 'Hindi post includes appropriate readable hashtags');
+  assert(hindiLi.sourceTraceability.length > 0, 'Hindi post preserves source traceability');
+
+  // Case 2: Marathi Emergency Post
+  const marathiOutputs = provider.generate({
+    ...sampleBaseRequest,
+    config: { ...sampleBaseRequest.config, language: 'Marathi' },
+    requestedChannels: [COMMUNICATION_CHANNEL_IDS.LINKEDIN]
+  });
+  const marathiLi = marathiOutputs[0];
+  assert(marathiLi.content.includes('🚨') && (marathiLi.content.includes('हवामान इशारा') || marathiLi.content.includes('सुरक्षा')), 'Marathi emergency post contains Devanagari headline');
+  assert(marathiLi.content.includes('सुरक्षा सूचना व महत्त्वाची माहिती:'), 'Marathi post contains Devanagari directives header');
+  assert(marathiLi.content.includes('⚠️ तातडीची सुरक्षा सूचना:'), 'Marathi post contains Devanagari emergency directive');
+  assert(!marathiLi.content.includes('What are your thoughts on this?'), 'Marathi post has NO English generic engagement questions');
+  assert(!marathiLi.content.includes('आपले मत खाली नक्की नोंदवा'), 'Marathi post does NOT ask for opinions during emergency');
+  assert(marathiLi.structuredData?.hashtags?.some(t => /[\u0900-\u097F]/.test(t) || t === '#WeatherAlert'), 'Marathi post includes appropriate readable hashtags');
+  assert(marathiLi.sourceTraceability.length > 0, 'Marathi post preserves source traceability');
+
+  // Case 3: Hindi Non-Emergency Post
+  const hindiNonEmerg = provider.generate({
+    sourceId: 'src-hindi-lit',
+    sourceContent: { rawText: 'राष्ट्रीय डिजिटल साक्षरता मिशन के अंतर्गत ग्रामीण नागरिकों को डिजिटल उपकरणों का प्रशिक्षण प्रदान किया जा रहा है।' },
+    analysis: {
+      analysisId: 'ana-hindi-lit',
+      overview: { mainTopic: 'राष्ट्रीय डिजिटल साक्षरता मिशन', summary: 'ग्रामीण नागरिकों को डिजिटल उपकरणों का प्रशिक्षण प्रदान किया जा रहा है।', category: 'शिक्षा एवं प्रौद्योगिकी' },
+      urgency: { level: 'low', reasons: [] },
+      tone: { primary: 'Informative' },
+      intent: { primary: 'Inform', secondary: ['Education'] },
+      keyFacts: ['50,000 से अधिक नागरिकों को डिजिटल साक्षरता प्रशिक्षण दिया गया।', 'ग्राम पंचायतों में डिजिटल केंद्र स्थापित किए गए।']
+    },
+    transformationOutputs: [],
+    config: { language: 'Hindi', tone: 'Informative', targetAudience: 'General Public' },
+    requestedChannels: [COMMUNICATION_CHANNEL_IDS.LINKEDIN]
+  });
+  const hindiNonEmergLi = hindiNonEmerg[0];
+  assert(hindiNonEmergLi.content.includes('📌 महत्वपूर्ण अपडेट:'), 'Hindi non-emergency post uses professional hook');
+  assert(hindiNonEmergLi.content.includes('इस महत्वपूर्ण विषय पर अपने विचार'), 'Hindi non-emergency post includes appropriate professional discussion CTA');
+
+  // Case 4: Marathi Non-Emergency Post
+  const marathiNonEmerg = provider.generate({
+    sourceId: 'src-marathi-agri',
+    sourceContent: { rawText: 'राज्य कृषी विकास योजनेअंतर्गत आधुनिक सिंचन पद्धतींना प्रोत्साहन दिले जात आहे.' },
+    analysis: {
+      analysisId: 'ana-marathi-agri',
+      overview: { mainTopic: 'राज्य कृषी विकास योजना', summary: 'आधुनिक सिंचन पद्धतींना प्रोत्साहन दिले जात आहे.', category: 'कृषी व ग्रामीण विकास' },
+      urgency: { level: 'low', reasons: [] },
+      tone: { primary: 'Informative' },
+      intent: { primary: 'Inform', secondary: ['Agriculture'] },
+      keyFacts: ['शेतकऱ्यांना ठिबक सिंचनासाठी अनुदान उपलब्ध.', 'पाण्याचा कार्यक्षम वापर वाढविणे हा मुख्य उद्देश आहे.']
+    },
+    transformationOutputs: [],
+    config: { language: 'Marathi', tone: 'Informative', targetAudience: 'General Public' },
+    requestedChannels: [COMMUNICATION_CHANNEL_IDS.LINKEDIN]
+  });
+  const marathiNonEmergLi = marathiNonEmerg[0];
+  assert(marathiNonEmergLi.content.includes('📌 महत्त्वाची माहिती:'), 'Marathi non-emergency post uses professional hook');
+  assert(marathiNonEmergLi.content.includes('या महत्त्वाच्या विषयावर आपले विचार'), 'Marathi non-emergency post includes appropriate professional discussion CTA');
+}
+
+// 29. REGRESSION: PRESERVATION OF SOURCE CONTEXT, FACTS & TRACEABILITY
+console.log('\n--- Suite 29: Regression - Preservation of Source Context & Traceability ---');
+{
+  const provider = new DeterministicCommunicationProvider();
+  const outputs = provider.generate({
+    ...sampleBaseRequest,
+    requestedChannels: [COMMUNICATION_CHANNEL_IDS.LINKEDIN]
+  });
+  const li = outputs[0];
+
+  // Case 1: Grounded numbers and facts preserved without hallucination
+  assert(li.content.includes('85 to 105 km/h'), 'Preserves verified wind speed (85 to 105 km/h)');
+  assert(li.content.includes('1.5 to 2.2 meters'), 'Preserves verified storm surge (1.5 to 2.2 meters)');
+  assert(li.content.includes('210 mm'), 'Preserves verified rainfall metric (210 mm)');
+  assert(li.content.includes('112'), 'Preserves verified emergency helpline 112 from source');
+
+  // Case 2: Strict anti-hallucination (never invent alert levels or forecast periods not in source)
+  assert(!li.content.includes('Red Alert'), 'Does NOT invent unstated "Red Alert" level');
+  assert(!li.content.includes('Orange Alert'), 'Does NOT invent unstated "Orange Alert" level');
+  assert(!li.content.includes('Category 5'), 'Does NOT invent unstated "Category 5" classification');
+  assert(!li.content.includes('500,000 residents'), 'Does NOT invent imaginary casualty/evacuation statistics');
+
+  // Case 3: Source lineage & traceability preserved
+  assert(Array.isArray(li.sourceTraceability) && li.sourceTraceability.length > 0, 'LinkedIn has non-empty sourceTraceability array');
+  assert(li.sourceTraceability.every(t => t.sourceId === sampleBaseRequest.sourceId), 'Every traceability record references original sourceId');
+  assert(li.sourceTraceability.every(t => t.origin === 'analysis.keyFacts'), 'Traceability records note origin as analysis.keyFacts');
+
+  // Case 4: Structured data maintains audience, tone, language, and emergency flag
+  assert(li.structuredData.isEmergency === true, 'structuredData flags isEmergency as true');
+  assert(li.structuredData.language === 'English', 'structuredData preserves language');
+  assert(Boolean(li.structuredData.cta), 'structuredData preserves cta string');
+  assert(Array.isArray(li.structuredData.keyPoints), 'structuredData preserves keyPoints array');
+}
+
+// 30. REGRESSION: EDIT, REGENERATE, COPY & HANDOFF INTEGRITY
+console.log('\n--- Suite 30: Regression - Edit, Regenerate, Copy & Handoff Integrity ---');
+{
+  const provider = new DeterministicCommunicationProvider();
+  const outputs = provider.generate({
+    ...sampleBaseRequest,
+    requestedChannels: [COMMUNICATION_CHANNEL_IDS.LINKEDIN]
+  });
+  const li = outputs[0];
+
+  // Case 1: Editing preserves validation and recalculates metrics
+  const editedText = `${li.content}\n\n[Edited by Public Safety Officer at 16:30]`;
+  const editedItem = updateOutputContent(li, editedText);
+  assert(editedItem.content === editedText, 'Content accurately reflects manual edits');
+  assert(editedItem.metadata.isEdited === true, 'isEdited flag set to true');
+  assert(editedItem.metadata.characterCount === editedText.length, 'Character count accurately updated after editing');
+  assert(editedItem.validation.isValid === true, 'Edited item remains valid');
+
+  // Case 2: Single-channel regeneration
+  const regenerated = await regenerateSingleChannel(sampleBaseRequest, li.outputId, COMMUNICATION_CHANNEL_IDS.LINKEDIN);
+  assert(regenerated.outputId === li.outputId, 'Single regeneration preserves original outputId');
+  assert(regenerated.channelId === 'linkedin', 'Regenerates requested linkedin channel');
+  assert(!regenerated.content.includes('What are your thoughts on this?'), 'Regenerated LinkedIn post sanitizes generic questions');
+  assert(regenerated.validation.isValid === true, 'Regenerated item passes validation');
+
+  // Case 3: Copy formatting
+  assert(typeof li.content === 'string' && li.content.length > 100, 'LinkedIn post content is directly copyable text');
+
+  // Case 4: Module 5 Handoff Contract
+  const completeResult = await generateCommunication(sampleBaseRequest, { delayMs: 0 });
+  const handoffLinkedIn = completeResult.outputs.find(o => o.channelId === 'linkedin');
+  assert(Boolean(handoffLinkedIn), 'Module 5 handoff package contains LinkedIn channel');
+  assert(Boolean(handoffLinkedIn.outputId), 'Handoff LinkedIn item has outputId');
+  assert(Boolean(handoffLinkedIn.metadata.provider), 'Handoff LinkedIn item has provider metadata');
+  assert(Array.isArray(handoffLinkedIn.sourceTraceability), 'Handoff LinkedIn item has sourceTraceability');
+  assert(handoffLinkedIn.validation.isValid === true, 'Handoff LinkedIn item is valid for review');
 }
 
 console.log('\n========================================');

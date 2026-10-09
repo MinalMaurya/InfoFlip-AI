@@ -14,6 +14,23 @@ import {
   createCommunicationOutputItem 
 } from '../../types/communication.js';
 import { getCommunicationChannelById } from './communicationChannelRegistry.js';
+import { 
+  buildLinkedInPost, 
+  isEmergencyContent, 
+  generateReadableHashtags, 
+  sanitizeLinkedInPost, 
+  removeRepetitiveHeadings,
+  extractHelpline
+} from './linkedInPostBuilder.js';
+
+export {
+  buildLinkedInPost,
+  isEmergencyContent,
+  generateReadableHashtags,
+  sanitizeLinkedInPost,
+  removeRepetitiveHeadings,
+  extractHelpline
+};
 
 export class DeterministicCommunicationProvider {
   /**
@@ -73,7 +90,21 @@ export class DeterministicCommunicationProvider {
 
       switch (channelId) {
         case COMMUNICATION_CHANNEL_IDS.LINKEDIN: {
-          const res = this.buildLinkedIn({ mainTopic, summary, keyFacts, audience, tone, lang, mod3Map, sourceId });
+          const res = this.buildLinkedIn({ 
+            mainTopic, 
+            summary, 
+            keyFacts, 
+            audience, 
+            tone, 
+            lang, 
+            mod3Map, 
+            sourceId,
+            analysis,
+            dates,
+            numbers,
+            urgency,
+            rawText
+          });
           content = res.content;
           title = res.title;
           structuredData = res.structuredData;
@@ -185,55 +216,8 @@ export class DeterministicCommunicationProvider {
   }
 
   // 1. LINKEDIN POST
-  buildLinkedIn({ mainTopic, summary, keyFacts, audience, tone, lang, mod3Map, sourceId }) {
-    const isHindi = lang === 'Hindi';
-    const isMarathi = lang === 'Marathi';
-
-    let hook = `📌 Key Development: ${mainTopic}`;
-    let intro = summary;
-    let keyFactsHeader = 'Key highlights to know:';
-    let cta = `What are your thoughts on this? How is your organization addressing this? Join the conversation below.`;
-    let tags = `#${mainTopic.replace(/[^a-zA-Z0-9]/g, '')} #PublicInformation #InfoFlip`;
-
-    if (isHindi) {
-      hook = `📌 महत्वपूर्ण अपडेट: ${mainTopic}`;
-      intro = `${summary} (लक्षित दर्शक: ${audience})`;
-      keyFactsHeader = 'मुख्य महत्वपूर्ण बिंदु:';
-      cta = 'इस महत्वपूर्ण विषय पर अपनी राय साझा करें और प्रतिक्रिया दें।';
-      tags = `#${mainTopic.replace(/[^a-zA-Z0-9]/g, '')} #महत्वपूर्ण #समाचार`;
-    } else if (isMarathi) {
-      hook = `📌 महत्त्वाची माहिती: ${mainTopic}`;
-      intro = `${summary} (लक्षित गट: ${audience})`;
-      keyFactsHeader = 'प्रमुख ठळक मुद्दे:';
-      cta = 'या महत्त्वाच्या विषयावर आपले मत खाली नक्की नोंदवा.';
-      tags = `#${mainTopic.replace(/[^a-zA-Z0-9]/g, '')} #माहिती #महत्त्वाचे`;
-    }
-
-    // Reuse Module 3 LinkedIn if present for seamless consistency
-    const mod3LinkedIn = mod3Map['linkedin'];
-    if (mod3LinkedIn && typeof mod3LinkedIn.text === 'string' && mod3LinkedIn.text.length > 20) {
-      intro = mod3LinkedIn.text.split('\n\n')[0] || summary;
-    }
-
-    const bullets = keyFacts.slice(0, 4).map(f => `• ${f}`).join('\n');
-    const content = `${hook}\n\n${intro}\n\n${keyFactsHeader}\n${bullets}\n\n${cta}\n\n${tags}`;
-
-    return {
-      title: 'LinkedIn Professional Post',
-      content,
-      structuredData: {
-        hook,
-        intro,
-        keyPoints: keyFacts.slice(0, 4),
-        cta,
-        hashtags: tags.split(' ')
-      },
-      traceability: keyFacts.slice(0, 4).map(f => ({
-        fact: f,
-        sourceId,
-        origin: 'analysis.keyFacts'
-      }))
-    };
+  buildLinkedIn(params) {
+    return buildLinkedInPost(params);
   }
 
   // 2. X / TWITTER POST & THREAD
@@ -513,39 +497,52 @@ export class DeterministicCommunicationProvider {
 
   // 8. HASHTAG SUGGESTIONS
   buildHashtags({ mainTopic, analysis, entities, sourceId }) {
+    const isEmerg = isEmergencyContent({ analysis, mainTopic });
     const tagsSet = new Set();
 
-    // From main topic
-    const topicTag = '#' + mainTopic.replace(/[^a-zA-Z0-9]/g, '');
-    if (topicTag.length > 2) tagsSet.add(topicTag);
-
-    // From category / domain
-    if (analysis.overview?.category) {
-      tagsSet.add('#' + analysis.overview.category.replace(/[^a-zA-Z0-9]/g, ''));
+    if (isEmerg) {
+      const readableEmergency = generateReadableHashtags({ isEmergency: true, mainTopic, analysis });
+      readableEmergency.forEach(t => tagsSet.add(t));
+    } else {
+      // From main topic - only if concise (<= 25 chars)
+      const topicTag = '#' + mainTopic.replace(/[^a-zA-Z0-9]/g, '');
+      if (topicTag.length > 2 && topicTag.length <= 25) {
+        tagsSet.add(topicTag);
+      }
     }
 
-    // From keywords
+    // From category / domain (<= 25 chars)
+    if (analysis.overview?.category) {
+      const catTag = '#' + analysis.overview.category.replace(/[^a-zA-Z0-9]/g, '');
+      if (catTag.length > 2 && catTag.length <= 25) {
+        tagsSet.add(catTag);
+      }
+    }
+
+    // From keywords (<= 25 chars)
     if (analysis.keywords?.primary && Array.isArray(analysis.keywords.primary)) {
       analysis.keywords.primary.slice(0, 4).forEach(k => {
         const clean = '#' + k.replace(/[^a-zA-Z0-9]/g, '');
-        if (clean.length > 2) tagsSet.add(clean);
+        if (clean.length > 2 && clean.length <= 25) tagsSet.add(clean);
       });
     }
 
-    // From organizations or locations
+    // From organizations or locations (<= 25 chars)
     if (entities.organizations && Array.isArray(entities.organizations)) {
       entities.organizations.slice(0, 2).forEach(o => {
         const clean = '#' + o.replace(/[^a-zA-Z0-9]/g, '');
-        if (clean.length > 2) tagsSet.add(clean);
+        if (clean.length > 2 && clean.length <= 25) tagsSet.add(clean);
       });
     }
 
     // Core platform tags
     tagsSet.add('#VerifiedInfo');
-    tagsSet.add('#PublicNotice');
+    tagsSet.add('#PublicSafety');
     tagsSet.add('#InfoFlip');
 
-    const tagsArray = Array.from(tagsSet).slice(0, 8);
+    // Filter all tags to ensure readability (length <= 25)
+    const validTags = Array.from(tagsSet).filter(t => t.length >= 3 && t.length <= 25);
+    const tagsArray = validTags.slice(0, 8);
     const content = `RECOMMENDED TOPIC HASHTAGS:\n\n${tagsArray.join(' ')}\n\n(Generated strictly from source topics, entities, and category)`;
 
     return {

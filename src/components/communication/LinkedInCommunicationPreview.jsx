@@ -58,6 +58,11 @@ export default function LinkedInCommunicationPreview({
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 text-[#0A66C2] dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-900">
                 1st
               </span>
+              {structuredData?.isEmergency && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-900">
+                  ⚠️ Public Safety
+                </span>
+              )}
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">
               Target Audience: {audience} • Tone: {tone} • 1h • 🌐

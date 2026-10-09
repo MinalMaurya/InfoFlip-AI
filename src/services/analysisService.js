@@ -218,9 +218,48 @@ export const SAMPLE_ANALYSIS = {
     { value: '112', label: 'Emergency Helpline', context: 'National Emergency Response number' }
   ],
   claims: [
-    { statement: 'Deep depression intensified into a severe cyclonic storm moving northwestward.', type: 'source-stated', isGrounded: true },
-    { statement: 'Coastal district administrations are instructed to activate emergency shelters.', type: 'source-stated', isGrounded: true },
-    { statement: 'Immediate citizen compliance required to mitigate casualty risks across vulnerable quadrants.', type: 'ai-inferred', isGrounded: true }
+    { 
+      claimText: 'Deep depression intensified into a severe cyclonic storm moving northwestward.',
+      statement: 'Deep depression intensified into a severe cyclonic storm moving northwestward.', 
+      sourceExcerpt: 'deep depression has intensified into a severe cyclonic storm moving northwestward',
+      origin: 'source-extracted',
+      riskLevel: 'high',
+      verificationStatus: 'verification required',
+      verificationEvidence: null,
+      verificationTimestamp: null,
+      verificationMethod: null,
+      isIndependentlyVerified: false,
+      type: 'source-stated', 
+      isGrounded: true 
+    },
+    { 
+      claimText: 'Coastal district administrations are instructed to activate emergency shelters.',
+      statement: 'Coastal district administrations are instructed to activate emergency shelters.', 
+      sourceExcerpt: 'Coastal district administrations instructed to activate emergency shelters',
+      origin: 'source-extracted',
+      riskLevel: 'high',
+      verificationStatus: 'verification required',
+      verificationEvidence: null,
+      verificationTimestamp: null,
+      verificationMethod: null,
+      isIndependentlyVerified: false,
+      type: 'source-stated', 
+      isGrounded: true 
+    },
+    { 
+      claimText: 'Immediate citizen compliance required to mitigate casualty risks across vulnerable quadrants.',
+      statement: 'Immediate citizen compliance required to mitigate casualty risks across vulnerable quadrants.', 
+      sourceExcerpt: null,
+      origin: 'AI-inferred',
+      riskLevel: 'medium',
+      verificationStatus: 'not checked',
+      verificationEvidence: null,
+      verificationTimestamp: null,
+      verificationMethod: null,
+      isIndependentlyVerified: false,
+      type: 'ai-inferred', 
+      isGrounded: true 
+    }
   ],
   urgency: {
     level: 'high',

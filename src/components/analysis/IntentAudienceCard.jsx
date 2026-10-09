@@ -96,9 +96,9 @@ export default function IntentAudienceCard({ intent, audience }) {
           </div>
 
           <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
-            <span>Inferential Confidence: <strong>{Math.round((audience?.confidence || 0.85) * 100)}%</strong></span>
+            <span>Inferential Signal: <strong>{(audience?.confidence || 0.85) >= 0.75 ? 'Strong Match' : 'Moderate Match'}</strong></span>
             <span className="text-slate-400 dark:text-slate-500 text-[10px]">
-              {audience?.evidenceLevel === EVIDENCE_LEVELS.DETECTED ? 'Explicitly stated in source' : 'Semantically inferred'}
+              {audience?.evidenceLevel === EVIDENCE_LEVELS.DETECTED ? 'Explicitly stated in source' : 'Semantically inferred (not verified)'}
             </span>
           </div>
         </div>

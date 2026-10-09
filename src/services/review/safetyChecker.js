@@ -23,6 +23,8 @@ export function checkSafetyAndSensitivity(outputItem, context = {}) {
     'take immediate medication',
     'evacuate entire city',
     'immediately evacuate',
+    'mandatory evacuation',
+    'stay indoors',
     'drink salt water',
     'do not dial 911',
     'ignore official warnings',
@@ -32,7 +34,13 @@ export function checkSafetyAndSensitivity(outputItem, context = {}) {
 
   for (const term of riskyTerms) {
     if (lower.includes(term) && !rawSource.includes(term)) {
-      safetyAlerts.push(`High-risk unauthorized directive: "${term}"`);
+      if (term === 'stay indoors' && rawSource.includes('avoid unnecessary travel')) {
+        safetyAlerts.push(`High-risk unauthorized directive: "${term}" (unsupported strengthening of source instruction "avoid unnecessary travel")`);
+      } else if (term === 'mandatory evacuation') {
+        safetyAlerts.push(`High-risk unauthorized directive: "${term}" (mandatory evacuation absent from source)`);
+      } else {
+        safetyAlerts.push(`High-risk unauthorized directive: "${term}"`);
+      }
     }
   }
 

@@ -56,13 +56,24 @@ export function validateClaims(claims, sourceText) {
   if (!Array.isArray(claims)) return [];
 
   return claims.map(c => {
-    const text = typeof c === 'string' ? c : c.statement;
+    const text = typeof c === 'string' ? c : (c.claimText || c.statement || c.text || '');
     const isGrounded = isStatementGrounded(text, sourceText);
     const resolvedType = (c.type === 'source-stated' && isGrounded) 
       ? 'source-stated' 
       : 'ai-inferred';
 
+    if (typeof c === 'object' && c !== null) {
+      return {
+        ...c,
+        claimText: text,
+        statement: text,
+        type: resolvedType,
+        isGrounded
+      };
+    }
+
     return {
+      claimText: text,
       statement: text,
       type: resolvedType,
       isGrounded

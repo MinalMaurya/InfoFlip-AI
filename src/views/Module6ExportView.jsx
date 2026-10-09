@@ -6,6 +6,7 @@ import ExportAuditTrail from '../components/export/ExportAuditTrail.jsx';
 import ExportMetadata from '../components/export/ExportMetadata.jsx';
 import ExportProgress from '../components/export/ExportProgress.jsx';
 import ExportDataContractModal from '../components/export/ExportDataContractModal.jsx';
+import GeneralDisclaimerNotice from '../components/common/GeneralDisclaimerNotice.jsx';
 
 import { validateExportPackage } from '../services/export/exportService.js';
 import { EXPORT_STATUSES } from '../types/export.js';
@@ -130,11 +131,11 @@ export default function Module6ExportView({
                   QUALITY GATE PASSED · HUMAN CERTIFIED
                 </span>
                 <span className="px-2 py-0.2 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200">
-                  Verified
+                  Human Approved
                 </span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 max-w-2xl leading-relaxed">
-                {approvedCount} deliverable{approvedCount !== 1 ? 's' : ''} verified and approved. Only human-approved content is available for export.
+                {approvedCount} deliverable{approvedCount !== 1 ? 's' : ''} reviewed and authorized by human reviewer. Only approved content is released for export.
               </p>
             </div>
           </div>
@@ -147,6 +148,9 @@ export default function Module6ExportView({
           </div>
         </div>
       ) : null}
+
+      {/* General Transparency Notice */}
+      <GeneralDisclaimerNotice compact />
 
       {/* Toast Notification */}
       {toastMessage && (

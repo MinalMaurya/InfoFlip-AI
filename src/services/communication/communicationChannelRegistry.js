@@ -21,12 +21,15 @@ export const COMMUNICATION_CHANNEL_REGISTRY = {
     accentColor: 'indigo',
     maxCharacters: 3000,
     characterLimitWarning: 2800,
-    promptInstructions: `Generate a professional, readable LinkedIn post:
-- Strong opening hook that immediately engages professional audiences.
-- Clear core message summarizing the situation or findings.
+    promptInstructions: `Generate a high-impact, professional, and readable LinkedIn post:
+- Single clear relevant title or opening hook that immediately engages the audience.
+- Never use repetitive redundant headings (e.g., avoid "Key Development" followed by "Strategic Update").
+- For emergency, disaster, weather-alert, and public-safety content:
+  * Prioritize clear safety instructions, verified directives, and concise formatting over promotional language.
+  * Avoid generic engagement questions such as "What are your thoughts on this?". Use actionable next steps or verified emergency guidance.
+  * Use 3-5 readable, concise hashtags (e.g. #WeatherAlert, #PublicSafety, #DisasterPreparedness). Avoid extremely long hashtags.
+- For standard professional topics: clear core message, grounded facts, professional call-to-action, and 3-5 relevant hashtags.
 - Important verifiable facts and statistics taken directly from the source.
-- Appropriate and action-oriented Call to Action (CTA).
-- 3-5 grounded hashtags based on the actual topic.
 - Avoid unnecessary repetition or duplication.`
   },
 

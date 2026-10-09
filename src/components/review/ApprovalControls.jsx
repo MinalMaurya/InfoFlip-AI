@@ -3,6 +3,7 @@ import {
   CheckCircle2, 
   XCircle, 
   AlertCircle, 
+  AlertTriangle,
   RefreshCw, 
   MessageSquare, 
   ShieldCheck, 
@@ -10,12 +11,15 @@ import {
   Clock
 } from 'lucide-react';
 import { APPROVAL_STATUSES } from '../../types/review.js';
+import ContentStatusBadge from '../common/ContentStatusBadge.jsx';
+import { CONTENT_STATUS_FLAGS } from '../../types/contentConfidence.js';
 
 export default function ApprovalControls({
   approvalStatus = APPROVAL_STATUSES.PENDING_REVIEW,
   reviewerNotes = '',
   reviewedAt,
   isEdited = false,
+  unresolvedWarnings = [],
   onApprove,
   onReject,
   onRegenerate,
@@ -124,6 +128,24 @@ export default function ApprovalControls({
             placeholder="Specify reason for rejection, required revisions, or approval notes..."
             className="w-full p-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
           />
+        </div>
+      )}
+
+      {/* Unresolved Quality Warnings Notice before Approval */}
+      {unresolvedWarnings && unresolvedWarnings.length > 0 && approvalStatus !== APPROVAL_STATUSES.APPROVED && (
+        <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-200 text-xs space-y-1.5">
+          <div className="flex items-center gap-1.5 font-bold">
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+            <span>Unresolved Warnings Before Approval ({unresolvedWarnings.length})</span>
+          </div>
+          <ul className="list-disc list-inside text-[11px] pl-1 space-y-0.5 text-amber-900 dark:text-amber-100">
+            {unresolvedWarnings.map((w, idx) => (
+              <li key={idx}>{typeof w === 'string' ? w : (w.message || w.explanation || 'Verification warning')}</li>
+            ))}
+          </ul>
+          <p className="text-[10px] text-amber-700/90 dark:text-amber-300/90 pt-1 border-t border-amber-200/60 dark:border-amber-900/60">
+            ⚠️ <em>Human approval overrides quality gates for export. It does NOT independently verify unverified claims or alter factual ground truth.</em>
+          </p>
         </div>
       )}
 

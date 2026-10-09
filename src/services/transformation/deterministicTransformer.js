@@ -11,6 +11,14 @@
  */
 
 import { OUTPUT_FORMAT_IDS, createOutputItem } from '../../types/transformation.js';
+import { 
+  isEmergencyContent, 
+  generateReadableHashtags, 
+  sanitizeLinkedInPost,
+  deduplicateHeadlineAndIntro,
+  deduplicateFacts,
+  getTruthfulMetricsLabel
+} from '../communication/linkedInPostBuilder.js';
 
 export class DeterministicTransformer {
   /**
@@ -101,42 +109,122 @@ export class DeterministicTransformer {
   generateLinkedIn(source, analysis, config) {
     const { lang, audienceStr, tone, detail, objective } = config;
     const topic = analysis.overview?.mainTopic || 'Important Operational Update';
-    const summary = analysis.overview?.summary || (source.extractedText || '').slice(0, 160);
+    const rawSummary = analysis.overview?.summary || (source.extractedText || '').slice(0, 160);
     const facts = (analysis.keyFacts || []).map(f => typeof f === 'string' ? f : f.fact).slice(0, detail === 'Concise' ? 2 : 4);
     const numbers = (analysis.importantNumbers || []).slice(0, 3);
     const dates = (analysis.importantDates || []).slice(0, 2);
 
+    const isVerified = Boolean(
+      analysis.verification?.isVerified || 
+      analysis.verification?.status === 'verified' ||
+      analysis.claims?.some(c => c.isVerified) ||
+      source?.isVerified
+    );
+
+    const isEmergency = isEmergencyContent({
+      analysis,
+      config: { tone, targetAudience: audienceStr, language: lang },
+      sourceContent: source,
+      mainTopic: topic,
+      summary: rawSummary
+    });
+
     let openingHook = '';
     let callToAction = '';
-    let hashtagList = [];
 
     if (lang === 'Hindi') {
-      openingHook = `📢 महत्वपूर्ण सूचना | ${topic} [लक्षित वर्ग: ${audienceStr}]`;
-      callToAction = `कृपया इस सूचना को अपनी टीम और समुदाय के साथ साझा करें। आधिकारिक दिशानिर्देशों का पालन करें।`;
-      hashtagList = ['#सूचना', '#अपडेट', '#जनहित', '#InfoFlipAI'];
+      openingHook = isEmergency 
+        ? `🚨 मौसम चेतावनी एवं जन सुरक्षा सूचना: ${topic} [लक्षित वर्ग: ${audienceStr}]`
+        : `📢 महत्वपूर्ण सूचना | ${topic} [लक्षित वर्ग: ${audienceStr}]`;
+      callToAction = isEmergency
+        ? `⚠️ आपातकालीन सुरक्षा निर्देश: कृपया स्थानीय प्रशासन के सुरक्षा निर्देशों का कड़ाई से पालन करें और सुरक्षित स्थानों पर रहें।`
+        : (/public|citizen|resident/i.test(audienceStr)
+          ? `कृपया इस सूचना को समुदाय के साथ साझा करें और आधिकारिक दिशानिर्देशों का पालन करें।`
+          : `कृपया इस सूचना को अपनी टीम के साथ साझा करें। आधिकारिक दिशानिर्देशों का पालन करें।`);
     } else if (lang === 'Marathi') {
-      openingHook = `📢 महत्त्वाची माहिती | ${topic} [लक्षित गट: ${audienceStr}]`;
-      callToAction = `कृपया ही माहिती आपल्या सहकाऱ्यांपर्यंत पोहोचवा आणि अधिकृत सूचनांचे काटेकोर पालन करा.`;
-      hashtagList = ['#महत्त्वाचीमाहिती', '#जनहित', '#अपडेट', '#InfoFlipAI'];
+      openingHook = isEmergency
+        ? `🚨 हवामान इशारा व सार्वजनिक सुरक्षा सूचना: ${topic} [लक्षित गट: ${audienceStr}]`
+        : `📢 महत्त्वाची माहिती | ${topic} [लक्षित गट: ${audienceStr}]`;
+      callToAction = isEmergency
+        ? `⚠️ तातडीची सुरक्षा सूचना: कृपया स्थानिक प्रशासनाच्या नियमांचे काटेकोर पालन करा आणि अधिकृत सूचनांचे अनुसरण करा.`
+        : (/public|citizen|resident/i.test(audienceStr)
+          ? `कृपया ही माहिती नागरिकांपर्यंत पोहोचवा आणि अधिकृत नियमांचे पालन करा.`
+          : `कृपया ही माहिती आपल्या सहकाऱ्यांपर्यंत पोहोचवा आणि अधिकृत सूचनांचे काटेकोर पालन करा.`);
     } else {
-      openingHook = `🚨 Strategic Update on ${topic} | Key Directives for ${audienceStr}`;
-      callToAction = `Please ensure relevant teams and community stakeholders review these parameters immediately. Follow official protocol.`;
-      hashtagList = ['#Leadership', '#OperationalExcellence', '#PublicNotice', '#InfoFlipAI'];
+      openingHook = isEmergency
+        ? `🚨 Strategic Update: ${topic} | Public Safety Advisory for ${audienceStr}`
+        : `🚨 Strategic Update on ${topic} | Key Directives for ${audienceStr}`;
+      callToAction = isEmergency
+        ? `⚠️ Urgent Public Safety Directive: Adhere strictly to local administration instructions, avoid vulnerable areas, and follow official advisories.`
+        : (/public|citizen|resident/i.test(audienceStr)
+          ? `Please share this update to keep community members informed. Follow official protocol.`
+          : `Please ensure relevant teams review these parameters immediately. Follow official protocol.`);
     }
+
+    // 1. Deduplicate introduction against openingHook
+    const cleanIntro = deduplicateHeadlineAndIntro(openingHook, rawSummary, source.extractedText || source.rawText || '');
+
+    // 2. Scannable bullet points header
+    let bulletsHeader = '';
+    if (lang === 'Hindi') {
+      bulletsHeader = isEmergency 
+        ? (isVerified ? '🔹 सत्यापित सुरक्षा निर्देश एवं मुख्य जानकारी:' : '🔹 मुख्य सुरक्षा निर्देश एवं बिंदु:')
+        : '🔹 मुख्य तथ्य एवं महत्वपूर्ण बिंदु:';
+    } else if (lang === 'Marathi') {
+      bulletsHeader = isEmergency
+        ? (isVerified ? '🔹 सत्यापित सुरक्षा सूचना व मुख्य माहिती:' : '🔹 मुख्य सुरक्षा सूचना व मुद्दे:')
+        : '🔹 मुख्य मुद्दे व तथ्ये:';
+    } else {
+      bulletsHeader = isEmergency
+        ? (isVerified ? '🔹 Verified Safety Directives & Updates:' : '🔹 Key Safety Directives & Observations:')
+        : '🔹 Key Grounded Insights & Directives:';
+    }
+
+    // 3. Deduplicate facts against intro and numbers
+    const cleanFacts = deduplicateFacts(facts, cleanIntro, numbers, dates);
+
+    // 4. Truthful Metrics Labeling
+    const metricsLabel = getTruthfulMetricsLabel(lang, isVerified);
+    const metricsSection = numbers.length > 0 
+      ? `${metricsLabel} ${numbers.map(n => `${n.label}: ${n.value}`).join(' | ')}`
+      : null;
+
+    // 5. Timelines
+    const datesSection = dates.length > 0 
+      ? (lang === 'Hindi' 
+          ? `⏱️ महत्वपूर्ण समयसीमा: ${dates.map(d => `${d.date} - ${d.context}`).join('; ')}` 
+          : `⏱️ Timelines & Deadlines: ${dates.map(d => `${d.date} (${d.context})`).join('; ')}`) 
+      : null;
+
+    // 6. Readable Hashtags
+    const hashtagList = generateReadableHashtags({
+      isEmergency,
+      mainTopic: topic,
+      analysis,
+      lang,
+      rawText: source.extractedText || source.rawText || ''
+    });
 
     // Body compilation
     const bodyParagraphs = [
       openingHook,
-      summary,
-      lang === 'Hindi' ? '🔹 मुख्य तथ्य एवं महत्वपूर्ण बिंदु:' : lang === 'Marathi' ? '🔹 मुख्य मुद्दे व तथ्ये:' : '🔹 Key Grounded Insights & Directives:',
-      ...facts.map(f => `• ${f}`),
-      numbers.length > 0 ? (lang === 'Hindi' ? `📊 प्रमुख आंकड़े: ${numbers.map(n => `${n.label}: ${n.value}`).join(' | ')}` : `📊 Verified Key Metrics: ${numbers.map(n => `${n.label}: ${n.value}`).join(' | ')}`) : null,
-      dates.length > 0 ? (lang === 'Hindi' ? `⏱️ महत्वपूर्ण समयसीमा: ${dates.map(d => `${d.date} - ${d.context}`).join('; ')}` : `⏱️ Timelines & Deadlines: ${dates.map(d => `${d.date} (${d.context})`).join('; ')}`) : null,
+      cleanIntro,
+      bulletsHeader,
+      ...cleanFacts.map(f => `• ${f}`),
+      metricsSection,
+      datesSection,
       callToAction,
       hashtagList.join(' ')
     ].filter(Boolean);
 
-    const fullText = bodyParagraphs.join('\n\n');
+    const fullText = sanitizeLinkedInPost(bodyParagraphs.join('\n\n'), {
+      isEmergency,
+      lang,
+      mainTopic: topic,
+      analysis,
+      rawText: source.extractedText || source.rawText || '',
+      isVerified
+    });
 
     return {
       headline: openingHook,
@@ -191,20 +279,36 @@ export class DeterministicTransformer {
     const facts = (analysis.keyFacts || []).map(f => typeof f === 'string' ? f : f.fact).slice(0, 4);
     const numbers = (analysis.importantNumbers || []).map(n => `${n.label}: ${n.value} (${n.context})`);
     const orgs = (analysis.entities?.organizations || []).join(', ');
+    const isEmergency = isEmergencyContent({ analysis, config: { tone, targetAudience: audienceStr, language: lang }, sourceContent: source });
+    const isVerified = Boolean(analysis.verification?.isVerified || source?.isVerified || analysis.claims?.some(c => c.isVerified));
+
+    const implications = isEmergency
+      ? [
+          `Immediate public safety readiness and response coordination active across authorized bodies (${orgs || 'Authorized response teams'}).`,
+          'Safety directives and operational notices must be synchronized with documented timeline windows.'
+        ]
+      : [
+          `Immediate operational coordination required across active stakeholders (${orgs || 'Authorized bodies'}).`,
+          'Operational readiness protocols must be synchronized with verified timeline markers.'
+        ];
+
+    const recommendedConsiderations = isEmergency
+      ? [
+          'Review public notification channels and dispatch localized safety notices across vulnerable areas.',
+          'Maintain real-time logging and monitor authorized feeds for updated advisories.'
+        ]
+      : [
+          'Review communication channels and dispatch localized notices across relevant touchpoints.',
+          'Maintain real-time audit logging for source factual statements.'
+        ];
 
     return {
       title: `${title} - Executive Summary`,
-      executiveOverview: `${overview} Prepared specifically for ${audienceStr} under a ${tone.toLowerCase()} communication protocol.`,
+      executiveOverview: `${overview} Prepared specifically for ${audienceStr} under an official ${tone.toLowerCase()} protocol.`,
       keyPoints: facts.length > 0 ? facts : ['Official situational guidelines have been reviewed and normalized from source.'],
-      importantFindings: numbers.length > 0 ? numbers : ['All quantitative thresholds are grounded in official source telemetry.'],
-      implications: [
-        `Immediate cross-departmental coordination required across active stakeholders (${orgs || 'Authorized bodies'}).`,
-        'Operational readiness protocols must be synchronized with verified timeline markers.'
-      ],
-      recommendedConsiderations: [
-        'Review communication channels and dispatch localized notices across vulnerable touchpoints.',
-        'Maintain real-time audit logging for verified factual statements.'
-      ]
+      importantFindings: numbers.length > 0 ? numbers : ['All quantitative observations reflect figures reported directly in source documentation.'],
+      implications,
+      recommendedConsiderations
     };
   }
 
@@ -216,6 +320,12 @@ export class DeterministicTransformer {
     const facts = (analysis.keyFacts || []).map(f => typeof f === 'string' ? f : f.fact).slice(0, 4);
     const dates = (analysis.importantDates || []).map(d => `${d.date} - ${d.context}`);
     const urgencyLvl = analysis.urgency?.level || 'standard';
+    const isVerified = Boolean(
+      (analysis.verification?.isVerified || analysis.verification?.isIndependentlyVerified) &&
+      analysis.verification?.verificationEvidence
+    ) || Boolean(
+      analysis.claims?.some(c => c.isIndependentlyVerified && (c.verificationEvidence || c.evidence))
+    );
 
     return {
       title,
@@ -227,7 +337,8 @@ export class DeterministicTransformer {
         'Verify emergency equipment, battery reserves, and communications links.',
         'Report urgent field anomalies or assistance requests to authorized dispatchers.'
       ],
-      importantDates: dates.length > 0 ? dates : ['Active immediately upon release until official de-escalation notice.']
+      importantDates: dates.length > 0 ? dates : ['Active immediately upon release until official de-escalation notice.'],
+      verificationNotice: isVerified ? 'Independently verified by authorized response coordination.' : 'Extracted from provided source; independent verification required for critical decisions.'
     };
   }
 
@@ -238,6 +349,12 @@ export class DeterministicTransformer {
     const subtitle = `Visual breakdown and key takeaways for ${audienceStr}`;
     const facts = (analysis.keyFacts || []).map(f => typeof f === 'string' ? f : f.fact).slice(0, 3);
     const numbers = (analysis.importantNumbers || []).slice(0, 4);
+    const isVerified = Boolean(
+      (analysis.verification?.isVerified || analysis.verification?.isIndependentlyVerified) &&
+      analysis.verification?.verificationEvidence
+    ) || Boolean(
+      analysis.claims?.some(c => c.isIndependentlyVerified && (c.verificationEvidence || c.evidence))
+    );
 
     const sections = [
       {
@@ -248,12 +365,12 @@ export class DeterministicTransformer {
       {
         heading: '02. Grounded Impact',
         keyPoint: 'Core Operational Parameters',
-        supportingFact: facts[1] || 'Parameters verified through source text analysis.'
+        supportingFact: facts[1] || 'Parameters extracted through source text analysis.'
       },
       {
         heading: '03. Directive & Resolution',
         keyPoint: 'Actionable Protocols',
-        supportingFact: facts[2] || 'Citizens and teams must maintain compliance with verified advisories.'
+        supportingFact: facts[2] || 'Citizens and teams must maintain compliance with official advisories.'
       }
     ];
 
@@ -268,10 +385,12 @@ export class DeterministicTransformer {
       subtitle,
       sections,
       statistics: statistics.length > 0 ? statistics : [
-        { value: '100%', label: 'Grounded Facts', context: 'Zero hallucinated statistics' },
+        { value: '100%', label: 'Source-Grounded', context: 'Zero hallucinated statistics' },
         { value: '24/7', label: 'Monitoring', context: 'Active operational cycle' }
       ],
-      callout: `Verified communication issued for ${audienceStr}. Consult official portals for real-time status.`
+      callout: isVerified
+        ? `Verified communication issued for ${audienceStr}. Consult official portals for real-time status.`
+        : `Official communication issued for ${audienceStr}. Consult official portals for real-time status.`
     };
   }
 
@@ -281,6 +400,7 @@ export class DeterministicTransformer {
     const title = analysis.overview?.mainTopic || 'Strategic Overview & Operational Directives';
     const facts = (analysis.keyFacts || []).map(f => typeof f === 'string' ? f : f.fact);
     const numbers = (analysis.importantNumbers || []);
+    const isVerified = Boolean(analysis.verification?.isVerified || source?.isVerified || analysis.claims?.some(c => c.isVerified));
 
     const slides = [
       {
@@ -292,11 +412,11 @@ export class DeterministicTransformer {
           `Domain / Sector: ${analysis.overview?.category || 'General'}`,
           `Classification Tone: ${tone}`
         ],
-        speakerNotes: 'Welcome stakeholders. Today we are reviewing verified source context and aligned directives.'
+        speakerNotes: 'Welcome stakeholders. Today we are reviewing source context and aligned directives.'
       },
       {
         slideNumber: 2,
-        title: 'Current Situation & Executive Context',
+        title: 'Current Situation & Context',
         purpose: 'Ground the audience in the established background',
         bullets: [
           analysis.overview?.summary ? analysis.overview.summary.slice(0, 140) + '...' : 'Review of official incoming documentation.',
@@ -307,7 +427,7 @@ export class DeterministicTransformer {
       },
       {
         slideNumber: 3,
-        title: 'Key Grounded Findings & Verified Metrics',
+        title: isVerified ? 'Key Grounded Findings & Verified Metrics' : 'Key Grounded Findings & Source Metrics',
         purpose: 'Present factual evidence without speculation',
         bullets: facts.slice(0, 3).length > 0 
           ? facts.slice(0, 3) 
@@ -320,7 +440,7 @@ export class DeterministicTransformer {
         purpose: 'Quantify impact across parameters',
         bullets: numbers.slice(0, 3).length > 0 
           ? numbers.slice(0, 3).map(n => `${n.label}: ${n.value} (${n.context})`)
-          : ['Data thresholds verified against official baseline.'],
+          : ['Data thresholds referenced against official baseline.'],
         speakerNotes: 'Review the quantitative milestones carefully before moving to action assignments.'
       },
       {
@@ -344,22 +464,24 @@ export class DeterministicTransformer {
 
   // 7. VIDEO SCRIPT GENERATOR
   generateVideoScript(source, analysis, config) {
-    const { audienceStr } = config;
+    const { audienceStr, tone, lang } = config;
     const title = `Video Briefing: ${analysis.overview?.mainTopic || 'Executive Summary'}`;
     const facts = (analysis.keyFacts || []).map(f => typeof f === 'string' ? f : f.fact);
     const numbers = (analysis.importantNumbers || []);
+    const isEmergency = isEmergencyContent({ analysis, config: { tone, targetAudience: audienceStr, language: lang }, sourceContent: source });
+    const isVerified = Boolean(analysis.verification?.isVerified || source?.isVerified || analysis.claims?.some(c => c.isVerified));
 
     const scenes = [
       {
         sceneNumber: 1,
-        visual: 'Fade in on high-impact title card with authoritative animated badge. Clean graphical backdrop.',
+        visual: 'Fade in on high-impact title card with authoritative badge. Clean graphical backdrop.',
         narration: `Attention ${audienceStr}. Here is a vital update regarding ${analysis.overview?.mainTopic || 'current operations'}.`,
         onScreenText: `${(analysis.overview?.mainTopic || 'OFFICIAL BRIEFING').toUpperCase()}`,
         duration: '15s'
       },
       {
         sceneNumber: 2,
-        visual: 'Split screen displaying situational summary diagram and verified domain category badge.',
+        visual: 'Split screen displaying situational summary diagram and domain category badge.',
         narration: analysis.overview?.summary 
           ? `${analysis.overview.summary.slice(0, 160)}...`
           : 'Recent official notifications have established key operational guidelines.',
@@ -368,11 +490,11 @@ export class DeterministicTransformer {
       },
       {
         sceneNumber: 3,
-        visual: 'Animated bullet cards sliding in sequentially highlighting verified factual statements.',
+        visual: 'Animated bullet cards sliding in sequentially highlighting factual statements.',
         narration: facts[0] 
-          ? `Key facts to note: ${facts[0]} ${facts[1] ? `Furthermore, ${facts[1]}` : ''}`
-          : 'Ground teams have verified these factual benchmarks.',
-        onScreenText: 'VERIFIED FINDINGS',
+          ? `Key points to note: ${facts[0]} ${facts[1] ? `Furthermore, ${facts[1]}` : ''}`
+          : 'Ground teams have reported these factual benchmarks.',
+        onScreenText: isVerified ? 'VERIFIED FINDINGS' : 'KEY FINDINGS',
         duration: '25s'
       },
       {
@@ -387,7 +509,9 @@ export class DeterministicTransformer {
       {
         sceneNumber: 5,
         visual: 'Closing screen with helpline details, verified official crest/logo, and call-to-action banner.',
-        narration: 'Please follow official channels for updates. Share this verified briefing with your cohort.',
+        narration: isEmergency
+          ? 'Please follow official channels for updates. Adhere strictly to authorized public safety instructions.'
+          : 'Please follow official channels for updates. Share this briefing with your cohort.',
         onScreenText: 'STAY INFORMED • FOLLOW OFFICIAL PROTOCOLS',
         duration: '15s'
       }

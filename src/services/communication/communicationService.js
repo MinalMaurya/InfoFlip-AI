@@ -13,6 +13,7 @@ import {
   createCommunicationRequest, 
   createCommunicationResult,
   createCommunicationOutputItem,
+  COMMUNICATION_CHANNEL_IDS,
   ALL_COMMUNICATION_CHANNELS
 } from '../../types/communication.js';
 import { 
@@ -26,6 +27,11 @@ import {
   resolveChannelId 
 } from './communicationChannelRegistry.js';
 import { DeterministicCommunicationProvider } from './deterministicCommunicationProvider.js';
+import { 
+  sanitizeLinkedInPost, 
+  isEmergencyContent, 
+  extractHelpline 
+} from './linkedInPostBuilder.js';
 
 /**
  * Main service entry point for generating communication assets
@@ -126,6 +132,27 @@ export async function generateCommunication(rawRequest, options = {}) {
     }
 
     if (item) {
+      if (canonicalId === COMMUNICATION_CHANNEL_IDS.LINKEDIN) {
+        const isEmerg = isEmergencyContent(structuredRequest);
+        const helpline = extractHelpline(
+          structuredRequest.sourceContent?.rawText || structuredRequest.sourceContent?.extractedText || '',
+          structuredRequest.analysis?.keyFacts?.map(f => typeof f === 'string' ? f : f.fact) || [],
+          structuredRequest.analysis?.importantNumbers || []
+        );
+        const sanitized = sanitizeLinkedInPost(item.content, {
+          isEmergency: isEmerg,
+          lang: structuredRequest.config?.language || 'English',
+          mainTopic: structuredRequest.analysis?.overview?.mainTopic || '',
+          helpline,
+          analysis: structuredRequest.analysis,
+          rawText: structuredRequest.sourceContent?.rawText || ''
+        });
+        item = {
+          ...item,
+          content: sanitized
+        };
+      }
+
       const val = validateCommunicationOutput(canonicalId, item);
       validatedOutputs.push({
         ...item,
@@ -187,9 +214,30 @@ export async function regenerateSingleChannel(baseRequest, outputId, channelId, 
     results = fallback.generate(singleRequest, options);
   }
 
-  const regeneratedItem = results.find(i => resolveChannelId(i.channelId) === canonicalId) || results[0];
+  let regeneratedItem = results.find(i => resolveChannelId(i.channelId) === canonicalId) || results[0];
   if (!regeneratedItem) {
     throw new Error(`Failed to regenerate output for channel ${channelId}.`);
+  }
+
+  if (canonicalId === COMMUNICATION_CHANNEL_IDS.LINKEDIN) {
+    const isEmerg = isEmergencyContent(singleRequest);
+    const helpline = extractHelpline(
+      singleRequest.sourceContent?.rawText || singleRequest.sourceContent?.extractedText || '',
+      singleRequest.analysis?.keyFacts?.map(f => typeof f === 'string' ? f : f.fact) || [],
+      singleRequest.analysis?.importantNumbers || []
+    );
+    const sanitized = sanitizeLinkedInPost(regeneratedItem.content, {
+      isEmergency: isEmerg,
+      lang: singleRequest.config?.language || 'English',
+      mainTopic: singleRequest.analysis?.overview?.mainTopic || '',
+      helpline,
+      analysis: singleRequest.analysis,
+      rawText: singleRequest.sourceContent?.rawText || ''
+    });
+    regeneratedItem = {
+      ...regeneratedItem,
+      content: sanitized
+    };
   }
 
   const val = validateCommunicationOutput(canonicalId, regeneratedItem);

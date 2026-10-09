@@ -19,7 +19,8 @@ CRITICAL ANTI-HALLUCINATION RULES:
 2. Zero Invention: NEVER invent statistics, figures, deadlines, individuals, organizations, quotes, URLs, or research findings.
 3. Missing Information: If key details are missing for a section, write "Not specified in the source." rather than manufacturing facts.
 4. Source Consistency: Inferred claims must be presented as contextual guidance, not stated as empirical facts.
-5. Language: Respect the requested language (English, Hindi, or Marathi) accurately and professionally.`;
+5. Safety Directives: NEVER strengthen safety instructions beyond what the source text explicitly states (e.g. do NOT turn "avoid unnecessary travel" into "stay indoors" or mandatory evacuation orders). Do NOT label source statements as independently verified or officially confirmed without proof.
+6. Language: Respect the requested language (English, Hindi, or Marathi) accurately and professionally.`;
 }
 
 export function buildTransformationUserPrompt(request) {
@@ -46,9 +47,9 @@ MODULE 2 CONTENT UNDERSTANDING:
 - Communicative Intent: ${analysis.intent?.primary || 'Inform'} (Secondary: ${(analysis.intent?.secondary || []).join(', ')})
 - Source Tone: ${analysis.tone?.primary || 'Neutral'}
 - Urgency: ${analysis.urgency?.level || 'not_detected'} (Reasons: ${(analysis.urgency?.reasons || []).join('; ')})
-- Verified Key Facts:
+- Grounded Key Facts from Source:
 ${(analysis.keyFacts || []).map(f => `  * [${f.importance || 'fact'}] ${typeof f === 'string' ? f : f.fact}`).join('\n')}
-- Verified Entities:
+- Grounded Entities from Source:
   * Organizations: ${(analysis.entities?.organizations || []).join(', ') || 'None specified'}
   * Locations: ${(analysis.entities?.locations || []).join(', ') || 'None specified'}
   * Key Dates & Deadlines: ${(analysis.importantDates || []).map(d => `${d.date} (${d.context})`).join('; ') || 'None specified'}

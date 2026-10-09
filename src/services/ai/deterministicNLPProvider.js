@@ -9,9 +9,11 @@ import {
 import { 
   isStatementGrounded, 
   determineEvidenceLevel, 
-  validateClaims 
+  validateClaims,
+  filterGroundedEntities
 } from '../../utils/hallucinationGuard.js';
 import { calculateTextMetrics } from '../../utils/textNormalization.js';
+import { createStructuredClaim, CLAIM_ORIGINS } from '../../types/contentConfidence.js';
 import { DeterministicTransformer } from '../transformation/deterministicTransformer.js';
 import { DeterministicCommunicationProvider } from '../communication/deterministicCommunicationProvider.js';
 
@@ -138,7 +140,7 @@ export class DeterministicNLPProvider extends AIProviderInterface {
     if (lower.includes('citizen') || lower.includes('public') || lower.includes('resident') || lower.includes('community')) {
       detectedAudiences.push('General Public');
     }
-    if (lower.includes('official') || lower.includes('administration') || lower.includes('officers') || lower.includes('ndrf') || lower.includes('district')) {
+    if (lower.includes('official') || lower.includes('administration') || lower.includes('officers') || lower.includes('ndrf') || lower.includes('sdrf') || lower.includes('district')) {
       detectedAudiences.push('Government Officials');
     }
     if (lower.includes('student') || lower.includes('faculty') || lower.includes('school') || lower.includes('campus')) {
@@ -155,8 +157,15 @@ export class DeterministicNLPProvider extends AIProviderInterface {
       detectedAudiences.push('General Public');
     }
 
+    const explicitSignals = detectedAudiences.filter(aud => 
+      (aud === 'General Public' && (lower.includes('citizen') || lower.includes('public') || lower.includes('resident'))) ||
+      (aud === 'Government Officials' && (lower.includes('official') || lower.includes('administration') || lower.includes('ndrf') || lower.includes('sdrf'))) ||
+      (aud === 'Students' && lower.includes('student'))
+    );
+    const inferredSignals = detectedAudiences.filter(aud => !explicitSignals.includes(aud));
+
     const audienceConfidence = detectedAudiences.length > 1 ? 0.90 : 0.82;
-    const audienceEvidence = (lower.includes('citizen') || lower.includes('official') || lower.includes('student'))
+    const audienceEvidence = explicitSignals.length > 0
       ? EVIDENCE_LEVELS.DETECTED
       : EVIDENCE_LEVELS.INFERRED;
 
@@ -180,7 +189,7 @@ export class DeterministicNLPProvider extends AIProviderInterface {
     const rawOrgs = cleanText.match(/\b([A-Z]{2,6}|(?:India Meteorological Department|IMD|NDRF|SDRF|DGHS|WHO|CERT-In|Ministry of Health|State Emergency Operations))\b/g) || [];
     const organizations = [...new Set(rawOrgs)].slice(0, 8);
 
-    const rawLocs = cleanText.match(/\b(coastal districts|suburban municipal wards|Bay of Bengal|State Capital|central maritime basin|district hospitals)\b/gi) || [];
+    const rawLocs = cleanText.match(/\b(coastal districts|coastal and low-lying districts|low-lying districts|suburban municipal wards|Bay of Bengal|State Capital|central maritime basin|district hospitals)\b/gi) || [];
     const locations = [...new Set(rawLocs.map(l => l.trim()))].slice(0, 6);
 
     const rawTech = cleanText.match(/\b(Doppler Weather Radar|Doppler Radar|MFA|larvicidal spraying|DEET|satellite|IV fluids|platelets)\b/gi) || [];
@@ -221,30 +230,28 @@ export class DeterministicNLPProvider extends AIProviderInterface {
       ...primaryKeywords.slice(0, 3)
     ];
 
-    // 9. CLAIMS & STATEMENTS (Explicitly separating Source-Stated from AI-Inferred)
-    const claims = [];
-    if (sentences[0]) {
-      claims.push({
-        statement: sentences[0],
-        type: 'source-stated'
-      });
+    // 9. CLAIMS & STATEMENTS (Structured claims adhering to Section 2)
+    const rawClaims = [];
+    for (const sentence of sentences) {
+      const cleanSentence = sentence.replace(/^[•\-\d.\s]+/, '').trim();
+      if (cleanSentence.length > 20 && cleanSentence.length < 240) {
+        rawClaims.push(createStructuredClaim(cleanSentence, cleanText));
+      }
+      if (rawClaims.length >= 5) break;
     }
-    if (sentences[1]) {
-      claims.push({
-        statement: sentences[1],
-        type: 'source-stated'
-      });
-    }
-    claims.push({
-      statement: `Target cohort (${detectedAudiences.join(', ')}) requires prioritized adaptation to prevent operational confusion.`,
-      type: 'ai-inferred'
-    });
-    claims.push({
-      statement: `Urgency level is calibrated as "${urgencyLevel}" based on time and risk markers detected in the text.`,
-      type: 'ai-inferred'
-    });
 
-    const validatedClaims = validateClaims(claims, cleanText);
+    rawClaims.push(createStructuredClaim({
+      claimText: `Target cohort (${detectedAudiences.join(', ')}) requires prioritized adaptation to prevent operational confusion.`,
+      type: 'ai-inferred',
+      origin: CLAIM_ORIGINS.AI_INFERRED
+    }, cleanText));
+    rawClaims.push(createStructuredClaim({
+      claimText: `Urgency level is calibrated as "${urgencyLevel}" based on time and risk markers detected in the text.`,
+      type: 'ai-inferred',
+      origin: CLAIM_ORIGINS.AI_INFERRED
+    }, cleanText));
+
+    const validatedClaims = validateClaims(rawClaims, cleanText);
 
     // 10. SUMMARY
     const summary = sentences.slice(0, 3).join(' ') || cleanText.slice(0, 240);
@@ -272,17 +279,19 @@ export class DeterministicNLPProvider extends AIProviderInterface {
       audience: {
         detected: detectedAudiences,
         confidence: audienceConfidence,
-        evidenceLevel: audienceEvidence
+        evidenceLevel: audienceEvidence,
+        explicitSignals,
+        inferredSignals
       },
       keyFacts: keyFacts,
       entities: {
-        people: ['Executive Director', 'Designated Response Leads'],
-        organizations: organizations.length > 0 ? organizations : ['State Public Authority'],
-        locations: locations.length > 0 ? locations : ['Regional Administration Zones'],
+        people: filterGroundedEntities(['Executive Director', 'Designated Response Leads', 'District Collector', 'Relief Commissioner'], cleanText),
+        organizations: filterGroundedEntities(organizations, cleanText),
+        locations: filterGroundedEntities(locations, cleanText),
         products: [],
-        technologies: technologies,
+        technologies: filterGroundedEntities(technologies, cleanText),
         dates: importantDates.map(d => d.date),
-        other: ['Emergency Channel 112']
+        other: cleanText.includes('112') ? ['Emergency Helpline 112'] : []
       },
       topics: topics,
       keywords: {

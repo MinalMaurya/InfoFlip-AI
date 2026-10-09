@@ -5,6 +5,8 @@
  * Module 5: Review, Quality Assurance & Human Approval
  */
 
+import { CONTENT_STATUS_FLAGS, CLAIM_VERIFICATION_STATUSES } from './contentConfidence.js';
+
 export const CHECK_STATUSES = {
   PASS: 'PASS',
   WARNING: 'WARNING',
@@ -102,11 +104,15 @@ export function createReviewItem({
     metadata: {
       characterCount: currentContent.length,
       wordCount: currentContent.split(/\s+/).filter(Boolean).length,
-      provider: metadata.provider || 'DeterministicFallback',
+      provider: metadata.provider || (metadata.isFallback === false ? 'GeminiAIProvider' : 'DeterministicFallback'),
       isFallback: metadata.isFallback ?? true,
       fallbackReason: metadata.fallbackReason || null,
       generatedAt: metadata.generatedAt || reviewedAt,
-      isEdited: Boolean(isEdited)
+      isEdited: Boolean(isEdited),
+      contentStatusFlag: metadata.contentStatusFlag || (metadata.isFallback ? CONTENT_STATUS_FLAGS.RULE_BASED_FALLBACK : CONTENT_STATUS_FLAGS.AI_GENERATED),
+      verificationStatus: metadata.verificationStatus || (metadata.isIndependentlyVerified ? CLAIM_VERIFICATION_STATUSES.INDEPENDENTLY_VERIFIED : 'Source not independently verified'),
+      isIndependentlyVerified: Boolean(metadata.isIndependentlyVerified),
+      ...metadata
     },
 
     sourceTraceability: Array.isArray(sourceTraceability) ? sourceTraceability : [],

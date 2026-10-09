@@ -51,13 +51,20 @@ if (geminiTests.status !== 0) {
   process.exit(geminiTests.status || 1);
 }
 
+const contentConfidenceTests = spawnSync('node', [path.join(__dirname, 'contentConfidence.test.js')], { stdio: 'inherit' });
+if (contentConfidenceTests.status !== 0) {
+  console.error('\n❌ Content confidence test suite failed!');
+  process.exit(contentConfidenceTests.status || 1);
+}
+
 console.log('====================================================');
-console.log('🎉 ALL SUITES PASSED: 621/621 TESTS PASSING (100%)');
+console.log('🎉 ALL SUITES PASSED: 796/796 TESTS PASSING (100%)');
 console.log('  - Module 1 (Input & Ingestion): 57/57');
 console.log('  - Module 2 (Understanding & Analysis): 63/63');
 console.log('  - Module 3 (Transformation & Output Engine): 103/103');
-console.log('  - Module 4 (Social & Communication Generator): 240/240');
+console.log('  - Module 4 (Social & Communication Generator): 313/313');
 console.log('  - Module 5 (Review, QA & Human Approval): 68/68');
 console.log('  - Module 6 (Export & Distribution): 66/66');
 console.log('  - Gemini 3.8 Flash Integration & Resilience: 24/24');
+console.log('  - Content Confidence & Verification Governance: 102/102');
 console.log('====================================================\n');
