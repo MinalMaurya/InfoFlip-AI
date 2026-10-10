@@ -30,8 +30,8 @@ export default function AnalysisLoadingTracker({
     >
       {/* Header */}
       <div className="text-center space-y-2">
-        <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto shadow-xs">
-          <BrainCircuit className="w-7 h-7 animate-pulse text-indigo-600 dark:text-indigo-400" />
+        <div className="w-14 h-14 rounded-2xl bg-surface-selected text-primary dark:text-accent flex items-center justify-center mx-auto shadow-xs">
+          <BrainCircuit className="w-7 h-7 animate-pulse text-primary dark:text-accent" />
         </div>
         <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
           {title}
@@ -52,7 +52,7 @@ export default function AnalysisLoadingTracker({
               key={step.id}
               className={`flex items-center gap-3 p-2 rounded-xl transition-all ${
                 isCurrent
-                  ? 'bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-200'
+                  ? 'bg-surface-selected/60 text-primary dark:text-accent'
                   : isDone
                   ? 'text-emerald-800 dark:text-emerald-300'
                   : 'text-slate-400 dark:text-slate-500 opacity-60'
@@ -62,7 +62,7 @@ export default function AnalysisLoadingTracker({
                 {isDone ? (
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 ) : isCurrent ? (
-                  <Loader2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400 animate-spin" />
+                  <Loader2 className="w-4 h-4 text-primary dark:text-accent animate-spin" />
                 ) : (
                   <Circle className="w-4 h-4 text-slate-300 dark:text-slate-600" />
                 )}
@@ -82,9 +82,9 @@ export default function AnalysisLoadingTracker({
 
       {/* Bar */}
       <div className="space-y-1.5">
-        <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+        <div className="w-full bg-sidebar-bg rounded-full h-2 overflow-hidden">
           <div 
-            className="bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 h-full rounded-full transition-all duration-300"
+            className="bg-primary h-full rounded-full transition-all duration-300"
             style={{ width: `${Math.min(100, (currentStep / 6) * 100)}%` }}
           />
         </div>

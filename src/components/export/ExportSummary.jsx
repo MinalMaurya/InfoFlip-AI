@@ -64,11 +64,11 @@ export default function ExportSummary({ exportPackage }) {
             <span className="font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px]">
               Approved Deliverables
             </span>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-surface-selected text-primary dark:bg-surface-selected dark:text-accent">
               {approvedCount} Channel{approvedCount !== 1 ? 's' : ''}
             </span>
           </div>
-          <div className="text-xl font-extrabold text-indigo-600 dark:text-indigo-400">
+          <div className="text-xl font-extrabold text-primary dark:text-accent">
             {approvedCount} Asset{approvedCount !== 1 ? 's' : ''} Ready
           </div>
           <p className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -96,13 +96,13 @@ export default function ExportSummary({ exportPackage }) {
           </span>
           <div className="flex flex-wrap gap-1 text-[11px] pt-0.5">
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium">
-              <Users className="w-3 h-3 text-indigo-500 shrink-0" /> {config.targetAudience || 'General Public'}
+              <Users className="w-3 h-3 text-text-primary0 shrink-0" /> {config.targetAudience || 'General Public'}
             </span>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium">
-              <Sliders className="w-3 h-3 text-indigo-500 shrink-0" /> {config.tone || 'Informative'}
+              <Sliders className="w-3 h-3 text-text-primary0 shrink-0" /> {config.tone || 'Informative'}
             </span>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium">
-              <Languages className="w-3 h-3 text-indigo-500 shrink-0" /> {config.language || 'English'}
+              <Languages className="w-3 h-3 text-text-primary0 shrink-0" /> {config.language || 'English'}
             </span>
           </div>
         </div>

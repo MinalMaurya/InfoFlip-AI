@@ -23,10 +23,10 @@ export default function ReviewProgressTracker({ progressState }) {
   ];
 
   return (
-    <div className="p-5 rounded-2xl border border-indigo-100 dark:border-indigo-950 bg-gradient-to-r from-indigo-50/60 via-purple-50/40 to-slate-50 dark:from-slate-900 dark:via-indigo-950/30 dark:to-slate-900 shadow-sm space-y-4">
+    <div className="p-5 rounded-2xl border border-border bg-sidebar-bg shadow-sm space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-indigo-600 text-white shadow-xs">
+          <div className="p-2 rounded-xl bg-primary text-white shadow-xs">
             <Loader2 className="w-4 h-4 animate-spin" />
           </div>
           <div>
@@ -39,7 +39,7 @@ export default function ReviewProgressTracker({ progressState }) {
           </div>
         </div>
 
-        <span className="text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-800 px-2.5 py-1 rounded-full border border-indigo-200 dark:border-indigo-800">
+        <span className="text-xs font-mono font-bold text-primary dark:text-accent bg-white dark:bg-slate-800 px-2.5 py-1 rounded-full border border-primary/40">
           Step {step} of 5
         </span>
       </div>
@@ -58,7 +58,7 @@ export default function ReviewProgressTracker({ progressState }) {
                 isDone
                   ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300'
                   : isCurrent
-                  ? 'bg-white dark:bg-slate-800 border-indigo-400 dark:border-indigo-600 text-indigo-700 dark:text-indigo-300 shadow-xs ring-1 ring-indigo-300'
+                  ? 'bg-white dark:bg-slate-800 border-primary dark:border-primary/40 text-primary dark:text-accent shadow-xs ring-1 ring-primary'
                   : 'bg-white/40 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-400'
               }`}
             >
@@ -66,7 +66,7 @@ export default function ReviewProgressTracker({ progressState }) {
                 {isDone ? (
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 ) : isCurrent ? (
-                  <Loader2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400 animate-spin" />
+                  <Loader2 className="w-4 h-4 text-primary dark:text-accent animate-spin" />
                 ) : (
                   <Icon className="w-4 h-4 opacity-50" />
                 )}

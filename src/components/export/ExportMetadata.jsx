@@ -29,7 +29,7 @@ export default function ExportMetadata({ exportPackage }) {
         <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-850/80 border border-slate-100 dark:border-slate-800 space-y-1">
           <div className="flex items-center justify-between text-slate-400">
             <span className="text-[10px] uppercase tracking-wider font-semibold">Total Words</span>
-            <FileText className="w-3.5 h-3.5 text-indigo-500" />
+            <FileText className="w-3.5 h-3.5 text-text-primary0" />
           </div>
           <div className="text-lg font-extrabold text-slate-800 dark:text-slate-100">{totalWords}</div>
         </div>
@@ -37,7 +37,7 @@ export default function ExportMetadata({ exportPackage }) {
         <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-850/80 border border-slate-100 dark:border-slate-800 space-y-1">
           <div className="flex items-center justify-between text-slate-400">
             <span className="text-[10px] uppercase tracking-wider font-semibold">Total Characters</span>
-            <Type className="w-3.5 h-3.5 text-indigo-500" />
+            <Type className="w-3.5 h-3.5 text-text-primary0" />
           </div>
           <div className="text-lg font-extrabold text-slate-800 dark:text-slate-100">{totalChars}</div>
         </div>
@@ -45,7 +45,7 @@ export default function ExportMetadata({ exportPackage }) {
         <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-850/80 border border-slate-100 dark:border-slate-800 space-y-1">
           <div className="flex items-center justify-between text-slate-400">
             <span className="text-[10px] uppercase tracking-wider font-semibold">Deliverable Count</span>
-            <Layers className="w-3.5 h-3.5 text-indigo-500" />
+            <Layers className="w-3.5 h-3.5 text-text-primary0" />
           </div>
           <div className="text-lg font-extrabold text-slate-800 dark:text-slate-100">{approvedOutputs.length} channels</div>
         </div>

@@ -7,7 +7,7 @@ export default function Footer({ onReset }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
         
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md overflow-hidden border border-indigo-200 dark:border-indigo-900 bg-white dark:bg-slate-900 flex items-center justify-center shrink-0 shadow-2xs">
+          <div className="w-6 h-6 rounded-md overflow-hidden border border-primary/40 bg-white dark:bg-slate-900 flex items-center justify-center shrink-0 shadow-2xs">
             <img 
               src="/infoflip-logo.png" 
               alt="InfoFlip-AI" 
@@ -15,7 +15,7 @@ export default function Footer({ onReset }) {
             />
           </div>
           <span className="font-bold text-slate-800 dark:text-slate-200">
-            InfoFlip<span className="text-indigo-600 dark:text-indigo-400">-AI</span>
+            InfoFlip<span className="text-primary dark:text-accent">-AI</span>
           </span>
           <span className="text-slate-300 dark:text-slate-700">|</span>
           <span>Gen AI Platform for Automated Content Transformation</span>
@@ -26,7 +26,7 @@ export default function Footer({ onReset }) {
           <span className="text-slate-300 dark:text-slate-700">•</span>
           <button
             onClick={onReset}
-            className="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold"
+            className="text-primary dark:text-accent hover:underline font-semibold"
           >
             Reset Workspace
           </button>

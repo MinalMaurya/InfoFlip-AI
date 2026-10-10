@@ -25,7 +25,7 @@ export default function CommunicationProgressTracker({ progressState, requestedC
       
       {/* Title */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-surface-selected text-primary dark:text-accent border border-primary/40">
           <Loader2 className="w-3.5 h-3.5 animate-spin" />
           <span>Module 4 • Social & Communication Engine</span>
         </div>
@@ -49,7 +49,7 @@ export default function CommunicationProgressTracker({ progressState, requestedC
               key={s.step}
               className={`p-3.5 rounded-2xl border transition-all flex sm:flex-col items-center gap-3 sm:text-center ${
                 isActive
-                  ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-400 dark:border-indigo-600 shadow-2xs ring-2 ring-indigo-400/20'
+                  ? 'bg-surface-selected border-primary dark:border-primary/40 shadow-2xs ring-2 ring-primary'
                   : isDone
                   ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900'
                   : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 opacity-50'
@@ -58,7 +58,7 @@ export default function CommunicationProgressTracker({ progressState, requestedC
               <div
                 className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold ${
                   isActive
-                    ? 'bg-indigo-600 text-white shadow-sm animate-pulse'
+                    ? 'bg-primary text-white shadow-sm animate-pulse'
                     : isDone
                     ? 'bg-emerald-600 text-white'
                     : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
@@ -69,7 +69,7 @@ export default function CommunicationProgressTracker({ progressState, requestedC
 
               <div className="min-w-0 flex-1">
                 <span className={`text-xs font-bold block ${
-                  isActive ? 'text-indigo-900 dark:text-indigo-200' : isDone ? 'text-emerald-900 dark:text-emerald-200' : 'text-slate-600 dark:text-slate-400'
+                  isActive ? 'text-primary dark:text-accent' : isDone ? 'text-emerald-900 dark:text-emerald-200' : 'text-slate-600 dark:text-slate-400'
                 }`}>
                   {s.label}
                 </span>

@@ -17,28 +17,28 @@ const STEPS = [
 
 export default function ProgressIndicator({ currentStep, stepTitle, stepDetail }) {
   return (
-    <div className="bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-900 rounded-2xl p-6 text-white shadow-xl border border-indigo-800/50 animate-fade-in my-6">
+    <div className="bg-surface rounded-2xl p-6 text-text-primary shadow-md border border-border animate-fade-in my-6 transition-colors">
       
       {/* Top Banner */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300">
-            <Loader2 className="w-4 h-4 animate-spin text-indigo-400" />
+          <div className="w-8 h-8 rounded-lg bg-surface-selected border border-primary/30 flex items-center justify-center text-primary dark:text-accent">
+            <Loader2 className="w-4 h-4 animate-spin text-primary dark:text-accent" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
+            <h3 className="text-sm font-bold text-text-primary tracking-wide flex items-center gap-2">
               Context-Aware GenAI Engine In Progress
-              <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-300 border border-indigo-400/30">
+              <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-surface-selected text-primary dark:text-accent border border-primary/30">
                 Step {currentStep} of 4
               </span>
             </h3>
-            <p className="text-xs text-indigo-200/80">
+            <p className="text-xs text-text-secondary">
               {stepDetail || 'Synthesizing verified multi-format communication...'}
             </p>
           </div>
         </div>
 
-        <div className="text-xs font-mono text-indigo-300/80">
+        <div className="text-xs font-mono text-text-secondary">
           Latency: ~1.4s (Interactive Prototype)
         </div>
       </div>
@@ -49,17 +49,16 @@ export default function ProgressIndicator({ currentStep, stepTitle, stepDetail }
           const Icon = s.icon;
           const isDone = currentStep > s.id;
           const isCurrent = currentStep === s.id;
-          const isUpcoming = currentStep < s.id;
 
           return (
             <div
               key={s.id}
               className={`p-3.5 rounded-xl border transition-all duration-200 ${
                 isCurrent
-                  ? 'bg-indigo-600/30 border-indigo-400 text-white shadow-lg ring-1 ring-indigo-400/50'
+                  ? 'bg-surface-selected border-primary text-text-primary shadow-xs ring-1 ring-focus-ring/40'
                   : isDone
-                  ? 'bg-emerald-950/30 border-emerald-500/40 text-emerald-200'
-                  : 'bg-white/5 border-white/10 text-slate-400 opacity-60'
+                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300'
+                  : 'bg-sidebar-bg border-border text-text-secondary opacity-70'
               }`}
             >
               <div className="flex items-center justify-between mb-2">
@@ -67,11 +66,11 @@ export default function ProgressIndicator({ currentStep, stepTitle, stepDetail }
                   Step 0{s.id}
                 </span>
                 {isDone ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 ) : isCurrent ? (
-                  <Loader2 className="w-4 h-4 text-indigo-300 animate-spin" />
+                  <Loader2 className="w-4 h-4 text-primary dark:text-accent animate-spin" />
                 ) : (
-                  <Icon className="w-3.5 h-3.5 text-slate-500" />
+                  <Icon className="w-3.5 h-3.5 text-text-secondary" />
                 )}
               </div>
               <div className="text-xs font-bold leading-snug">
@@ -86,9 +85,9 @@ export default function ProgressIndicator({ currentStep, stepTitle, stepDetail }
       </div>
 
       {/* Animated Linear Bar */}
-      <div className="w-full bg-indigo-950 rounded-full h-1.5 mt-5 overflow-hidden border border-indigo-800/40">
+      <div className="w-full bg-sidebar-bg rounded-full h-1.5 mt-5 overflow-hidden border border-border">
         <div 
-          className="bg-gradient-to-r from-indigo-500 via-purple-400 to-emerald-400 h-full transition-all duration-300 rounded-full"
+          className="bg-primary h-full transition-all duration-300 rounded-full"
           style={{ width: `${(currentStep / 4) * 100}%` }}
         />
       </div>

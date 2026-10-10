@@ -137,7 +137,7 @@ export default function ReviewOutputCard({
       {/* Top Header */}
       <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-900/60">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 shadow-2xs border border-indigo-100 dark:border-indigo-900/60">
+          <div className="p-2.5 rounded-2xl bg-surface-selected text-primary dark:text-accent shadow-2xs border border-primary/30">
             <ChannelIcon className="w-5 h-5" />
           </div>
           <div>
@@ -146,7 +146,7 @@ export default function ReviewOutputCard({
                 {title || channelId.toUpperCase()}
               </h3>
               {isEdited && (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-surface-selected text-primary dark:text-accent border border-primary/20">
                   Edited
                 </span>
               )}
@@ -185,9 +185,9 @@ export default function ReviewOutputCard({
           <button
             type="button"
             onClick={() => setActiveTab('overview')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-primary ${
               activeTab === 'overview'
-                ? 'bg-slate-100 dark:bg-slate-800 text-indigo-700 dark:text-indigo-400 shadow-2xs'
+                ? 'bg-slate-100 dark:bg-slate-800 text-primary dark:text-accent shadow-2xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
@@ -197,14 +197,14 @@ export default function ReviewOutputCard({
           <button
             type="button"
             onClick={() => setActiveTab('checks')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-primary ${
               activeTab === 'checks'
-                ? 'bg-slate-100 dark:bg-slate-800 text-indigo-700 dark:text-indigo-400 shadow-2xs'
+                ? 'bg-slate-100 dark:bg-slate-800 text-primary dark:text-accent shadow-2xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
             <span>Quality Checks</span>
-            <span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 text-[10px] inline-flex items-center justify-center font-bold">
+            <span className="w-4 h-4 rounded-full bg-surface-selected dark:bg-surface-selected text-primary dark:text-accent text-[10px] inline-flex items-center justify-center font-bold">
               10
             </span>
           </button>
@@ -212,9 +212,9 @@ export default function ReviewOutputCard({
           <button
             type="button"
             onClick={() => setActiveTab('traceability')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-primary ${
               activeTab === 'traceability'
-                ? 'bg-slate-100 dark:bg-slate-800 text-indigo-700 dark:text-indigo-400 shadow-2xs'
+                ? 'bg-slate-100 dark:bg-slate-800 text-primary dark:text-accent shadow-2xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
@@ -225,9 +225,9 @@ export default function ReviewOutputCard({
           <button
             type="button"
             onClick={() => setActiveTab('edit')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-primary ${
               activeTab === 'edit'
-                ? 'bg-slate-100 dark:bg-slate-800 text-indigo-700 dark:text-indigo-400 shadow-2xs'
+                ? 'bg-slate-100 dark:bg-slate-800 text-primary dark:text-accent shadow-2xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
@@ -240,7 +240,7 @@ export default function ReviewOutputCard({
         <button
           type="button"
           onClick={handleCopy}
-          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
           {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
           <span>{copied ? 'Copied' : 'Copy'}</span>

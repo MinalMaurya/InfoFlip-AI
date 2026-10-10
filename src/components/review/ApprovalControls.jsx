@@ -82,7 +82,7 @@ export default function ApprovalControls({
     <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+          <ShieldCheck className="w-4 h-4 text-primary dark:text-accent" />
           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
             Human Approval Decision
           </h4>
@@ -114,7 +114,7 @@ export default function ApprovalControls({
         <div className="space-y-1.5 animate-fade-in">
           <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 flex items-center justify-between">
             <span className="flex items-center gap-1.5">
-              <MessageSquare className="w-3.5 h-3.5 text-indigo-500" />
+              <MessageSquare className="w-3.5 h-3.5 text-text-primary0" />
               <span>Reviewer Remarks / Feedback</span>
             </span>
             <span className="text-[10px] text-slate-400">
@@ -126,7 +126,7 @@ export default function ApprovalControls({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Specify reason for rejection, required revisions, or approval notes..."
-            className="w-full p-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            className="w-full p-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:outline-none"
           />
         </div>
       )}
@@ -155,7 +155,7 @@ export default function ApprovalControls({
           <button
             type="button"
             onClick={() => setShowNotesInput(!showNotesInput)}
-            className="text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 underline font-medium outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded"
+            className="text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 underline font-medium outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
           >
             {showNotesInput ? 'Hide Remarks' : notes ? 'Edit Remarks' : '+ Add Remarks'}
           </button>

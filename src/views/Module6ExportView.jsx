@@ -74,7 +74,7 @@ export default function Module6ExportView({
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900/50">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-surface-selected dark:bg-surface-selected text-primary dark:text-accent border border-primary/40">
                 EXPORT
               </span>
               <span className="text-slate-300 dark:text-slate-700">•</span>
@@ -107,7 +107,7 @@ export default function Module6ExportView({
               <button
                 type="button"
                 onClick={() => setShowContractModal(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-indigo-700 dark:text-indigo-300 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-primary dark:text-accent border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 title="Inspect Module 6 Export Package Contract"
               >
                 <Code className="w-3.5 h-3.5" />
@@ -188,7 +188,7 @@ export default function Module6ExportView({
               <button
                 type="button"
                 onClick={onBackToReview}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition-colors"
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-primary hover:bg-primary-hover text-white shadow-xs transition-colors"
               >
                 Go to Module 5 (Review) to Approve
               </button>

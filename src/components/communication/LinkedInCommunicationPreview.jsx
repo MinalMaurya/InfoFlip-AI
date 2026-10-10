@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Share2, Copy, Check, ThumbsUp, MessageSquare, Repeat2, Send } from 'lucide-react';
+import { Copy, Check, ThumbsUp, MessageSquare, Repeat2, Send } from 'lucide-react';
 
 export default function LinkedInCommunicationPreview({
   content,
@@ -26,16 +26,16 @@ export default function LinkedInCommunicationPreview({
     return (
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+          <label className="text-xs font-bold uppercase tracking-wider text-text-secondary">
             Edit LinkedIn Post Content
           </label>
-          <span className="text-xs text-slate-500">{text.length} characters</span>
+          <span className="text-xs text-text-secondary">{text.length} characters</span>
         </div>
         <textarea
           rows={12}
           value={text}
           onChange={(e) => onUpdateContent(e.target.value)}
-          className="w-full p-4 rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-slate-900 text-sm font-sans text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed"
+          className="w-full p-4 rounded-2xl border border-input-border bg-input-bg text-sm font-sans text-text-primary focus:outline-none focus:ring-2 focus:ring-focus-ring leading-relaxed"
           placeholder="Enter LinkedIn post text..."
         />
       </div>
@@ -43,28 +43,28 @@ export default function LinkedInCommunicationPreview({
   }
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-2xs space-y-4">
+    <div className="bg-surface rounded-2xl border border-border p-5 sm:p-6 shadow-2xs space-y-4 transition-colors">
       {/* LinkedIn Post Header Simulation */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+      <div className="flex items-center justify-between pb-3 border-b border-divider">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#0A66C2] text-white flex items-center justify-center font-bold text-sm shadow-xs">
+          <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm shadow-2xs">
             in
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
+              <span className="text-sm font-bold text-text-primary">
                 InfoFlip Communication Desk
               </span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 text-[#0A66C2] dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-900">
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface-selected text-text-primary font-bold border border-border">
                 1st
               </span>
               {structuredData?.isEmergency && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-900">
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-warning-subtle text-warning font-bold border border-warning/30">
                   ⚠️ Public Safety
                 </span>
               )}
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+            <p className="text-[11px] text-text-secondary">
               Target Audience: {audience} • Tone: {tone} • 1h • 🌐
             </p>
           </div>
@@ -73,32 +73,32 @@ export default function LinkedInCommunicationPreview({
         <button
           type="button"
           onClick={handleCopy}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors shadow-2xs"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-sidebar-bg hover:bg-surface-hover text-text-primary border border-border transition-colors shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           title="Copy post to clipboard"
         >
-          {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
+          {copied ? <Check className="w-3.5 h-3.5 text-success" /> : <Copy className="w-3.5 h-3.5 text-text-secondary" />}
           <span>{copied ? 'Copied!' : 'Copy Post'}</span>
         </button>
       </div>
 
       {/* Post Text Body */}
-      <div className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-line leading-relaxed font-sans">
+      <div className="text-sm text-text-primary whitespace-pre-line leading-relaxed font-sans">
         {text}
       </div>
 
       {/* Simulated Engagement Bar */}
-      <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+      <div className="pt-3 border-t border-divider flex items-center justify-between text-xs text-text-secondary">
         <div className="flex items-center gap-4 sm:gap-6">
-          <span className="flex items-center gap-1.5 hover:text-[#0A66C2] transition-colors cursor-pointer">
+          <span className="flex items-center gap-1.5 hover:text-primary dark:hover:text-accent transition-colors cursor-pointer">
             <ThumbsUp className="w-4 h-4" /> Like
           </span>
-          <span className="flex items-center gap-1.5 hover:text-[#0A66C2] transition-colors cursor-pointer">
+          <span className="flex items-center gap-1.5 hover:text-primary dark:hover:text-accent transition-colors cursor-pointer">
             <MessageSquare className="w-4 h-4" /> Comment
           </span>
-          <span className="flex items-center gap-1.5 hover:text-[#0A66C2] transition-colors cursor-pointer">
+          <span className="flex items-center gap-1.5 hover:text-primary dark:hover:text-accent transition-colors cursor-pointer">
             <Repeat2 className="w-4 h-4" /> Repost
           </span>
-          <span className="flex items-center gap-1.5 hover:text-[#0A66C2] transition-colors cursor-pointer">
+          <span className="flex items-center gap-1.5 hover:text-primary dark:hover:text-accent transition-colors cursor-pointer">
             <Send className="w-4 h-4" /> Send
           </span>
         </div>

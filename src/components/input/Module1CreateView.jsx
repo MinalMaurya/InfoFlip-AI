@@ -263,7 +263,7 @@ export default function Module1CreateView({
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900/50">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-surface-selected dark:bg-surface-selected text-primary dark:text-accent border border-primary/40">
                 INPUT
               </span>
               <span className="text-slate-300 dark:text-slate-700">•</span>
@@ -284,7 +284,7 @@ export default function Module1CreateView({
             <button
               type="button"
               onClick={() => handleLoadScenario(DEMO_SCENARIOS[0])}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-primary dark:text-accent border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Load Weather Demo</span>
@@ -351,14 +351,14 @@ export default function Module1CreateView({
           )}
 
           {/* Module 1 Ingestion Features Reminder */}
-          <div className="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 flex flex-wrap items-center justify-between gap-3 text-xs text-indigo-950 dark:text-indigo-300">
+          <div className="p-4 rounded-2xl bg-surface-selected/60 border border-primary/30 flex flex-wrap items-center justify-between gap-3 text-xs text-text-primary dark:text-accent">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <ShieldCheck className="w-4 h-4 text-primary dark:text-accent shrink-0" />
               <span>
                 <strong>Zero-Loss Ingestion:</strong> Formats are normalized, tokenized, and packaged with zero external API data leakage.
               </span>
             </div>
-            <span className="text-[11px] font-mono text-indigo-600 dark:text-indigo-400 font-semibold">
+            <span className="text-[11px] font-mono text-primary dark:text-accent font-semibold">
               Max 10 MB • UTF-8 Validated
             </span>
           </div>
@@ -387,7 +387,7 @@ export default function Module1CreateView({
             
             <div className="flex items-center justify-between text-xs font-semibold">
               <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
-                <FileCheck2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <FileCheck2 className="w-4 h-4 text-primary dark:text-accent" />
                 <span>Next Stage: Module 2 (AI Content Understanding)</span>
               </span>
               <span className={`font-mono text-[11px] px-2 py-0.5 rounded-full ${
@@ -404,12 +404,12 @@ export default function Module1CreateView({
               type="button"
               onClick={handleAnalyzeContent}
               disabled={!hasValidInput || isIngesting}
-              className={`w-full py-4 px-6 rounded-xl font-bold text-sm sm:text-base text-white shadow-lg transition-all duration-200 flex items-center justify-center gap-2.5 relative overflow-hidden group outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+              className={`w-full py-4 px-6 rounded-xl font-bold text-sm sm:text-base text-white shadow-sm transition-all duration-200 flex items-center justify-center gap-2.5 relative overflow-hidden group outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
                 !hasValidInput
-                  ? 'bg-slate-300 dark:bg-slate-800 text-slate-500 dark:text-slate-500 cursor-not-allowed shadow-none'
+                  ? 'bg-disabled-bg text-disabled-text cursor-not-allowed shadow-none'
                   : isIngesting
-                  ? 'bg-indigo-400 dark:bg-indigo-600/70 cursor-wait shadow-none'
-                  : 'bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 hover:from-indigo-700 hover:via-indigo-700 hover:to-purple-700 shadow-indigo-300/40 dark:shadow-indigo-950/50 hover:shadow-indigo-400/50 active:scale-[0.99]'
+                  ? 'bg-primary/70 cursor-wait shadow-none'
+                  : 'bg-primary hover:bg-primary-hover active:scale-[0.99]'
               }`}
             >
               {isIngesting ? (

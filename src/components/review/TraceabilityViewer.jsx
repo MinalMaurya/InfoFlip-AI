@@ -95,7 +95,7 @@ export default function TraceabilityViewer({
       <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400">
         <div className="flex items-center gap-3">
           <span className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
-            <Layers className="w-3.5 h-3.5 text-indigo-500" /> Lineage:
+            <Layers className="w-3.5 h-3.5 text-text-primary0" /> Lineage:
           </span>
           {sourceId && (
             <span className="font-mono bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">
@@ -153,7 +153,7 @@ export default function TraceabilityViewer({
                 {/* Source Origin */}
                 <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 space-y-1">
                   <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                    <FileText className="w-3 h-3 text-indigo-500" /> Source Excerpt
+                    <FileText className="w-3 h-3 text-text-primary0" /> Source Excerpt
                   </span>
                   <p className="text-slate-800 dark:text-slate-200 font-medium italic leading-relaxed">
                     "{sourceSnippet}"
@@ -161,9 +161,9 @@ export default function TraceabilityViewer({
                 </div>
 
                 {/* Generated Claim */}
-                <div className="p-2.5 rounded-lg bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 space-y-1">
-                  <span className="text-[10px] font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-1">
-                    <ArrowRight className="w-3 h-3 text-indigo-600 dark:text-indigo-400" /> Generated Statement
+                <div className="p-2.5 rounded-lg bg-surface-selected/60 border border-primary/30 space-y-1">
+                  <span className="text-[10px] font-bold text-primary dark:text-accent uppercase tracking-wider flex items-center gap-1">
+                    <ArrowRight className="w-3 h-3 text-primary dark:text-accent" /> Generated Statement
                   </span>
                   <p className="text-slate-800 dark:text-slate-200 font-medium leading-relaxed">
                     "{generatedStatement}"

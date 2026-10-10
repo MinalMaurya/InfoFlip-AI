@@ -78,7 +78,7 @@ export default function TransformationControls({
       {/* Header */}
       <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/30">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-bold text-sm">
+          <div className="w-8 h-8 rounded-lg bg-surface-selected dark:bg-surface-selected text-primary dark:text-accent flex items-center justify-center font-bold text-sm">
             2
           </div>
           <div>
@@ -103,14 +103,14 @@ export default function TransformationControls({
           {/* Audience Selection */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-              <Users className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <Users className="w-3.5 h-3.5 text-primary dark:text-accent" />
               Target Audience
             </label>
             <div className="relative">
               <select
                 value={audience}
                 onChange={(e) => setAudience(e.target.value)}
-                className="w-full bg-slate-50/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 cursor-pointer"
+                className="w-full bg-slate-50/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary cursor-pointer"
               >
                 {AUDIENCE_OPTIONS.map((aud) => (
                   <option key={aud} value={aud} className="dark:bg-slate-900 dark:text-slate-100">
@@ -127,14 +127,14 @@ export default function TransformationControls({
           {/* Tone Selection */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-              <Sliders className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <Sliders className="w-3.5 h-3.5 text-primary dark:text-accent" />
               Tone & Voice
             </label>
             <div className="relative">
               <select
                 value={tone}
                 onChange={(e) => setTone(e.target.value)}
-                className="w-full bg-slate-50/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 cursor-pointer"
+                className="w-full bg-slate-50/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary cursor-pointer"
               >
                 {TONE_OPTIONS.map((t) => (
                   <option key={t} value={t} className="dark:bg-slate-900 dark:text-slate-100">
@@ -154,10 +154,10 @@ export default function TransformationControls({
         <div className="space-y-2">
           <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
             <span className="flex items-center gap-1.5">
-              <Languages className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <Languages className="w-3.5 h-3.5 text-primary dark:text-accent" />
               Output Language
             </span>
-            <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold">
+            <span className="text-[11px] text-primary dark:text-accent font-semibold">
               Authentic Vernacular Synthesis
             </span>
           </label>
@@ -171,7 +171,7 @@ export default function TransformationControls({
                   onClick={() => setLanguage(lang.id)}
                   className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold transition-all duration-150 ${
                     isSelected
-                      ? 'bg-indigo-50/80 dark:bg-indigo-950/60 border-indigo-500 dark:border-indigo-500 text-indigo-700 dark:text-indigo-300 shadow-2xs'
+                      ? 'bg-surface-selected/60 border-primary/300 dark:border-primary/40 text-primary dark:text-accent shadow-2xs'
                       : 'bg-slate-50/50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
@@ -187,14 +187,14 @@ export default function TransformationControls({
         <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-              <LayoutGrid className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <LayoutGrid className="w-3.5 h-3.5 text-primary dark:text-accent" />
               Communication Artefacts ({selectedFormats.length} selected)
             </label>
             <div className="flex items-center gap-2 text-[11px]">
               <button
                 type="button"
                 onClick={selectAllFormats}
-                className="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold"
+                className="text-primary dark:text-accent hover:underline font-semibold"
               >
                 Select All
               </button>
@@ -221,12 +221,12 @@ export default function TransformationControls({
                   onClick={() => toggleFormat(fmt.id)}
                   className={`text-left p-3 rounded-xl border transition-all duration-150 relative flex items-start gap-2.5 ${
                     isSelected
-                      ? 'bg-indigo-50/50 dark:bg-indigo-950/40 border-indigo-400 dark:border-indigo-600 text-slate-900 dark:text-slate-100 shadow-2xs ring-1 ring-indigo-400/30'
+                      ? 'bg-surface-selected/60 border-primary dark:border-primary/40 text-slate-900 dark:text-slate-100 shadow-2xs ring-1 ring-primary'
                       : 'bg-white dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50/50 dark:hover:bg-slate-800/80'
                   }`}
                 >
                   <div className={`mt-0.5 p-1.5 rounded-lg shrink-0 ${
-                    isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+                    isSelected ? 'bg-primary text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
                   }`}>
                     <Icon className="w-4 h-4" />
                   </div>
@@ -239,7 +239,7 @@ export default function TransformationControls({
                     </div>
                   </div>
                   <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
-                    isSelected ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 dark:border-slate-600'
+                    isSelected ? 'bg-primary border-primary text-white' : 'border-slate-300 dark:border-slate-600'
                   }`}>
                     {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                   </div>
@@ -261,10 +261,10 @@ export default function TransformationControls({
             type="button"
             onClick={onTransform}
             disabled={isTransforming}
-            className={`w-full py-4 px-6 rounded-xl font-bold text-base text-white shadow-lg transition-all duration-200 flex items-center justify-center gap-3 relative overflow-hidden group ${
+            className={`w-full py-4 px-6 rounded-xl font-bold text-base text-white shadow-sm transition-all duration-200 flex items-center justify-center gap-3 relative overflow-hidden group ${
               isTransforming
-                ? 'bg-indigo-400 dark:bg-indigo-600/70 cursor-not-allowed shadow-none'
-                : 'bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 hover:from-indigo-700 hover:via-indigo-700 hover:to-purple-700 shadow-indigo-300/40 dark:shadow-indigo-950/60 hover:shadow-indigo-400/50 active:scale-[0.99]'
+                ? 'bg-disabled-bg text-disabled-text cursor-not-allowed shadow-none'
+                : 'bg-primary hover:bg-primary-hover active:scale-[0.99]'
             }`}
           >
             <Sparkles className={`w-5 h-5 ${isTransforming ? 'animate-spin' : 'group-hover:scale-110 transition-transform'}`} />

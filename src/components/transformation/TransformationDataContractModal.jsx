@@ -35,7 +35,7 @@ export default function TransformationDataContractModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-overlay backdrop-blur-xs animate-fade-in">
       <div 
         className="w-full max-w-4xl bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
         role="dialog"
@@ -45,7 +45,7 @@ export default function TransformationDataContractModal({
         {/* Modal Header */}
         <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-800/40">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-2xs">
+            <div className="w-9 h-9 rounded-xl bg-surface-selected text-primary dark:text-accent flex items-center justify-center shadow-2xs">
               <Code className="w-5 h-5" />
             </div>
             <div>
@@ -53,7 +53,7 @@ export default function TransformationDataContractModal({
                 <h3 id="contract-modal-title" className="text-base font-bold text-slate-900 dark:text-slate-100">
                   Module 3 Transformation Output Contract
                 </h3>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-surface-selected dark:bg-surface-selected text-primary dark:text-accent border border-primary/40">
                   Ready for Modules 4 & 5
                 </span>
               </div>
@@ -98,8 +98,8 @@ export default function TransformationDataContractModal({
         </div>
 
         {/* Modal Code Body */}
-        <div className="flex-1 p-6 overflow-y-auto bg-slate-950 text-slate-100 font-mono text-xs leading-relaxed">
-          <pre className="selection:bg-indigo-500 selection:text-white">
+        <div className="flex-1 p-6 overflow-y-auto bg-sidebar-bg dark:bg-app-bg text-text-primary font-mono text-xs leading-relaxed">
+          <pre className="selection:bg-primary selection:text-white">
             <code>{jsonString}</code>
           </pre>
         </div>

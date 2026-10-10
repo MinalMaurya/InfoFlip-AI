@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Copy, Check, Send, Paperclip, ExternalLink } from 'lucide-react';
+import { Copy, Check } from 'lucide-react';
 
 export default function EmailPreview({
   content,
@@ -30,16 +30,16 @@ export default function EmailPreview({
     return (
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+          <label className="text-xs font-bold uppercase tracking-wider text-text-secondary">
             Edit Email Content
           </label>
-          <span className="text-xs text-slate-500">{text.length} characters</span>
+          <span className="text-xs text-text-secondary">{text.length} characters</span>
         </div>
         <textarea
           rows={14}
           value={text}
           onChange={(e) => onUpdateContent(e.target.value)}
-          className="w-full p-4 rounded-2xl border border-blue-200 dark:border-blue-900/60 bg-white dark:bg-slate-900 text-sm font-sans text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed font-mono"
+          className="w-full p-4 rounded-2xl border border-input-border bg-input-bg text-sm font-mono text-text-primary focus:outline-none focus:ring-2 focus:ring-focus-ring leading-relaxed"
           placeholder="Enter email content with Subject: and Preview: lines..."
         />
       </div>
@@ -47,13 +47,13 @@ export default function EmailPreview({
   }
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs overflow-hidden">
+    <div className="bg-surface rounded-2xl border border-border shadow-2xs overflow-hidden transition-colors">
       {/* Email Meta Header */}
-      <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 space-y-2.5">
+      <div className="p-4 sm:p-5 border-b border-border bg-sidebar-bg dark:bg-surface-elevated space-y-2.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Subject:</span>
-            <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
+            <span className="text-xs font-bold text-text-secondary uppercase tracking-wider">Subject:</span>
+            <span className="text-sm font-bold text-text-primary">
               {subject}
             </span>
           </div>
@@ -61,23 +61,23 @@ export default function EmailPreview({
           <button
             type="button"
             onClick={handleCopy}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors shadow-2xs"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-surface border border-border hover:bg-surface-hover text-text-primary transition-colors shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
+            {copied ? <Check className="w-3.5 h-3.5 text-success" /> : <Copy className="w-3.5 h-3.5 text-text-secondary" />}
             <span>{copied ? 'Copied!' : 'Copy Email'}</span>
           </button>
         </div>
 
         {previewText && (
-          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-2 text-xs text-text-secondary">
             <span className="font-semibold uppercase tracking-wider text-[10px]">Snippet:</span>
             <span className="italic truncate">{previewText}</span>
           </div>
         )}
 
-        <div className="pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+        <div className="pt-2 border-t border-divider flex items-center justify-between text-xs text-text-secondary">
           <div>
-            <span className="font-semibold text-slate-700 dark:text-slate-300">From: </span>
+            <span className="font-semibold text-text-primary">From: </span>
             <span>InfoFlip Dispatch Desk &lt;notifications@infoflip.internal&gt;</span>
           </div>
           <span className="text-[11px]">Today, 10:00 AM</span>
@@ -86,7 +86,7 @@ export default function EmailPreview({
 
       {/* Email Body */}
       <div className="p-6 sm:p-8 space-y-4">
-        <div className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-line leading-relaxed font-sans max-w-3xl">
+        <div className="text-sm text-text-primary whitespace-pre-line leading-relaxed font-sans max-w-3xl">
           {text}
         </div>
       </div>

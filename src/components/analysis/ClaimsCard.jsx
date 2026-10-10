@@ -98,7 +98,7 @@ export default function ClaimsCard({ claims, sourceText = '' }) {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800/80">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+          <div className="w-7 h-7 rounded-lg bg-surface-selected text-primary dark:text-accent flex items-center justify-center">
             <ShieldCheck className="w-4 h-4" />
           </div>
           <div>

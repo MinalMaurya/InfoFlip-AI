@@ -83,7 +83,7 @@ export default function GeneratedCard({
       {/* Card Header */}
       <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-3 bg-slate-50/60 dark:bg-slate-800/30">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 dark:bg-indigo-500 text-white flex items-center justify-center shadow-xs">
+          <div className="w-8 h-8 rounded-lg bg-primary dark:bg-primary text-white flex items-center justify-center shadow-xs">
             <Icon className="w-4 h-4" />
           </div>
           <div>
@@ -96,13 +96,13 @@ export default function GeneratedCard({
               )}
             </h3>
             <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/40">
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-surface-selected text-primary dark:text-accent border border-primary/30">
                 {artefact.audience}
               </span>
               <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                 {artefact.tone}
               </span>
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-900/40">
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-surface-selected text-primary dark:text-accent border border-primary/20">
                 {artefact.language}
               </span>
             </div>
@@ -120,7 +120,7 @@ export default function GeneratedCard({
       <div className="p-5 flex-1 flex flex-col justify-between">
         {isEditing ? (
           <div className="space-y-3">
-            <div className="flex items-center justify-between text-xs text-indigo-700 dark:text-indigo-300 font-semibold bg-indigo-50/70 dark:bg-indigo-950/40 px-3 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-900/40">
+            <div className="flex items-center justify-between text-xs text-primary dark:text-accent font-semibold bg-surface-selected/60 px-3 py-1.5 rounded-lg border border-primary/30">
               <span className="flex items-center gap-1.5">
                 <Edit3 className="w-3.5 h-3.5" />
                 Human Review Mode: Edit and refine content before dispatch
@@ -130,7 +130,7 @@ export default function GeneratedCard({
               value={draftContent}
               onChange={(e) => setDraftContent(e.target.value)}
               rows={9}
-              className="w-full p-3.5 text-sm rounded-xl border border-indigo-300 dark:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-sans leading-relaxed text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800"
+              className="w-full p-3.5 text-sm rounded-xl border border-primary/30 dark:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary font-sans leading-relaxed text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800"
               autoFocus
             />
             <div className="flex items-center justify-end gap-2 pt-1">

@@ -23,14 +23,14 @@ export default function IntentAudienceCard({ intent, audience }) {
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-2xs space-y-3">
         <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-surface-selected text-primary dark:text-accent flex items-center justify-center">
               <Target className="w-4 h-4" />
             </div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
               Communication Intent
             </h3>
           </div>
-          <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400">
+          <span className="text-[11px] font-semibold text-primary dark:text-accent">
             Primary: {intent?.primary || 'Inform'}
           </span>
         </div>
@@ -38,7 +38,7 @@ export default function IntentAudienceCard({ intent, audience }) {
         <div className="space-y-2">
           <div className="text-sm font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
             <span>{intent?.primary || 'Inform'}</span>
-            <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+            <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-surface-selected dark:bg-surface-selected text-primary dark:text-accent">
               Lead Directive
             </span>
           </div>
@@ -67,7 +67,7 @@ export default function IntentAudienceCard({ intent, audience }) {
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-2xs space-y-3">
         <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-surface-selected text-primary dark:text-accent flex items-center justify-center">
               <Users className="w-4 h-4" />
             </div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -85,7 +85,7 @@ export default function IntentAudienceCard({ intent, audience }) {
               audience.detected.map((aud, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-900/60"
+                  className="px-3 py-1.5 rounded-xl text-xs font-bold bg-surface-selected text-primary dark:text-accent border border-primary/30 dark:border-primary/40"
                 >
                   {aud}
                 </span>

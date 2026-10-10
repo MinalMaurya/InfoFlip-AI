@@ -66,11 +66,11 @@ export default function Navbar({
             <button 
               type="button"
               onClick={() => handleNavClick('create')}
-              className="flex items-center gap-3 text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-xl"
+              className="flex items-center gap-3 text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xl"
               title="InfoFlip-AI GenAI Platform"
             >
               {/* Mascot Logo Badge */}
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden shadow-xs border border-indigo-200/80 dark:border-indigo-900/80 bg-white dark:bg-slate-900 flex items-center justify-center group-hover:scale-105 transition-transform duration-200 shrink-0">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden shadow-xs border border-primary/30 dark:border-primary/40 bg-white dark:bg-slate-900 flex items-center justify-center group-hover:scale-105 transition-transform duration-200 shrink-0">
                 <img 
                   src="/infoflip-logo.png" 
                   alt="InfoFlip-AI Logo" 
@@ -81,11 +81,11 @@ export default function Navbar({
 
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xl font-extrabold bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-700 dark:from-white dark:via-indigo-200 dark:to-indigo-400 bg-clip-text text-transparent tracking-tight">
-                    InfoFlip<span className="text-indigo-600 dark:text-indigo-400">-AI</span>
+                  <span className="text-xl font-extrabold bg-gradient-to-r from-slate-900 via-primary to-primary-hover dark:from-white dark:via-accent dark:to-accent bg-clip-text text-transparent tracking-tight">
+                    InfoFlip<span className="text-primary dark:text-accent">-AI</span>
                   </span>
-                  <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80">
-                    <Cpu className="w-3 h-3 text-indigo-500" /> SIH26154
+                  <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-surface-selected text-primary dark:text-accent border border-primary/30 dark:border-primary/40">
+                    <Cpu className="w-3 h-3 text-text-primary0" /> SIH26154
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:block">
@@ -105,21 +105,21 @@ export default function Navbar({
                   key={item.id}
                   type="button"
                   onClick={() => handleNavClick(item.id)}
-                  className={`relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+                  className={`relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                     active
-                      ? 'text-indigo-700 dark:text-indigo-300 bg-indigo-50/80 dark:bg-indigo-950/60 shadow-2xs border border-indigo-100 dark:border-indigo-900/50'
+                      ? 'text-primary dark:text-accent bg-surface-selected/60 shadow-2xs border border-primary/30'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100/70 dark:hover:bg-slate-800/60'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${active ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'}`} />
+                  <Icon className={`w-4 h-4 ${active ? 'text-primary dark:text-accent' : 'text-slate-400 dark:text-slate-500'}`} />
                   <span>{item.label}</span>
                   {item.count > 0 && (
-                    <span className="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+                    <span className="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-surface-selected dark:bg-surface-selected text-primary dark:text-accent">
                       {item.count}
                     </span>
                   )}
                   {active && (
-                    <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-indigo-600 dark:bg-indigo-400 rounded-full" />
+                    <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-primary dark:bg-accent/30 rounded-full" />
                   )}
                 </button>
               );
@@ -141,7 +141,7 @@ export default function Navbar({
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+              className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               aria-label="Toggle mobile menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -166,18 +166,18 @@ export default function Navbar({
                   key={item.id}
                   type="button"
                   onClick={() => handleNavClick(item.id)}
-                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                     active
-                      ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold'
+                      ? 'bg-surface-selected text-primary dark:text-accent font-bold'
                       : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Icon className={`w-4 h-4 ${active ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'}`} />
+                    <Icon className={`w-4 h-4 ${active ? 'text-primary dark:text-accent' : 'text-slate-400 dark:text-slate-500'}`} />
                     <span>{item.label}</span>
                   </div>
                   {item.count > 0 && (
-                    <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300">
+                    <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-surface-selected text-primary dark:text-accent">
                       {item.count}
                     </span>
                   )}

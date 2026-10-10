@@ -24,8 +24,8 @@ export default function HistoryView({
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 mb-2">
-            <History className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-surface-selected text-primary dark:text-accent border border-primary/40 mb-2">
+            <History className="w-3.5 h-3.5 text-primary dark:text-accent" />
             <span>Workflow History & Saved Deliverables</span>
           </div>
           <h1 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
@@ -39,7 +39,7 @@ export default function HistoryView({
         <button
           type="button"
           onClick={onBackToWorkspace}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition-colors"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-primary hover:bg-primary-hover text-white shadow-xs transition-colors"
         >
           <Sparkles className="w-4 h-4" />
           <span>Resume Active Workflow</span>
@@ -70,7 +70,7 @@ export default function HistoryView({
               <div className="space-y-2 flex-1 min-w-0">
                 {/* Badges: Category, Date, Stage, Quality Gate */}
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-900/40">
+                  <span className="text-xs font-bold uppercase tracking-wider text-primary dark:text-accent bg-surface-selected px-2 py-0.5 rounded border border-primary/30">
                     {item.category || 'Advisory'}
                   </span>
                   
@@ -78,8 +78,8 @@ export default function HistoryView({
                     <Calendar className="w-3 h-3 text-slate-400" /> {item.createdDate || item.timestamp}
                   </span>
 
-                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/40 px-2 py-0.5 rounded border border-purple-200 dark:border-purple-900/50">
-                    <FileCheck2 className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary dark:text-accent bg-surface-selected px-2 py-0.5 rounded border border-primary/20">
+                    <FileCheck2 className="w-3 h-3 text-primary dark:text-accent" />
                     <span>Stage: {stage}</span>
                   </span>
 
@@ -88,8 +88,8 @@ export default function HistoryView({
                     <span>Quality Gate: {qualityGate}</span>
                   </span>
 
-                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50/80 dark:bg-indigo-950/30 px-2 py-0.5 rounded border border-indigo-200/80 dark:border-indigo-800">
-                    <DownloadCloud className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary dark:text-accent bg-surface-selected/60 px-2 py-0.5 rounded border border-primary/30 dark:border-primary/40">
+                    <DownloadCloud className="w-3 h-3 text-primary dark:text-accent" />
                     <span>{exportStatus}</span>
                   </span>
                 </div>
@@ -132,7 +132,7 @@ export default function HistoryView({
                   {item.exportId && (
                     <>
                       <span className="text-slate-300 dark:text-slate-700">•</span>
-                      <span className="font-mono text-[10px] text-indigo-600 dark:text-indigo-400">
+                      <span className="font-mono text-[10px] text-primary dark:text-accent">
                         pkg: {item.exportId}
                       </span>
                     </>
@@ -145,7 +145,7 @@ export default function HistoryView({
                 <button
                   type="button"
                   onClick={() => onSelectHistoryItem(item)}
-                  className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800 transition-colors shadow-2xs active:scale-[0.98]"
+                  className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-primary dark:text-accent bg-surface-selected hover:bg-surface-hover dark:hover:bg-surface-hover border border-primary/40 transition-colors shadow-2xs active:scale-[0.98]"
                 >
                   <span>Open Workflow</span>
                   <ArrowRight className="w-3.5 h-3.5" />

@@ -30,20 +30,20 @@ export default function ContextIntentCard({ contextSummary }) {
   };
 
   return (
-    <div className="bg-gradient-to-r from-indigo-50/70 via-purple-50/50 to-slate-50 dark:from-indigo-950/40 dark:via-purple-950/20 dark:to-slate-900 border border-indigo-200/80 dark:border-indigo-900/60 rounded-2xl p-4 sm:p-5 shadow-2xs mb-6 animate-fade-in">
+    <div className="bg-sidebar-bg border border-border rounded-2xl p-4 sm:p-5 shadow-2xs mb-6 animate-fade-in">
       <div className="flex flex-wrap items-center justify-between gap-3">
         
         {/* Title */}
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-indigo-600 dark:bg-indigo-500 text-white flex items-center justify-center shadow-2xs">
+          <div className="w-8 h-8 rounded-xl bg-primary text-white flex items-center justify-center shadow-2xs">
             <BrainCircuit className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-indigo-900 dark:text-indigo-300">
+              <span className="text-xs font-bold uppercase tracking-wider text-primary dark:text-accent">
                 Cognitive Pipeline Extracted
               </span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 shadow-2xs">
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-white dark:bg-slate-800 border border-primary/40 text-primary dark:text-accent shadow-2xs">
                 Context & Intent Grounded
               </span>
             </div>
@@ -56,7 +56,7 @@ export default function ContextIntentCard({ contextSummary }) {
         {/* Quick Badges */}
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 shadow-2xs">
-            <Target className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+            <Target className="w-3.5 h-3.5 text-primary dark:text-accent" />
             <span className="font-semibold text-slate-800 dark:text-slate-200">Intent:</span>
             <span>{intent}</span>
           </div>
@@ -79,7 +79,7 @@ export default function ContextIntentCard({ contextSummary }) {
 
       {/* Expanded Semantic Diagnostics */}
       {expanded && (
-        <div className="mt-4 pt-4 border-t border-indigo-100/80 dark:border-indigo-900/60 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs animate-fade-in">
+        <div className="mt-4 pt-4 border-t border-primary/30 dark:border-primary/40 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs animate-fade-in">
           <div className="bg-white/90 dark:bg-slate-800/90 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700">
             <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 block mb-0.5">
               Audience Filter

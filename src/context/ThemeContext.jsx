@@ -8,6 +8,34 @@ const ThemeContext = createContext({
 
 const THEME_STORAGE_KEY = 'infoflip-theme';
 
+function resolveInitialTheme(themePref) {
+  if (typeof window === 'undefined') return 'light';
+  if (themePref === 'dark') return 'dark';
+  if (themePref === 'light') return 'light';
+  try {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  } catch {
+    return 'light';
+  }
+}
+
+function applyDomTheme(nextResolved, mode) {
+  if (typeof document === 'undefined') return;
+  const root = document.documentElement;
+  const isDark = nextResolved === 'dark';
+
+  if (isDark) {
+    root.classList.add('dark');
+    if (document.body) document.body.classList.add('dark');
+  } else {
+    root.classList.remove('dark');
+    if (document.body) document.body.classList.remove('dark');
+  }
+  root.setAttribute('data-theme', nextResolved);
+  root.setAttribute('data-theme-mode', mode);
+  root.style.colorScheme = nextResolved;
+}
+
 export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState(() => {
     try {
@@ -21,11 +49,10 @@ export function ThemeProvider({ children }) {
     return 'system';
   });
 
-  const [resolvedTheme, setResolvedTheme] = useState('light');
+  const [resolvedTheme, setResolvedTheme] = useState(() => resolveInitialTheme(theme));
 
-  // Handle theme changes and system preference changes
+  // Handle theme changes and system preference changes without flash or reload
   useEffect(() => {
-    const root = document.documentElement;
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
     const applyTheme = () => {
@@ -36,13 +63,9 @@ export function ThemeProvider({ children }) {
         isDark = theme === 'dark';
       }
 
-      setResolvedTheme(isDark ? 'dark' : 'light');
-
-      if (isDark) {
-        root.classList.add('dark');
-      } else {
-        root.classList.remove('dark');
-      }
+      const nextResolved = isDark ? 'dark' : 'light';
+      setResolvedTheme(nextResolved);
+      applyDomTheme(nextResolved, theme);
     };
 
     applyTheme();
@@ -58,6 +81,10 @@ export function ThemeProvider({ children }) {
   }, [theme]);
 
   const setTheme = (newTheme) => {
+    if (newTheme !== 'light' && newTheme !== 'dark' && newTheme !== 'system') return;
+    const nextResolved = resolveInitialTheme(newTheme);
+    applyDomTheme(nextResolved, newTheme);
+    setResolvedTheme(nextResolved);
     setThemeState(newTheme);
     try {
       localStorage.setItem(THEME_STORAGE_KEY, newTheme);

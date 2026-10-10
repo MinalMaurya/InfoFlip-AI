@@ -47,13 +47,13 @@ export default function ReviewDataContractModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-overlay backdrop-blur-xs animate-fade-in">
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-4xl w-full flex flex-col max-h-[90vh] overflow-hidden">
         
         {/* Header */}
         <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">
+            <div className="p-2 rounded-xl bg-surface-selected text-primary dark:text-accent">
               <Code className="w-5 h-5" />
             </div>
             <div>
@@ -83,7 +83,7 @@ export default function ReviewDataContractModal({
               onClick={() => setActiveTab('reviewResult')}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 activeTab === 'reviewResult'
-                  ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-2xs border border-slate-200/80 dark:border-slate-700'
+                  ? 'bg-white dark:bg-slate-800 text-primary dark:text-accent shadow-2xs border border-slate-200/80 dark:border-slate-700'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
@@ -96,7 +96,7 @@ export default function ReviewDataContractModal({
               onClick={() => setActiveTab('exportPackage')}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 activeTab === 'exportPackage'
-                  ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-2xs border border-slate-200/80 dark:border-slate-700'
+                  ? 'bg-white dark:bg-slate-800 text-primary dark:text-accent shadow-2xs border border-slate-200/80 dark:border-slate-700'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
@@ -118,7 +118,7 @@ export default function ReviewDataContractModal({
             <button
               type="button"
               onClick={handleDownload}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-primary hover:bg-primary-hover text-white transition-colors"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Download</span>
@@ -127,7 +127,7 @@ export default function ReviewDataContractModal({
         </div>
 
         {/* JSON Viewer */}
-        <div className="flex-1 p-5 overflow-auto bg-slate-950 font-mono text-xs text-emerald-400 leading-relaxed">
+        <div className="flex-1 p-5 overflow-auto bg-sidebar-bg dark:bg-app-bg font-mono text-xs text-text-primary leading-relaxed">
           <pre>{currentJson}</pre>
         </div>
 

@@ -35,13 +35,13 @@ export default function CommunicationDataContractModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-overlay backdrop-blur-xs animate-fade-in">
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden">
         
         {/* Modal Header */}
         <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/80 dark:bg-slate-800/50">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+            <div className="w-10 h-10 rounded-xl bg-surface-selected border border-primary/40 flex items-center justify-center text-primary dark:text-accent">
               <Code className="w-5 h-5" />
             </div>
             <div>
@@ -49,7 +49,7 @@ export default function CommunicationDataContractModal({
                 <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
                   Module 4 Communication Contract
                 </h3>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-surface-selected dark:bg-surface-selected text-primary dark:text-accent">
                   Standard JSON
                 </span>
               </div>
@@ -89,7 +89,7 @@ export default function CommunicationDataContractModal({
         </div>
 
         {/* Modal JSON Viewer */}
-        <div className="p-6 overflow-y-auto font-mono text-xs text-slate-800 dark:text-slate-200 bg-slate-950 text-slate-100 leading-relaxed selection:bg-indigo-500 selection:text-white">
+        <div className="p-6 overflow-y-auto font-mono text-xs bg-sidebar-bg dark:bg-app-bg text-text-primary leading-relaxed selection:bg-primary selection:text-white">
           <pre>{jsonString}</pre>
         </div>
 

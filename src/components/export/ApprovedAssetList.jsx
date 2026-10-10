@@ -23,7 +23,7 @@ export default function ApprovedAssetList({ exportPackage }) {
         <div>
           <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
             <span>Approved Communication Deliverables</span>
-            <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
+            <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-surface-selected text-primary dark:bg-surface-selected dark:text-accent">
               {items.length}
             </span>
           </h3>
@@ -37,9 +37,9 @@ export default function ApprovedAssetList({ exportPackage }) {
           <button
             type="button"
             onClick={() => setActiveChannel('ALL')}
-            className={`px-3 py-1 rounded-xl text-xs font-bold transition-all outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+            className={`px-3 py-1 rounded-xl text-xs font-bold transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary ${
               activeChannel === 'ALL'
-                ? 'bg-indigo-600 text-white shadow-2xs'
+                ? 'bg-primary text-white shadow-2xs'
                 : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700'
             }`}
           >
@@ -53,9 +53,9 @@ export default function ApprovedAssetList({ exportPackage }) {
                 key={ch}
                 type="button"
                 onClick={() => setActiveChannel(ch)}
-                className={`capitalize px-3 py-1 rounded-xl text-xs font-semibold transition-all outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+                className={`capitalize px-3 py-1 rounded-xl text-xs font-semibold transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                   activeChannel === ch
-                    ? 'bg-indigo-600 text-white shadow-2xs font-bold'
+                    ? 'bg-primary text-white shadow-2xs font-bold'
                     : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700'
                 }`}
               >

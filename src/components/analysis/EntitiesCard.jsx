@@ -13,9 +13,9 @@ export default function EntitiesCard({ entities }) {
   if (!entities) return null;
 
   const sections = [
-    { title: 'Organizations', items: entities.organizations, icon: Building2, color: 'indigo' },
+    { title: 'Organizations', items: entities.organizations, icon: Building2, color: 'primary' },
     { title: 'Locations', items: entities.locations, icon: MapPin, color: 'blue' },
-    { title: 'Technologies / Assets', items: entities.technologies, icon: Cpu, color: 'purple' },
+    { title: 'Technologies / Assets', items: entities.technologies, icon: Cpu, color: 'primary' },
     { title: 'People / Roles', items: entities.people, icon: UserCheck, color: 'emerald' },
     { title: 'Dates / Milestones', items: entities.dates, icon: Calendar, color: 'amber' },
     { title: 'Other Entities', items: entities.other, icon: Layers, color: 'slate' }
@@ -31,7 +31,7 @@ export default function EntitiesCard({ entities }) {
       {/* Header */}
       <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800/80">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+          <div className="w-7 h-7 rounded-lg bg-surface-selected text-primary dark:text-accent flex items-center justify-center">
             <Building2 className="w-4 h-4" />
           </div>
           <div>
@@ -60,7 +60,7 @@ export default function EntitiesCard({ entities }) {
               className="p-3 rounded-xl bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-2"
             >
               <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-300">
-                <Icon className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                <Icon className="w-3.5 h-3.5 text-primary dark:text-accent" />
                 <span>{sec.title}</span>
                 <span className="text-[10px] text-slate-400 font-normal">({sec.items.length})</span>
               </div>

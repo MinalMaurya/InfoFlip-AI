@@ -20,7 +20,7 @@ export default function SourceTraceabilityCard({ sourceData, traceability }) {
       {/* Traceability Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs uppercase">
+          <div className="w-8 h-8 rounded-xl bg-surface-selected text-primary dark:text-accent flex items-center justify-center font-bold text-xs uppercase">
             {sourceType.slice(0, 3)}
           </div>
           <div>
@@ -51,7 +51,7 @@ export default function SourceTraceabilityCard({ sourceData, traceability }) {
             <button
               type="button"
               onClick={() => setShowSourceText(!showSourceText)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <Eye className="w-3.5 h-3.5 text-slate-500" />
               <span>{showSourceText ? 'Hide Source Text' : 'Inspect Source Text'}</span>

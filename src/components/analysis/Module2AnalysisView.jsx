@@ -110,7 +110,7 @@ export default function Module2AnalysisView({
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900/50">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-surface-selected dark:bg-surface-selected text-primary dark:text-accent border border-primary/40">
                 UNDERSTAND
               </span>
               <span className="text-slate-300 dark:text-slate-700">•</span>
@@ -133,7 +133,7 @@ export default function Module2AnalysisView({
                 <button
                   type="button"
                   onClick={() => setShowContractModal(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-indigo-700 dark:text-indigo-300 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-primary dark:text-accent border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   title="Inspect Module 2 Structured Analysis Contract"
                 >
                   <Code className="w-3.5 h-3.5" />
@@ -157,7 +157,7 @@ export default function Module2AnalysisView({
               <button
                 type="button"
                 onClick={() => onContinueToTransform({ source: sourceData, analysis })}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-primary hover:bg-primary-hover transition-colors shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <span>Continue to Transform</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -199,7 +199,7 @@ export default function Module2AnalysisView({
             <button
               type="button"
               onClick={handleReanalyze}
-              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-2xs"
+              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-primary hover:bg-primary-hover transition-colors shadow-2xs"
             >
               Try Again
             </button>
@@ -217,7 +217,7 @@ export default function Module2AnalysisView({
       ) : !analysis ? (
         /* Empty State: No Source Loaded */
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800 p-8 sm:p-12 text-center max-w-xl mx-auto shadow-2xs">
-          <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto mb-4 shadow-xs">
+          <div className="w-14 h-14 rounded-2xl bg-surface-selected text-primary dark:text-accent flex items-center justify-center mx-auto mb-4 shadow-xs">
             <BrainCircuit className="w-7 h-7" />
           </div>
           <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
@@ -231,7 +231,7 @@ export default function Module2AnalysisView({
               <button
                 type="button"
                 onClick={onBackToInput}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-xs"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-primary hover:bg-primary-hover transition-colors shadow-xs"
               >
                 <PlusCircle className="w-4 h-4" />
                 <span>Go to Module 1 (Input)</span>
@@ -240,9 +240,9 @@ export default function Module2AnalysisView({
             <button
               type="button"
               onClick={handleLoadSampleAnalysis}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 border border-indigo-200 dark:border-indigo-800 transition-colors shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-primary dark:text-accent bg-surface-selected hover:bg-surface-hover dark:hover:bg-surface-hover border border-primary/40 transition-colors shadow-2xs"
             >
-              <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              <Sparkles className="w-4 h-4 text-primary dark:text-accent" />
               <span>Load Pre-Analyzed Weather Sample</span>
             </button>
           </div>
@@ -263,10 +263,10 @@ export default function Module2AnalysisView({
               {typeof analysis.confidence?.overall === 'number' && (
                 <span 
                   title={getQualitativeConfidenceLabel(analysis.confidence.overall).note}
-                  className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 flex items-center gap-1"
+                  className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-surface-selected text-primary dark:text-accent border border-primary/40 flex items-center gap-1"
                 >
                   <span>{getQualitativeConfidenceLabel(analysis.confidence.overall).label}</span>
-                  <span className="text-[10px] text-indigo-500 dark:text-indigo-400 font-normal">
+                  <span className="text-[10px] text-primary dark:text-accent font-normal">
                     (AI Probability; not verified)
                   </span>
                 </span>
@@ -354,7 +354,7 @@ export default function Module2AnalysisView({
             <div>
               <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <span>Ready for Content Transformation (Module 3)</span>
-                <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+                <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-surface-selected dark:bg-surface-selected text-primary dark:text-accent">
                   Context Analyzed
                 </span>
               </h4>
@@ -367,7 +367,7 @@ export default function Module2AnalysisView({
               <button
                 type="button"
                 onClick={() => setShowContractModal(true)}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <Code className="w-3.5 h-3.5 text-slate-500" />
                 <span>Inspect JSON</span>
@@ -377,7 +377,7 @@ export default function Module2AnalysisView({
                 <button
                   type="button"
                   onClick={() => onContinueToTransform({ source: sourceData, analysis })}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md shadow-indigo-300/40 dark:shadow-indigo-950 active:scale-[0.99] outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-primary hover:bg-primary-hover transition-all shadow-sm active:scale-[0.99] outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                 >
                   <span>Continue to Transform →</span>
                 </button>

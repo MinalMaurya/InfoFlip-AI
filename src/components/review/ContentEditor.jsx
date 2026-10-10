@@ -53,12 +53,12 @@ export default function ContentEditor({
       {/* Header with Mode Toggles */}
       <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">
-          <Edit3 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+          <Edit3 className="w-4 h-4 text-primary dark:text-accent" />
           <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">
             Human-in-the-Loop Content Editor
           </h4>
           {isEdited && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300">
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-surface-selected text-primary dark:text-accent border border-primary/20">
               Edited by Human
             </span>
           )}
@@ -106,14 +106,14 @@ export default function ContentEditor({
 
           {/* Editable Draft */}
           <div className="space-y-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-primary dark:text-accent flex items-center gap-1">
               <Edit3 className="w-3.5 h-3.5" /> Human Revised Version
             </span>
             <textarea
               rows={10}
               value={draftContent}
               onChange={(e) => setDraftContent(e.target.value)}
-              className="w-full p-3 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none font-sans text-xs leading-relaxed resize-y max-h-80"
+              className="w-full p-3 rounded-xl border border-primary/40 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:outline-none font-sans text-xs leading-relaxed resize-y max-h-80"
               placeholder="Edit content here..."
             />
           </div>
@@ -124,7 +124,7 @@ export default function ContentEditor({
             rows={8}
             value={draftContent}
             onChange={(e) => setDraftContent(e.target.value)}
-            className="w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/80 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none font-sans text-xs leading-relaxed resize-y"
+            className="w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/80 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-primary focus:outline-none font-sans text-xs leading-relaxed resize-y"
             placeholder="Edit communication content..."
           />
         </div>
@@ -149,7 +149,7 @@ export default function ContentEditor({
         </div>
 
         {isDifferentFromOriginal && (
-          <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-medium">
+          <span className="text-[10px] text-primary dark:text-accent font-medium">
             Modified from original AI output
           </span>
         )}
@@ -182,10 +182,10 @@ export default function ContentEditor({
             type="button"
             onClick={handleSave}
             disabled={!hasUnsavedChanges && !isDifferentFromOriginal}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold text-white transition-all shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold text-white transition-all shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-primary ${
               savedSuccess
                 ? 'bg-emerald-600'
-                : 'bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98]'
+                : 'bg-primary hover:bg-primary-hover active:scale-[0.98]'
             } disabled:opacity-50 disabled:pointer-events-none`}
           >
             {savedSuccess ? (

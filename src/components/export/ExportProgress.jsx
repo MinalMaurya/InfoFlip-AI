@@ -5,9 +5,9 @@ export default function ExportProgress({ status, message }) {
   if (status !== 'EXPORTING') return null;
 
   return (
-    <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 flex items-center justify-between gap-3 text-xs animate-fade-in">
+    <div className="p-4 rounded-2xl bg-surface-selected/60 border border-primary/40 flex items-center justify-between gap-3 text-xs animate-fade-in">
       <div className="flex items-center gap-3">
-        <div className="p-2 rounded-xl bg-indigo-600 text-white shadow-2xs">
+        <div className="p-2 rounded-xl bg-primary text-white shadow-2xs">
           <Loader2 className="w-4 h-4 animate-spin" />
         </div>
         <div>
@@ -19,7 +19,7 @@ export default function ExportProgress({ status, message }) {
           </p>
         </div>
       </div>
-      <span className="font-mono text-[10px] text-indigo-600 dark:text-indigo-400 font-bold bg-white dark:bg-slate-800 px-2.5 py-1 rounded-full border border-indigo-200 dark:border-indigo-800">
+      <span className="font-mono text-[10px] text-primary dark:text-accent font-bold bg-white dark:bg-slate-800 px-2.5 py-1 rounded-full border border-primary/40">
         PROCESSING
       </span>
     </div>

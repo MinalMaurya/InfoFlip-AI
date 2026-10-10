@@ -19,8 +19,8 @@ export default function ReviewSummary({ summary, onFilterChange, activeFilter, c
       label: 'Total Outputs',
       count: summary.totalOutputs || 0,
       icon: FileText,
-      color: 'indigo',
-      badgeBg: 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300'
+      color: 'primary',
+      badgeBg: 'bg-surface-selected border-primary/40 text-primary dark:text-accent'
     },
     {
       id: 'PASS',
@@ -51,16 +51,16 @@ export default function ReviewSummary({ summary, onFilterChange, activeFilter, c
       label: 'Needs Review',
       count: summary.needsHumanReview || 0,
       icon: Clock,
-      color: 'purple',
-      badgeBg: 'bg-purple-50 dark:bg-purple-950/60 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300'
+      color: 'primary',
+      badgeBg: 'bg-surface-selected border-primary/30 text-primary dark:text-accent'
     },
     {
       id: 'APPROVED',
       label: 'Approved',
       count: summary.approved || 0,
       icon: ThumbsUp,
-      color: 'teal',
-      badgeBg: 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300'
+      color: 'emerald',
+      badgeBg: 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
     }
   ];
 
@@ -85,9 +85,9 @@ export default function ReviewSummary({ summary, onFilterChange, activeFilter, c
               key={card.id}
               type="button"
               onClick={() => onFilterChange && onFilterChange(card.id)}
-              className={`p-3.5 sm:p-4 rounded-2xl border text-left transition-all cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${card.badgeBg} ${
+              className={`p-3.5 sm:p-4 rounded-2xl border text-left transition-all cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary ${card.badgeBg} ${
                 isSelected
-                  ? 'ring-2 ring-indigo-500 shadow-md scale-[1.02] font-semibold'
+                  ? 'ring-2 ring-primary shadow-md scale-[1.02] font-semibold'
                   : 'hover:shadow-sm hover:scale-[1.01] opacity-90 hover:opacity-100'
               }`}
             >

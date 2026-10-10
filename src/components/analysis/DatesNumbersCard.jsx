@@ -15,7 +15,7 @@ export default function DatesNumbersCard({ importantDates = [], importantNumbers
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-2xs space-y-3">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+              <div className="w-7 h-7 rounded-lg bg-surface-selected text-primary dark:text-accent flex items-center justify-center">
                 <Calendar className="w-4 h-4" />
               </div>
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -58,7 +58,7 @@ export default function DatesNumbersCard({ importantDates = [], importantNumbers
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-2xs space-y-3">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+              <div className="w-7 h-7 rounded-lg bg-surface-selected text-primary dark:text-accent flex items-center justify-center">
                 <Hash className="w-4 h-4" />
               </div>
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -77,7 +77,7 @@ export default function DatesNumbersCard({ importantDates = [], importantNumbers
                 key={idx}
                 className="p-2.5 rounded-xl bg-slate-50/60 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 space-y-0.5"
               >
-                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block truncate">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-primary dark:text-accent block truncate">
                   {num.label}
                 </span>
                 <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100 block truncate">

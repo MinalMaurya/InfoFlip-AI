@@ -63,8 +63,8 @@ export default function PipelineStepIndicator({
       {/* Workflow Header (Requirements 13 & 19) */}
       <div className="flex flex-wrap items-center justify-between gap-2 mb-3 px-1">
         <div className="flex items-center gap-2.5">
-          <div className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400 relative">
-            <span className="animate-ping absolute inset-0 rounded-full bg-indigo-400 opacity-75"></span>
+          <div className="w-2 h-2 rounded-full bg-primary dark:bg-accent/30 relative">
+            <span className="animate-ping absolute inset-0 rounded-full bg-accent/30 opacity-75"></span>
           </div>
           <div>
             <h2 className="text-xs sm:text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">
@@ -77,8 +77,8 @@ export default function PipelineStepIndicator({
         </div>
 
         {/* Current Stage Indicator */}
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-3 py-1 rounded-full border border-indigo-200/80 dark:border-indigo-800/80">
-          <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-primary dark:text-accent bg-surface-selected px-3 py-1 rounded-full border border-primary/30 dark:border-primary/40">
+          <Sparkles className="w-3.5 h-3.5 text-text-primary0" />
           <span>Stage {currentStep} of 6: {currentStepObj.title} • {currentStepObj.subtitle}</span>
         </div>
       </div>
@@ -115,13 +115,13 @@ export default function PipelineStepIndicator({
               }
               className={`relative flex flex-col justify-between p-3 rounded-lg border transition-all select-none ${
                 onStepClick && isAllowed
-                  ? 'cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-600 hover:shadow-xs active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500'
+                  ? 'cursor-pointer hover:border-primary dark:hover:border-primary hover:shadow-xs active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary'
                   : isFuture
                   ? 'cursor-not-allowed opacity-65'
                   : ''
               } ${
                 isCurrent
-                  ? 'bg-indigo-50/80 dark:bg-indigo-950/40 border-indigo-500 dark:border-indigo-500 shadow-xs ring-1 ring-indigo-500/20'
+                  ? 'bg-surface-selected/60 border-primary/300 dark:border-primary/40 shadow-xs ring-1 ring-primary'
                   : isPast
                   ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/60'
                   : 'bg-slate-50/70 dark:bg-slate-800/30 border-slate-200/80 dark:border-slate-800/80'
@@ -133,7 +133,7 @@ export default function PipelineStepIndicator({
                   <div
                     className={`w-6 h-6 rounded-md flex items-center justify-center font-bold text-[11px] shrink-0 ${
                       isCurrent
-                        ? 'bg-indigo-600 text-white shadow-xs'
+                        ? 'bg-primary text-white shadow-xs'
                         : isPast
                         ? 'bg-emerald-600 text-white'
                         : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
@@ -143,7 +143,7 @@ export default function PipelineStepIndicator({
                   </div>
                   <Icon className={`w-3.5 h-3.5 ${
                     isCurrent 
-                      ? 'text-indigo-600 dark:text-indigo-400'
+                      ? 'text-primary dark:text-accent'
                       : isPast 
                       ? 'text-emerald-600 dark:text-emerald-400' 
                       : 'text-slate-400 dark:text-slate-500'
@@ -157,8 +157,8 @@ export default function PipelineStepIndicator({
                     <span>Done</span>
                   </span>
                 ) : isCurrent ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-100/80 dark:bg-indigo-900/60 px-1.5 py-0.2 rounded">
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400 animate-pulse" />
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-primary dark:text-accent bg-surface-selected px-1.5 py-0.2 rounded">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary dark:bg-accent/30 animate-pulse" />
                     <span>Active</span>
                   </span>
                 ) : (
@@ -172,7 +172,7 @@ export default function PipelineStepIndicator({
               <div className="min-w-0">
                 <div className={`text-xs font-bold truncate ${
                   isCurrent 
-                    ? 'text-indigo-950 dark:text-indigo-100 font-extrabold' 
+                    ? 'text-text-primary dark:text-accent font-extrabold' 
                     : isPast
                     ? 'text-emerald-950 dark:text-emerald-200'
                     : 'text-slate-700 dark:text-slate-300'

@@ -44,16 +44,16 @@ export default function TwitterCommunicationPreview({
     return (
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+          <label className="text-xs font-bold uppercase tracking-wider text-text-secondary">
             Edit X / Twitter Content
           </label>
-          <span className="text-xs text-slate-500">{text.length} characters</span>
+          <span className="text-xs text-text-secondary">{text.length} characters</span>
         </div>
         <textarea
           rows={10}
           value={text}
           onChange={(e) => onUpdateContent(e.target.value)}
-          className="w-full p-4 rounded-2xl border border-sky-200 dark:border-sky-900/60 bg-white dark:bg-slate-900 text-sm font-sans text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500 leading-relaxed"
+          className="w-full p-4 rounded-2xl border border-input-border bg-input-bg text-sm font-sans text-text-primary focus:outline-none focus:ring-2 focus:ring-focus-ring leading-relaxed"
           placeholder="Enter X / Twitter posts (use '---' between thread posts)..."
         />
       </div>
@@ -65,11 +65,11 @@ export default function TwitterCommunicationPreview({
       {/* Header bar with thread count and copy all */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+          <span className="text-xs font-bold text-text-primary">
             {displayPosts.length > 1 ? `Thread (${displayPosts.length} Posts)` : 'Single Tweet'}
           </span>
           {displayPosts.length > 1 && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-surface-selected text-text-primary border border-border">
               Thread Format
             </span>
           )}
@@ -78,9 +78,9 @@ export default function TwitterCommunicationPreview({
         <button
           type="button"
           onClick={handleCopyAll}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors shadow-2xs"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-surface border border-border hover:bg-surface-hover text-text-primary transition-colors shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
         >
-          {copiedAll ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
+          {copiedAll ? <Check className="w-3.5 h-3.5 text-success" /> : <Copy className="w-3.5 h-3.5 text-text-secondary" />}
           <span>{copiedAll ? 'Thread Copied!' : 'Copy Entire Thread'}</span>
         </button>
       </div>
@@ -94,22 +94,22 @@ export default function TwitterCommunicationPreview({
           return (
             <div
               key={idx}
-              className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-2xs relative"
+              className="bg-surface rounded-2xl border border-border p-4 sm:p-5 shadow-2xs relative transition-colors"
             >
               {/* Tweet Header */}
               <div className="flex items-center justify-between mb-2.5">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 flex items-center justify-center font-bold text-xs">
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs">
                     𝕏
                   </div>
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                      <span className="text-xs font-bold text-text-primary">
                         InfoFlip
                       </span>
-                      <span className="text-xs text-slate-400">@InfoFlipAI</span>
-                      <span className="text-xs text-slate-400">·</span>
-                      <span className="text-[11px] text-slate-400">Post {idx + 1} of {displayPosts.length}</span>
+                      <span className="text-xs text-text-secondary">@InfoFlipAI</span>
+                      <span className="text-xs text-text-secondary">·</span>
+                      <span className="text-[11px] text-text-secondary">Post {idx + 1} of {displayPosts.length}</span>
                     </div>
                   </div>
                 </div>
@@ -117,8 +117,8 @@ export default function TwitterCommunicationPreview({
                 <div className="flex items-center gap-2">
                   <span className={`text-[11px] font-mono font-semibold px-2 py-0.5 rounded-md ${
                     isOverLimit
-                      ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-300'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                      ? 'bg-error-subtle text-error border border-error/30'
+                      : 'bg-sidebar-bg text-text-secondary border border-border'
                   }`}>
                     {charCount}/280
                   </span>
@@ -126,35 +126,35 @@ export default function TwitterCommunicationPreview({
                   <button
                     type="button"
                     onClick={() => handleCopySingle(postItem, idx)}
-                    className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+                    className="p-1.5 rounded-lg hover:bg-surface-hover text-text-secondary hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                     title="Copy this post"
                   >
-                    {copiedIndex === idx ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedIndex === idx ? <Check className="w-3.5 h-3.5 text-success" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>
 
               {/* Tweet Text */}
-              <div className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-line leading-relaxed pl-10 font-sans">
+              <div className="text-sm text-text-primary whitespace-pre-line leading-relaxed pl-10 font-sans">
                 {postItem}
               </div>
 
               {/* Tweet Metrics Bar */}
-              <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 pl-10 flex items-center justify-between text-xs text-slate-400">
+              <div className="pt-3 mt-3 border-t border-divider pl-10 flex items-center justify-between text-xs text-text-secondary">
                 <div className="flex items-center gap-6">
-                  <span className="flex items-center gap-1 hover:text-sky-500 transition-colors cursor-pointer">
+                  <span className="flex items-center gap-1 hover:text-primary dark:hover:text-accent transition-colors cursor-pointer">
                     <MessageSquare className="w-3.5 h-3.5" />
                   </span>
-                  <span className="flex items-center gap-1 hover:text-emerald-500 transition-colors cursor-pointer">
+                  <span className="flex items-center gap-1 hover:text-success transition-colors cursor-pointer">
                     <Repeat className="w-3.5 h-3.5" />
                   </span>
-                  <span className="flex items-center gap-1 hover:text-rose-500 transition-colors cursor-pointer">
+                  <span className="flex items-center gap-1 hover:text-error transition-colors cursor-pointer">
                     <Heart className="w-3.5 h-3.5" />
                   </span>
-                  <span className="flex items-center gap-1 hover:text-sky-500 transition-colors cursor-pointer">
+                  <span className="flex items-center gap-1 hover:text-primary dark:hover:text-accent transition-colors cursor-pointer">
                     <Bookmark className="w-3.5 h-3.5" />
                   </span>
-                  <span className="flex items-center gap-1 hover:text-sky-500 transition-colors cursor-pointer">
+                  <span className="flex items-center gap-1 hover:text-primary dark:hover:text-accent transition-colors cursor-pointer">
                     <Share className="w-3.5 h-3.5" />
                   </span>
                 </div>

@@ -28,14 +28,14 @@ export default function DataContractModal({ isOpen, onClose, contractData }) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="contract-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-overlay backdrop-blur-sm animate-fade-in"
     >
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-slide-up">
         
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/60 dark:bg-slate-800/40">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-mono font-bold text-xs">
+            <div className="w-8 h-8 rounded-xl bg-surface-selected dark:bg-surface-selected text-primary dark:text-accent flex items-center justify-center font-mono font-bold text-xs">
               <Code className="w-4 h-4" />
             </div>
             <div>
@@ -79,7 +79,7 @@ export default function DataContractModal({ isOpen, onClose, contractData }) {
         </div>
 
         {/* JSON Code Viewer */}
-        <div className="p-6 overflow-y-auto flex-1 bg-slate-950 text-slate-200 font-mono text-xs leading-relaxed">
+        <div className="p-6 overflow-y-auto flex-1 bg-sidebar-bg dark:bg-app-bg text-text-primary font-mono text-xs leading-relaxed">
           <pre className="whitespace-pre-wrap">{formattedJson}</pre>
         </div>
 
@@ -92,7 +92,7 @@ export default function DataContractModal({ isOpen, onClose, contractData }) {
           <button
             type="button"
             onClick={onClose}
-            className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-xs"
+            className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-primary hover:bg-primary-hover transition-colors shadow-xs"
           >
             Done
           </button>

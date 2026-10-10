@@ -96,7 +96,7 @@ export default function AboutView({ onStartTransforming }) {
       
       {/* Hero Badge & Mascot */}
       <div className="text-center max-w-2xl mx-auto mb-10">
-        <div className="w-20 h-20 mx-auto mb-4 rounded-2xl overflow-hidden shadow-sm border border-indigo-200 dark:border-indigo-900 bg-white dark:bg-slate-900 flex items-center justify-center">
+        <div className="w-20 h-20 mx-auto mb-4 rounded-2xl overflow-hidden shadow-sm border border-primary/40 bg-white dark:bg-slate-900 flex items-center justify-center">
           <img 
             src="/infoflip-logo.png" 
             alt="InfoFlip-AI Mascot" 
@@ -104,11 +104,11 @@ export default function AboutView({ onStartTransforming }) {
             loading="eager"
           />
         </div>
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 mb-3">
-          <Cpu className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" /> SIH Problem Statement: SIH26154
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-surface-selected text-primary dark:text-accent border border-primary/40 mb-3">
+          <Cpu className="w-3.5 h-3.5 text-primary dark:text-accent" /> SIH Problem Statement: SIH26154
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
-          InfoFlip<span className="text-indigo-600 dark:text-indigo-400">-AI</span>
+          InfoFlip<span className="text-primary dark:text-accent">-AI</span>
         </h1>
         <p className="text-base text-slate-600 dark:text-slate-400 mt-2 font-medium">
           GenAI Content Transformation Platform (SIH 26154)
@@ -121,7 +121,7 @@ export default function AboutView({ onStartTransforming }) {
       {/* Problem & Solution Card */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xs mb-8">
         <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-2 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400"></span>
+          <span className="w-2 h-2 rounded-full bg-primary dark:bg-accent/30"></span>
           <span>The Problem & Solution (SIH26154)</span>
         </h2>
         <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -143,10 +143,10 @@ export default function AboutView({ onStartTransforming }) {
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xs mb-8">
         <div className="flex items-center justify-between gap-2 mb-4">
           <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <Sparkles className="w-4 h-4 text-primary dark:text-accent" />
             <span>The Six-Stage Pipeline</span>
           </h2>
-          <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-2.5 py-0.5 rounded-full border border-indigo-200/60 dark:border-indigo-800">
+          <span className="text-xs font-semibold text-primary dark:text-accent bg-surface-selected px-2.5 py-0.5 rounded-full border border-primary/30 dark:border-primary/40">
             Modules 1 – 6 Complete
           </span>
         </div>
@@ -161,10 +161,10 @@ export default function AboutView({ onStartTransforming }) {
               >
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="w-6 h-6 rounded-lg bg-indigo-600 text-white font-bold text-xs flex items-center justify-center">
+                    <span className="w-6 h-6 rounded-lg bg-primary text-white font-bold text-xs flex items-center justify-center">
                       {stage.num}
                     </span>
-                    <Icon className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                    <Icon className="w-4 h-4 text-primary dark:text-accent" />
                   </div>
                   <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100 mb-1">
                     {stage.title}
@@ -192,7 +192,7 @@ export default function AboutView({ onStartTransforming }) {
                 key={idx}
                 className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex items-start gap-3"
               >
-                <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 shrink-0">
+                <div className="p-2 rounded-xl bg-surface-selected text-primary dark:text-accent shrink-0">
                   <Icon className="w-4 h-4" />
                 </div>
                 <div>
@@ -206,25 +206,25 @@ export default function AboutView({ onStartTransforming }) {
       </div>
 
       {/* Production Architecture Roadmap */}
-      <div className="bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-900 rounded-2xl p-6 text-white shadow-xl mb-8 border border-indigo-800/50">
-        <h3 className="text-base font-bold mb-2 flex items-center gap-2 text-indigo-200">
-          <Sparkles className="w-4 h-4 text-indigo-400" />
+      <div className="bg-sidebar-bg rounded-2xl p-6 text-text-primary shadow-sm mb-8 border border-border transition-colors">
+        <h3 className="text-base font-bold mb-2 flex items-center gap-2 text-text-primary">
+          <Sparkles className="w-4 h-4 text-primary dark:text-accent" />
           Production-Ready Architecture
         </h3>
-        <p className="text-xs text-indigo-100/90 leading-relaxed mb-4">
+        <p className="text-xs text-text-secondary leading-relaxed mb-4">
           Built with an enterprise-grade hybrid pipeline: Google Gemini 3.8 Flash for zero-shot semantic understanding with automatic deterministic fallback guarantees.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-          <div className="p-3 bg-white/10 rounded-xl border border-white/10">
-            <strong className="block text-indigo-300 mb-1">1. Hybrid GenAI</strong>
+          <div className="p-3 bg-surface rounded-xl border border-border text-text-secondary">
+            <strong className="block text-primary dark:text-accent mb-1">1. Hybrid GenAI</strong>
             Gemini 3.8 Flash with 429 quota exhaustion fast-fallback.
           </div>
-          <div className="p-3 bg-white/10 rounded-xl border border-white/10">
-            <strong className="block text-indigo-300 mb-1">2. Human-in-the-Loop</strong>
+          <div className="p-3 bg-surface rounded-xl border border-border text-text-secondary">
+            <strong className="block text-primary dark:text-accent mb-1">2. Human-in-the-Loop</strong>
             Audit gate prevents unverified distribution of claims.
           </div>
-          <div className="p-3 bg-white/10 rounded-xl border border-white/10">
-            <strong className="block text-indigo-300 mb-1">3. Multi-Channel Export</strong>
+          <div className="p-3 bg-surface rounded-xl border border-border text-text-secondary">
+            <strong className="block text-primary dark:text-accent mb-1">3. Multi-Channel Export</strong>
             ZIP packages, JSON manifests, PDF documents, and clipboard.
           </div>
         </div>
@@ -235,7 +235,7 @@ export default function AboutView({ onStartTransforming }) {
         <button
           type="button"
           onClick={onStartTransforming}
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-300 dark:shadow-indigo-950 transition-colors active:scale-[0.98]"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm bg-primary hover:bg-primary-hover text-white shadow-sm transition-colors active:scale-[0.98]"
         >
           <span>Start Transformation Workflow</span>
           <ArrowRight className="w-4 h-4" />

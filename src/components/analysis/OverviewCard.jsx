@@ -10,17 +10,17 @@ export default function OverviewCard({ overview, confidence }) {
       {/* Top Meta Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800/80">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+          <div className="w-7 h-7 rounded-lg bg-surface-selected text-primary dark:text-accent flex items-center justify-center">
             <BookOpen className="w-4 h-4" />
           </div>
-          <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+          <span className="text-xs font-bold uppercase tracking-wider text-primary dark:text-accent">
             Executive Summary
           </span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           {overview.category && (
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-900/50">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-surface-selected text-primary dark:text-accent border border-primary/30 dark:border-primary/40">
               {overview.category}
             </span>
           )}

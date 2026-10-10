@@ -106,7 +106,7 @@ export default function ExportActions({
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
         <div>
           <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <Download className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <Download className="w-5 h-5 text-primary dark:text-accent" />
             <span>Multi-Format Export Actions</span>
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -118,9 +118,9 @@ export default function ExportActions({
           <button
             type="button"
             onClick={onInspectContracts}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
-            <Code className="w-3.5 h-3.5 text-indigo-500" />
+            <Code className="w-3.5 h-3.5 text-text-primary0" />
             <span>Inspect Contracts JSON</span>
           </button>
         )}
@@ -132,14 +132,14 @@ export default function ExportActions({
         <button
           type="button"
           onClick={handleCopyAll}
-          className={`flex flex-col items-center justify-center p-3.5 rounded-2xl text-xs font-bold transition-all shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+          className={`flex flex-col items-center justify-center p-3.5 rounded-2xl text-xs font-bold transition-all shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-primary ${
             copiedAll
               ? 'bg-emerald-600 text-white'
               : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 active:scale-[0.98]'
           }`}
         >
           <div className="flex items-center gap-1.5 mb-0.5">
-            {copiedAll ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4 text-indigo-500" />}
+            {copiedAll ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4 text-text-primary0" />}
             <span className="font-bold">{copiedAll ? 'Copied to Clipboard' : 'Copy All'}</span>
           </div>
           <span className="text-[10px] opacity-75 font-normal">All channel deliverables</span>
@@ -204,7 +204,7 @@ export default function ExportActions({
           type="button"
           onClick={handleDownloadPackage}
           disabled={downloadingFormat === 'package'}
-          className="flex flex-col items-center justify-center p-3.5 rounded-2xl text-xs font-bold bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white transition-all shadow-md shadow-indigo-200 dark:shadow-indigo-950 active:scale-[0.98] disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
+          className="flex flex-col items-center justify-center p-3.5 rounded-2xl text-xs font-bold bg-primary hover:bg-primary-hover text-white transition-all shadow-sm active:scale-[0.98] disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
         >
           <div className="flex items-center gap-1.5 mb-0.5">
             {downloadingFormat === 'package' ? (
@@ -214,7 +214,7 @@ export default function ExportActions({
             )}
             <span className="font-bold">Package (.zip)</span>
           </div>
-          <span className="text-[10px] text-indigo-100 font-normal">Archive + Manifest</span>
+          <span className="text-[10px] text-white/80 font-normal">Archive + Manifest</span>
         </button>
       </div>
     </div>

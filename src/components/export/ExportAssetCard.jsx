@@ -70,7 +70,7 @@ export default function ExportAssetCard({ item, exportPackage }) {
       {/* Top Header */}
       <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-900/60">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/60 shadow-2xs">
+          <div className="p-2.5 rounded-2xl bg-surface-selected text-primary dark:text-accent border border-primary/30 shadow-2xs">
             <ChannelIcon className="w-5 h-5" />
           </div>
           <div>
@@ -110,7 +110,7 @@ export default function ExportAssetCard({ item, exportPackage }) {
           <button
             type="button"
             onClick={handleCopy}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
             <span>{copied ? 'Copied' : 'Copy'}</span>
@@ -137,7 +137,7 @@ export default function ExportAssetCard({ item, exportPackage }) {
         {/* Human Review Audit Lineage Bar */}
         <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-700 dark:text-slate-300">
           <div className="flex flex-wrap items-center gap-2">
-            <UserCheck className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+            <UserCheck className="w-3.5 h-3.5 text-primary dark:text-accent" />
             <span className="font-semibold">{reviewer}</span>
             <span className="text-slate-400">&bull;</span>
             <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400">

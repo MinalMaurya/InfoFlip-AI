@@ -32,7 +32,7 @@ export default function SourceInput({
       {/* Card Header */}
       <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-3 bg-slate-50/50 dark:bg-slate-800/30">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-bold text-sm">
+          <div className="w-8 h-8 rounded-lg bg-surface-selected dark:bg-surface-selected text-primary dark:text-accent flex items-center justify-center font-bold text-sm">
             1
           </div>
           <div>
@@ -53,11 +53,11 @@ export default function SourceInput({
           <button
             type="button"
             onClick={() => setShowDemoMenu(!showDemoMenu)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 transition-colors shadow-2xs active:scale-95"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-surface-selected hover:bg-surface-hover dark:hover:bg-surface-hover text-primary dark:text-accent border border-primary/40 transition-colors shadow-2xs active:scale-95"
           >
-            <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+            <Sparkles className="w-3.5 h-3.5 text-primary dark:text-accent" />
             <span>Load Demo Content</span>
-            <ChevronDown className="w-3.5 h-3.5 text-indigo-500" />
+            <ChevronDown className="w-3.5 h-3.5 text-text-primary0" />
           </button>
 
           {/* Demo Scenarios Dropdown */}
@@ -82,10 +82,10 @@ export default function SourceInput({
                     <button
                       key={scenario.id}
                       onClick={() => handleSelectDemo(scenario)}
-                      className="w-full text-left px-3 py-2.5 hover:bg-indigo-50/70 dark:hover:bg-indigo-950/40 transition-colors flex items-start gap-2.5 border-b border-slate-50 dark:border-slate-800/50 last:border-b-0"
+                      className="w-full text-left px-3 py-2.5 hover:bg-surface-hover dark:hover:bg-surface-hover transition-colors flex items-start gap-2.5 border-b border-slate-50 dark:border-slate-800/50 last:border-b-0"
                     >
-                      <div className="mt-0.5 p-1.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 group-hover:bg-indigo-100">
-                        <Icon className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                      <div className="mt-0.5 p-1.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 group-hover:bg-surface-hover">
+                        <Icon className="w-4 h-4 text-primary dark:text-accent" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
@@ -114,10 +114,10 @@ export default function SourceInput({
             onChange={(e) => setSource(e.target.value)}
             rows={7}
             placeholder="Paste a news article, advisory, report, incident description, policy document or any source information here..."
-            className={`w-full rounded-xl border p-4 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all resize-y leading-relaxed font-normal ${
+            className={`w-full rounded-xl border p-4 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary transition-all resize-y leading-relaxed font-normal ${
               error 
                 ? 'border-rose-400 dark:border-rose-600 bg-rose-50/20 dark:bg-rose-950/20' 
-                : 'border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/30 focus:border-indigo-400 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900'
+                : 'border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/30 focus:border-primary dark:focus:border-primary focus:bg-white dark:focus:bg-slate-900'
             }`}
           />
         </div>

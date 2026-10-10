@@ -22,7 +22,7 @@ export default function ToneUrgencyCard({ tone, urgency }) {
       {/* Tone Analysis Card */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-2xs space-y-3">
         <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800/80">
-          <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+          <div className="w-7 h-7 rounded-lg bg-surface-selected text-primary dark:text-accent flex items-center justify-center">
             <Sliders className="w-4 h-4" />
           </div>
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">

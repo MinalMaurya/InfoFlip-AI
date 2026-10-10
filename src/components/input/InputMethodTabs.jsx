@@ -40,15 +40,15 @@ export default function InputMethodTabs({ activeTab, onSelectTab }) {
               aria-selected={isSelected}
               onClick={() => onSelectTab(tab.id)}
               onKeyDown={(e) => handleKeyDown(e, idx)}
-              className={`relative flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+              className={`relative flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                 isSelected
-                  ? 'bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-400 shadow-xs border border-slate-200/80 dark:border-slate-800'
+                  ? 'bg-white dark:bg-slate-900 text-primary dark:text-accent shadow-xs border border-slate-200/80 dark:border-slate-800'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-700/50'
               }`}
             >
               <Icon className={`w-4 h-4 shrink-0 ${
                 isSelected 
-                  ? 'text-indigo-600 dark:text-indigo-400' 
+                  ? 'text-primary dark:text-accent' 
                   : 'text-slate-400 dark:text-slate-500'
               }`} />
               

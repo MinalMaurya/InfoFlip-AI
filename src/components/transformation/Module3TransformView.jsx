@@ -355,7 +355,7 @@ export default function Module3TransformView({
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900/50">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-surface-selected dark:bg-surface-selected text-primary dark:text-accent border border-primary/40">
                 TRANSFORM
               </span>
               <span className="text-slate-300 dark:text-slate-700">•</span>
@@ -377,7 +377,7 @@ export default function Module3TransformView({
               <button
                 type="button"
                 onClick={() => setShowContractModal(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-indigo-700 dark:text-indigo-300 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-primary dark:text-accent border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 title="Inspect Module 3 Output Contract"
               >
                 <Code className="w-3.5 h-3.5" />
@@ -403,7 +403,7 @@ export default function Module3TransformView({
                   analysis: analysisData,
                   transformation: transformationResult
                 })}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-primary hover:bg-primary-hover transition-colors shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <span>Continue to Communicate</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -430,7 +430,7 @@ export default function Module3TransformView({
               <button
                 type="button"
                 onClick={onBackToInput}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-xs"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-primary hover:bg-primary-hover transition-colors shadow-xs"
               >
                 <PlusCircle className="w-4 h-4" />
                 <span>Return to Input (Module 1)</span>
@@ -440,7 +440,7 @@ export default function Module3TransformView({
               <button
                 type="button"
                 onClick={onLoadDemo}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800 transition-colors shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-primary dark:text-accent bg-surface-selected hover:bg-surface-hover border border-primary/40 transition-colors shadow-2xs"
               >
                 <Sparkles className="w-4 h-4" />
                 <span>Load Weather Demo</span>
@@ -450,8 +450,8 @@ export default function Module3TransformView({
         </div>
       ) : !analysisData ? (
         /* Check 2: Missing Module 2 Analysis Check */
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-indigo-200 dark:border-indigo-900/60 p-8 sm:p-12 text-center max-w-xl mx-auto shadow-2xs">
-          <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto mb-4">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-primary/40 p-8 sm:p-12 text-center max-w-xl mx-auto shadow-2xs">
+          <div className="w-14 h-14 rounded-2xl bg-surface-selected text-primary dark:text-accent flex items-center justify-center mx-auto mb-4">
             <BrainCircuit className="w-7 h-7" />
           </div>
           <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
@@ -465,7 +465,7 @@ export default function Module3TransformView({
               <button
                 type="button"
                 onClick={onBackToUnderstand}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-xs"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-primary hover:bg-primary-hover transition-colors shadow-xs"
               >
                 <BrainCircuit className="w-4 h-4" />
                 <span>Return to Understand (Module 2)</span>
@@ -482,7 +482,7 @@ export default function Module3TransformView({
             <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs text-slate-600 dark:text-slate-400">
               <div className="flex items-center gap-1.5">
                 <span className="font-semibold text-slate-900 dark:text-slate-100">Topic:</span>
-                <span className="px-2.5 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 font-semibold text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/50">
+                <span className="px-2.5 py-0.5 rounded-lg bg-surface-selected font-semibold text-primary dark:text-accent border border-primary/30">
                   {analysisData.overview?.mainTopic || 'General Document'}
                 </span>
               </div>
@@ -531,7 +531,7 @@ export default function Module3TransformView({
               <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-2xs space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs">
+                    <div className="w-7 h-7 rounded-lg bg-surface-selected text-primary dark:text-accent flex items-center justify-center font-bold text-xs">
                       <Users className="w-3.5 h-3.5" />
                     </div>
                     <div>
@@ -554,7 +554,7 @@ export default function Module3TransformView({
                     <button
                       type="button"
                       onClick={() => setShowCustomAudienceInput(!showCustomAudienceInput)}
-                      className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+                      className="text-[11px] font-semibold text-primary dark:text-accent hover:underline"
                     >
                       {showCustomAudienceInput ? 'Choose from list' : '+ Custom Cohort'}
                     </button>
@@ -566,7 +566,7 @@ export default function Module3TransformView({
                       value={customAudience}
                       onChange={(e) => setCustomAudience(e.target.value)}
                       placeholder="Enter custom audience (e.g. Healthcare Staff)..."
-                      className="w-full p-2.5 rounded-xl border border-indigo-300 dark:border-indigo-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full p-2.5 rounded-xl border border-primary/40 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                   ) : (
                     <div className="flex flex-wrap gap-1.5">
@@ -577,7 +577,7 @@ export default function Module3TransformView({
                           onClick={() => setTargetAudience(aud)}
                           className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
                             targetAudience === aud
-                              ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                              ? 'bg-primary text-white font-bold shadow-xs'
                               : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                           }`}
                         >
@@ -601,7 +601,7 @@ export default function Module3TransformView({
                         onClick={() => setTone(t)}
                         className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
                           tone === t
-                            ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                            ? 'bg-primary text-white font-bold shadow-xs'
                             : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                         }`}
                       >
@@ -624,7 +624,7 @@ export default function Module3TransformView({
                         onClick={() => setLanguage(lang.id)}
                         className={`p-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all ${
                           language === lang.id
-                            ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 ring-2 ring-indigo-400/20'
+                            ? 'border-primary bg-surface-selected text-primary dark:text-accent ring-2 ring-primary'
                             : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
                         }`}
                       >
@@ -640,7 +640,7 @@ export default function Module3TransformView({
               <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-2xs space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs">
+                    <div className="w-7 h-7 rounded-lg bg-surface-selected text-primary dark:text-accent flex items-center justify-center font-bold text-xs">
                       <Sliders className="w-3.5 h-3.5" />
                     </div>
                     <div>
@@ -660,7 +660,7 @@ export default function Module3TransformView({
                     <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                       Level of Detail
                     </label>
-                    <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                    <span className="text-xs font-bold text-primary dark:text-accent">
                       {detailLevel}
                     </span>
                   </div>
@@ -672,7 +672,7 @@ export default function Module3TransformView({
                         onClick={() => setDetailLevel(lvl)}
                         className={`py-1.5 rounded-lg text-xs font-bold transition-all ${
                           detailLevel === lvl
-                            ? 'bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-300 shadow-2xs'
+                            ? 'bg-white dark:bg-slate-900 text-primary dark:text-accent shadow-2xs'
                             : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                         }`}
                       >
@@ -691,7 +691,7 @@ export default function Module3TransformView({
                     <select
                       value={objective}
                       onChange={(e) => setObjective(e.target.value)}
-                      className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary"
                     >
                       {COMMUNICATION_OBJECTIVES.map((obj) => (
                         <option key={obj} value={obj}>{obj}</option>
@@ -706,7 +706,7 @@ export default function Module3TransformView({
                     <select
                       value={contentStyle}
                       onChange={(e) => setContentStyle(e.target.value)}
-                      className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary"
                     >
                       {CONTENT_STYLES.map((st) => (
                         <option key={st} value={st}>{st}</option>
@@ -723,9 +723,9 @@ export default function Module3TransformView({
               <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
                 <div>
                   <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                    <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                    <Layers className="w-4 h-4 text-primary dark:text-accent" />
                     <span>Select Output Formats</span>
-                    <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+                    <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-surface-selected dark:bg-surface-selected text-primary dark:text-accent">
                       {selectedFormats.length} of {getAllOutputFormats().length} Selected
                     </span>
                   </h3>
@@ -738,7 +738,7 @@ export default function Module3TransformView({
                   <button
                     type="button"
                     onClick={handleSelectAllFormats}
-                    className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline px-2 py-1"
+                    className="text-xs font-semibold text-primary dark:text-accent hover:underline px-2 py-1"
                   >
                     Select All
                   </button>
@@ -772,9 +772,9 @@ export default function Module3TransformView({
                           handleToggleFormat(fmt.id);
                         }
                       }}
-                      className={`cursor-pointer p-4 rounded-2xl border transition-all select-none flex flex-col justify-between outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+                      className={`cursor-pointer p-4 rounded-2xl border transition-all select-none flex flex-col justify-between outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                         isSelected
-                          ? 'border-indigo-500 dark:border-indigo-500/80 bg-indigo-50/70 dark:bg-indigo-950/40 shadow-xs ring-2 ring-indigo-400/20'
+                          ? 'border-primary/300 dark:border-primary/40 bg-surface-selected/60 shadow-xs ring-2 ring-primary'
                           : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50/50'
                       }`}
                     >
@@ -782,7 +782,7 @@ export default function Module3TransformView({
                         <div className="flex items-center justify-between">
                           <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs ${
                             isSelected
-                              ? 'bg-indigo-600 text-white shadow-2xs'
+                              ? 'bg-primary text-white shadow-2xs'
                               : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                           }`}>
                             <Icon className="w-4 h-4" />
@@ -790,7 +790,7 @@ export default function Module3TransformView({
 
                           <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
                             isSelected
-                              ? 'bg-indigo-600 border-indigo-600 text-white'
+                              ? 'bg-primary border-primary text-white'
                               : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
                           }`}>
                             {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
@@ -829,7 +829,7 @@ export default function Module3TransformView({
                   type="button"
                   onClick={handleGenerate}
                   disabled={isGenerating || selectedFormats.length === 0}
-                  className="w-full py-3.5 px-6 rounded-2xl font-bold text-sm text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-700 hover:to-purple-700 shadow-md shadow-indigo-300/40 dark:shadow-indigo-950 transition-all flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                  className="w-full py-3.5 px-6 rounded-2xl font-bold text-sm text-white bg-primary hover:bg-primary-hover shadow-sm transition-all flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                 >
                   {isGenerating ? (
                     <>
@@ -935,7 +935,7 @@ export default function Module3TransformView({
                   <button
                     type="button"
                     onClick={handleDownloadAllBundle}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 dark:bg-indigo-950 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 transition-colors shadow-2xs"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-surface-selected hover:bg-surface-hover dark:hover:bg-surface-hover text-primary dark:text-accent border border-primary/40 transition-colors shadow-2xs"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Download All</span>
@@ -964,7 +964,7 @@ export default function Module3TransformView({
                       }}
                       className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all shrink-0 border ${
                         isActive
-                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
+                          ? 'bg-primary text-white border-primary shadow-xs'
                           : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-50'
                       }`}
                     >
@@ -1160,7 +1160,7 @@ export default function Module3TransformView({
                         analysis: analysisData,
                         transformation: transformationResult
                       })}
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md shadow-indigo-300/40 dark:shadow-indigo-950 active:scale-[0.99]"
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-primary hover:bg-primary-hover transition-all shadow-sm active:scale-[0.99]"
                     >
                       <span>Continue to Communication (Module 4)</span>
                       <ArrowRight className="w-4 h-4" />

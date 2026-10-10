@@ -17,14 +17,14 @@ export default function ValueSection() {
       highlight: 'Multiple communication formats',
       description: 'Ingest raw reports, press notes, or policy documents once. Automatically generate emails, briefs, social updates, and press releases.',
       icon: Layers,
-      color: 'indigo'
+      color: 'primary'
     },
     {
       title: 'Audience Control',
       highlight: 'Adapt content for different audiences',
       description: 'Dynamically rephrase tone, vocabulary, and reading level for citizens, students, media, leadership, or departmental staff.',
       icon: Users,
-      color: 'purple'
+      color: 'primary'
     },
     {
       title: 'Consistent Context',
@@ -47,8 +47,8 @@ export default function ValueSection() {
       
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto mb-8">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 mb-2">
-          <Zap className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" /> SIH26154 Value Proposition
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-surface-selected text-primary dark:text-accent border border-primary/40 mb-2">
+          <Zap className="w-3.5 h-3.5 text-primary dark:text-accent" /> SIH26154 Value Proposition
         </div>
         <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
           Why InfoFlip-AI?
@@ -68,10 +68,10 @@ export default function ValueSection() {
               className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-2xs hover:shadow-md transition-all duration-200 flex flex-col justify-between"
             >
               <div>
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3">
+                <div className="w-10 h-10 rounded-xl bg-surface-selected border border-primary/30 text-primary dark:text-accent flex items-center justify-center mb-3">
                   <Icon className="w-5 h-5" />
                 </div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-primary dark:text-accent">
                   {c.title}
                 </h3>
                 <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 mt-0.5 leading-snug">
@@ -87,8 +87,8 @@ export default function ValueSection() {
       </div>
 
       {/* Visual Workflow Flowchart */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 shadow-lg border border-indigo-900/60">
-        <div className="text-xs font-mono uppercase tracking-widest text-indigo-400 mb-3 text-center sm:text-left">
+      <div className="bg-sidebar-bg text-text-primary rounded-2xl p-6 shadow-sm border border-border transition-colors">
+        <div className="text-xs font-mono uppercase tracking-widest text-primary dark:text-accent mb-3 text-center sm:text-left">
           End-to-End Transformation Pipeline
         </div>
         
@@ -96,31 +96,31 @@ export default function ValueSection() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-center">
           
           {/* Step 1 */}
-          <div className="bg-white/10 backdrop-blur-xs p-3.5 rounded-xl border border-white/10 flex flex-col items-center justify-center">
-            <span className="text-[10px] uppercase font-bold text-indigo-300">Input</span>
-            <span className="text-sm font-bold mt-0.5 text-white">1 Raw Source</span>
-            <span className="text-[11px] text-slate-300 mt-0.5">Advisory, Report, Policy</span>
+          <div className="bg-surface p-3.5 rounded-xl border border-border flex flex-col items-center justify-center">
+            <span className="text-[10px] uppercase font-bold text-primary dark:text-accent">Input</span>
+            <span className="text-sm font-bold mt-0.5 text-text-primary">1 Raw Source</span>
+            <span className="text-[11px] text-text-secondary mt-0.5">Advisory, Report, Policy</span>
           </div>
 
           {/* Step 2 */}
-          <div className="bg-white/10 backdrop-blur-xs p-3.5 rounded-xl border border-white/10 flex flex-col items-center justify-center">
-            <span className="text-[10px] uppercase font-bold text-indigo-300">Phase 01</span>
-            <span className="text-sm font-bold mt-0.5 text-white">Context & Intent</span>
-            <span className="text-[11px] text-slate-300 mt-0.5">Semantic Analysis & Urgency</span>
+          <div className="bg-surface p-3.5 rounded-xl border border-border flex flex-col items-center justify-center">
+            <span className="text-[10px] uppercase font-bold text-primary dark:text-accent">Phase 01</span>
+            <span className="text-sm font-bold mt-0.5 text-text-primary">Context & Intent</span>
+            <span className="text-[11px] text-text-secondary mt-0.5">Semantic Analysis & Urgency</span>
           </div>
 
           {/* Step 3 */}
-          <div className="bg-white/10 backdrop-blur-xs p-3.5 rounded-xl border border-white/10 flex flex-col items-center justify-center">
-            <span className="text-[10px] uppercase font-bold text-indigo-300">Phase 02</span>
-            <span className="text-sm font-bold mt-0.5 text-white">Audience + Tone + Language</span>
-            <span className="text-[11px] text-slate-300 mt-0.5">Vernacular & Formality Tuning</span>
+          <div className="bg-surface p-3.5 rounded-xl border border-border flex flex-col items-center justify-center">
+            <span className="text-[10px] uppercase font-bold text-primary dark:text-accent">Phase 02</span>
+            <span className="text-sm font-bold mt-0.5 text-text-primary">Audience + Tone + Language</span>
+            <span className="text-[11px] text-text-secondary mt-0.5">Vernacular & Formality Tuning</span>
           </div>
 
           {/* Step 4 */}
-          <div className="bg-gradient-to-r from-indigo-500/30 to-purple-500/30 p-3.5 rounded-xl border border-indigo-400/30 flex flex-col items-center justify-center">
-            <span className="text-[10px] uppercase font-bold text-emerald-300">Output</span>
-            <span className="text-sm font-bold mt-0.5 text-white">Multiple Artefacts</span>
-            <span className="text-[11px] text-emerald-200 mt-0.5">Social, Briefs, Emails, Press</span>
+          <div className="bg-surface-selected p-3.5 rounded-xl border border-primary/30 flex flex-col items-center justify-center">
+            <span className="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-300">Output</span>
+            <span className="text-sm font-bold mt-0.5 text-text-primary">Multiple Artefacts</span>
+            <span className="text-[11px] text-text-secondary mt-0.5">Social, Briefs, Emails, Press</span>
           </div>
 
         </div>

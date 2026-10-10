@@ -33,7 +33,7 @@ export default function SourcePreview({
   if (!hasContent) {
     return (
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800 p-8 sm:p-10 text-center flex flex-col items-center justify-center min-h-[380px] shadow-2xs">
-        <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-4 shadow-xs">
+        <div className="w-14 h-14 rounded-2xl bg-surface-selected text-primary dark:text-accent flex items-center justify-center mb-4 shadow-xs">
           <Layers className="w-7 h-7" />
         </div>
 
@@ -51,9 +51,9 @@ export default function SourcePreview({
             <button
               type="button"
               onClick={onSwitchToText}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
-              <FileText className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <FileText className="w-3.5 h-3.5 text-primary dark:text-accent" />
               <span>Paste Text</span>
             </button>
           )}
@@ -62,9 +62,9 @@ export default function SourcePreview({
             <button
               type="button"
               onClick={onSwitchToFile}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
-              <Layers className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <Layers className="w-3.5 h-3.5 text-primary dark:text-accent" />
               <span>Upload File</span>
             </button>
           )}
@@ -73,9 +73,9 @@ export default function SourcePreview({
             <button
               type="button"
               onClick={onLoadQuickDemo}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-primary dark:text-accent bg-surface-selected hover:bg-surface-hover dark:hover:bg-surface-hover border border-primary/40 transition-colors shadow-2xs outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
-              <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <Sparkles className="w-3.5 h-3.5 text-primary dark:text-accent" />
               <span>Quick Demo</span>
             </button>
           )}
@@ -96,9 +96,9 @@ export default function SourcePreview({
       case 'docx':
         return 'bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-900/50';
       case 'image':
-        return 'bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-900/50';
+        return 'bg-surface-selected text-primary dark:text-accent border-primary/20';
       default:
-        return 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-900/50';
+        return 'bg-surface-selected text-primary dark:text-accent border-primary/20';
     }
   };
 
@@ -139,7 +139,7 @@ export default function SourcePreview({
             <button
               type="button"
               onClick={onOpenDataContract}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 transition-colors"
+              className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-primary dark:text-accent hover:bg-surface-hover dark:hover:bg-surface-hover transition-colors"
               title="Inspect structured data contract for Module 2"
             >
               <Code className="w-3.5 h-3.5" />
@@ -211,7 +211,7 @@ export default function SourcePreview({
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-primary dark:text-accent hover:text-primary dark:hover:text-accent transition-colors"
             >
               <span>{isExpanded ? 'View less' : 'View more'}</span>
               {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
