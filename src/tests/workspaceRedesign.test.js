@@ -36,13 +36,16 @@ import {
   executeChatTurn,
   editCanonicalContentItem,
   approveCanonicalContentItem,
+  isEligibleForApprovePassed,
+  approvePassedCanonicalContentItems,
   rejectCanonicalContentItem,
   regenerateCanonicalContentItem,
+  restoreApprovedCanonicalContentItem,
   buildTurnExportPackage
 } from '../services/workspace/chatPipelineOrchestrator.js';
 
 import { validateFile } from '../utils/fileValidation.js';
-import { APPROVAL_STATUSES } from '../types/review.js';
+import { APPROVAL_STATUSES, CHECK_STATUSES } from '../types/review.js';
 import { CONTENT_STATUS_FLAGS } from '../types/contentConfidence.js';
 import { generateTXT, generateJSON, generatePackage } from '../services/export/exportService.js';
 
@@ -1010,6 +1013,133 @@ async function runTests() {
       chatWorkspaceSource.includes('<header className="relative z-30 h-14') &&
       appSource.includes('<header className="relative z-30 h-14'),
     '49. ThemeToggle dropdown is anchored below the trigger button with relative z-30 header stacking, opaque surface, and Escape/outside-click handling'
+  );
+
+  // Item 50: Visual hierarchy clearly communicates Source Document → Selected Formats → Generated Outputs → Quality Review → Approved Export without duplicate format selectors
+  assert(
+    chatWorkspaceSource.includes('aria-label="Transformation Workflow Hierarchy"') &&
+      chatWorkspaceSource.includes('<span>Source Document</span>') &&
+      chatWorkspaceSource.includes('<span>Selected Formats</span>') &&
+      chatWorkspaceSource.includes('<span>Generated Outputs</span>') &&
+      chatWorkspaceSource.includes('<span>Quality Review</span>') &&
+      chatWorkspaceSource.includes('<span>Approved Export</span>') &&
+      rightSidebarSource.includes('Output Config') &&
+      !chatWorkspaceSource.includes('handleToggleFormat'),
+    '50. Workspace visual hierarchy clearly communicates Source Document → Selected Formats → Generated Outputs → Quality Review → Approved Export while keeping format selection exclusively in RightSidebar'
+  );
+
+  // Item 51: Every generated output preserves sourceReference, sourceTraceability, and lineage connecting it to the source document
+  const outputRendererSource = fs.readFileSync(
+    path.join(SRC_DIR, 'components/workspace/GeneratedOutputRenderer.jsx'),
+    'utf8'
+  );
+  const provenanceTurn = await executeChatTurn({
+    conversation: createEmptyConversation(),
+    prompt: 'Create LinkedIn and WhatsApp updates from this cyclone bulletin.',
+    sourceText: SAMPLE_CYCLONE_SOURCE,
+    requestedFormats: ['linkedin', 'whatsapp'],
+    delayMs: 0
+  });
+  const everyOutputHasSourceRef = provenanceTurn.canonicalItems.every(
+    (item) =>
+      item.sourceReference &&
+      item.sourceReference.sourceId === provenanceTurn.sourceData.sourceId &&
+      typeof item.sourceReference.fileName === 'string' &&
+      item.sourceReference.excerpt.length > 0 &&
+      item.lineage?.sourceId === provenanceTurn.sourceData.sourceId
+  );
+  assert(
+    everyOutputHasSourceRef &&
+      Boolean(provenanceTurn.assistantMessage.sourceSummary?.sourceId) &&
+      Boolean(provenanceTurn.userMessage.sourceAttachment?.sourceText) &&
+      outputRendererSource.includes('Grounded in Source:') &&
+      outputRendererSource.includes('Source References ('),
+    '51. Every generated output preserves sourceReference, sourceTraceability, and lineage, and GeneratedOutputRenderer displays visible source provenance and references'
+  );
+
+  // Item 52: Approve Passed strictly approves only eligible pending items that passed all required checks (0 failed, 0 warnings) and never treats human approval as independent factual verification
+  const itemPass = {
+    ...provenanceTurn.canonicalItems[0],
+    itemId: 'item-pass-1',
+    overallStatus: CHECK_STATUSES.PASS,
+    approvalStatus: APPROVAL_STATUSES.PENDING_REVIEW,
+    summary: { passed: 10, warnings: 0, failed: 0 },
+    checks: Object.fromEntries(
+      Object.entries(provenanceTurn.canonicalItems[0].checks || {}).map(([k, v]) => [
+        k,
+        { ...v, status: CHECK_STATUSES.PASS }
+      ])
+    )
+  };
+  const itemWarn = {
+    ...provenanceTurn.canonicalItems[1],
+    itemId: 'item-warn-2',
+    overallStatus: CHECK_STATUSES.WARNING,
+    approvalStatus: APPROVAL_STATUSES.PENDING_REVIEW,
+    summary: { passed: 9, warnings: 1, failed: 0 }
+  };
+  const itemRejected = {
+    ...provenanceTurn.canonicalItems[0],
+    itemId: 'item-rej-3',
+    overallStatus: CHECK_STATUSES.PASS,
+    approvalStatus: APPROVAL_STATUSES.REJECTED,
+    summary: { passed: 10, warnings: 0, failed: 0 }
+  };
+  const batchResult = approvePassedCanonicalContentItems(
+    {
+      'item-pass-1': itemPass,
+      'item-warn-2': itemWarn,
+      'item-rej-3': itemRejected
+    },
+    ['item-pass-1', 'item-warn-2', 'item-rej-3']
+  );
+
+  assert(
+    isEligibleForApprovePassed(itemPass) === true &&
+      isEligibleForApprovePassed(itemWarn) === false &&
+      isEligibleForApprovePassed(itemRejected) === false &&
+      batchResult.approvedCount === 1 &&
+      batchResult.skippedCount === 2 &&
+      batchResult.updatedItemsById['item-pass-1'].approvalStatus === APPROVAL_STATUSES.APPROVED &&
+      batchResult.updatedItemsById['item-warn-2'].approvalStatus === APPROVAL_STATUSES.PENDING_REVIEW &&
+      batchResult.updatedItemsById['item-rej-3'].approvalStatus === APPROVAL_STATUSES.REJECTED &&
+      batchResult.updatedItemsById['item-pass-1'].metadata.verificationStatus.includes('not independently verified') &&
+      chatWorkspaceSource.includes('onApproveAllInTurn(passedInTurn.map(o => o.itemId))'),
+    '52. Approve Passed strictly approves only eligible pending items with 0 warnings/failures, skips warning/rejected items, and preserves non-verified source disclaimer'
+  );
+
+  // Item 53: Regenerating one output preserves other outputs, protects approved content, resets contentStatusFlag, and supports restoring the previous approved snapshot
+  const approvedForRegen = approveCanonicalContentItem(itemPass, 'Approved before regen test');
+  const protectedRegen = await regenerateCanonicalContentItem(
+    approvedForRegen,
+    { activeSource: provenanceTurn.sourceData, activeAnalysis: provenanceTurn.analysisData, config: provenanceTurn.resolvedConfig },
+    { protectApproved: true }
+  );
+  const confirmedRegen = await regenerateCanonicalContentItem(
+    approvedForRegen,
+    { activeSource: provenanceTurn.sourceData, activeAnalysis: provenanceTurn.analysisData, config: provenanceTurn.resolvedConfig }
+  );
+  const restoredApproved = restoreApprovedCanonicalContentItem(confirmedRegen);
+
+  assert(
+    protectedRegen.approvalStatus === APPROVAL_STATUSES.APPROVED &&
+      confirmedRegen.approvalStatus === APPROVAL_STATUSES.PENDING_REVIEW &&
+      confirmedRegen.metadata.contentStatusFlag !== CONTENT_STATUS_FLAGS.APPROVED_FOR_EXPORT &&
+      Boolean(confirmedRegen.previousApprovedVersion) &&
+      restoredApproved.approvalStatus === APPROVAL_STATUSES.APPROVED &&
+      restoredApproved.content === approvedForRegen.content &&
+      outputRendererSource.includes('Protect Approved Content — Confirm Single-Format Regeneration') &&
+      outputRendererSource.includes('Restore Approved'),
+    '53. Single-output regeneration protects approved content with confirmation guard, snapshots previousApprovedVersion, resets status badge accurately, and supports restoring approved content'
+  );
+
+  // Item 54: GeneratedOutputRenderer and LibraryView use semantic Graphite + Steel Blue theme tokens without hardcoded bg-white dark:bg-slate-900 classes
+  assert(
+    !outputRendererSource.includes('bg-white dark:bg-slate-900') &&
+      !libraryViewSource.includes('bg-white dark:bg-slate-900') &&
+      outputRendererSource.includes('bg-surface') &&
+      libraryViewSource.includes('bg-surface'),
+    '54. GeneratedOutputRenderer and LibraryView use 100% semantic Graphite + Steel Blue surface/border/text tokens across Light, Dark, and System themes'
   );
 
   console.log('\n========================================');

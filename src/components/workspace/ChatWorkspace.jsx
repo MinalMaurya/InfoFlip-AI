@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   ChevronDown,
   ChevronUp,
+  ChevronRight,
   Download,
   Copy,
   Check,
@@ -21,7 +22,9 @@ import {
   BrainCircuit,
   FolderArchive,
   FileCode,
-  ExternalLink
+  ExternalLink,
+  Link2,
+  Eye
 } from 'lucide-react';
 import ThemeToggle from '../ThemeToggle.jsx';
 import GeneralDisclaimerNotice from '../common/GeneralDisclaimerNotice.jsx';
@@ -31,7 +34,8 @@ import { SAMPLE_PRESETS } from '../../services/ingestionService.js';
 import { DEMO_SCENARIOS } from '../../data/demoScenarios.js';
 import {
   getWorkspaceFormatById,
-  buildTurnExportPackage
+  buildTurnExportPackage,
+  isEligibleForApprovePassed
 } from '../../services/workspace/chatPipelineOrchestrator.js';
 import {
   generateTXT,
@@ -60,6 +64,7 @@ export default function ChatWorkspace({
   onRejectItem,
   onApproveAllInTurn,
   onRegenerateItem,
+  onRestoreApprovedItem,
   regeneratingItemId,
   isGenerating,
   progressState,
@@ -75,6 +80,7 @@ export default function ChatWorkspace({
   const [activeTabByMessage, setActiveTabByMessage] = useState({});
   const [expandedAllByMessage, setExpandedAllByMessage] = useState({});
   const [expandedAnalysisByMessage, setExpandedAnalysisByMessage] = useState({});
+  const [expandedSourceByMessage, setExpandedSourceByMessage] = useState({});
   const [exportToast, setExportToast] = useState('');
 
   const promptTextareaRef = useRef(null);
@@ -89,6 +95,28 @@ export default function ChatWorkspace({
     conversation?.activeSource &&
     (conversation.activeSource.extractedText || conversation.activeSource.rawText)
   );
+
+  // Aggregate all generated outputs across this conversation for the workflow hierarchy summary
+  const allConversationOutputs = React.useMemo(() => {
+    const list = [];
+    for (const m of messages) {
+      if (m.role === 'assistant' && Array.isArray(m.outputs)) {
+        list.push(...m.outputs);
+      }
+    }
+    return list;
+  }, [messages]);
+
+  const totalGeneratedCount = allConversationOutputs.length;
+  const totalApprovedCount = allConversationOutputs.filter(
+    (o) => o.approvalStatus === APPROVAL_STATUSES.APPROVED
+  ).length;
+  const totalPendingCount = allConversationOutputs.filter(
+    (o) => o.approvalStatus === APPROVAL_STATUSES.PENDING_REVIEW
+  ).length;
+  const totalRejectedCount = allConversationOutputs.filter(
+    (o) => o.approvalStatus === APPROVAL_STATUSES.REJECTED
+  ).length;
 
   // Focus composer when New Chat is triggered
   useEffect(() => {
@@ -310,6 +338,131 @@ export default function ChatWorkspace({
         </div>
       </header>
 
+      {/* Workflow Visual Hierarchy Strip: Source Document → Selected Formats → Generated Outputs → Quality Review → Approved Export */}
+      <nav
+        aria-label="Transformation Workflow Hierarchy"
+        className="px-3 sm:px-5 py-2 bg-sidebar-bg border-b border-border shrink-0 overflow-x-auto"
+      >
+        <ol className="max-w-4xl mx-auto flex items-center justify-between gap-1.5 sm:gap-2 text-[11px] min-w-max">
+          {/* 1. Source Document */}
+          <li
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors ${
+              hasExistingSource || attachedFile || sourceTextValue.trim()
+                ? 'bg-surface border-primary/40 text-text-primary font-semibold'
+                : 'bg-surface border-border text-text-secondary'
+            }`}
+          >
+            <span className="w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] font-bold inline-flex items-center justify-center shrink-0">
+              1
+            </span>
+            <span>Source Document</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded bg-sidebar-bg text-text-secondary border border-border truncate max-w-[120px]">
+              {conversation?.activeSource?.fileName ||
+                attachedFile?.name ||
+                (sourceTextValue.trim() ? 'Draft Text' : 'Awaiting Input')}
+            </span>
+          </li>
+
+          <ChevronRight className="w-3.5 h-3.5 text-text-muted shrink-0" aria-hidden="true" />
+
+          {/* 2. Selected Formats */}
+          <li
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors ${
+              selectedFormats.length > 0
+                ? 'bg-surface border-primary/40 text-text-primary font-semibold'
+                : 'bg-surface border-border text-text-secondary'
+            }`}
+          >
+            <span className="w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] font-bold inline-flex items-center justify-center shrink-0">
+              2
+            </span>
+            <span>Selected Formats</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded bg-surface-selected text-primary dark:text-accent font-bold border border-border">
+              {selectedFormats.length} active
+            </span>
+          </li>
+
+          <ChevronRight className="w-3.5 h-3.5 text-text-muted shrink-0" aria-hidden="true" />
+
+          {/* 3. Generated Outputs */}
+          <li
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors ${
+              totalGeneratedCount > 0
+                ? 'bg-surface border-primary/40 text-text-primary font-semibold'
+                : 'bg-surface border-border text-text-secondary'
+            }`}
+          >
+            <span
+              className={`w-4 h-4 rounded-full text-[10px] font-bold inline-flex items-center justify-center shrink-0 ${
+                totalGeneratedCount > 0
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-sidebar-bg text-text-muted border border-border'
+              }`}
+            >
+              3
+            </span>
+            <span>Generated Outputs</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded bg-sidebar-bg text-text-secondary border border-border font-semibold">
+              {totalGeneratedCount}
+            </span>
+          </li>
+
+          <ChevronRight className="w-3.5 h-3.5 text-text-muted shrink-0" aria-hidden="true" />
+
+          {/* 4. Quality Review */}
+          <li
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors ${
+              totalGeneratedCount > 0
+                ? 'bg-surface border-primary/40 text-text-primary font-semibold'
+                : 'bg-surface border-border text-text-secondary'
+            }`}
+          >
+            <span
+              className={`w-4 h-4 rounded-full text-[10px] font-bold inline-flex items-center justify-center shrink-0 ${
+                totalGeneratedCount > 0
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-sidebar-bg text-text-muted border border-border'
+              }`}
+            >
+              4
+            </span>
+            <span>Quality Review</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded bg-sidebar-bg text-text-secondary border border-border">
+              {totalGeneratedCount === 0
+                ? 'Pending'
+                : totalPendingCount > 0
+                ? `${totalPendingCount} to review`
+                : 'Reviewed'}
+            </span>
+          </li>
+
+          <ChevronRight className="w-3.5 h-3.5 text-text-muted shrink-0" aria-hidden="true" />
+
+          {/* 5. Approved Export */}
+          <li
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors ${
+              totalApprovedCount > 0
+                ? 'bg-success-subtle border-success/40 text-success font-bold'
+                : 'bg-surface border-border text-text-secondary'
+            }`}
+          >
+            <span
+              className={`w-4 h-4 rounded-full text-[10px] font-bold inline-flex items-center justify-center shrink-0 ${
+                totalApprovedCount > 0
+                  ? 'bg-success text-white'
+                  : 'bg-sidebar-bg text-text-muted border border-border'
+              }`}
+            >
+              5
+            </span>
+            <span>Approved Export</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded bg-surface text-text-primary border border-border font-semibold">
+              {totalApprovedCount}/{totalGeneratedCount || 0} ready
+            </span>
+          </li>
+        </ol>
+      </nav>
+
       {/* Storage or Export Toast Notifications */}
       {storageWarning && (
         <div
@@ -351,12 +504,12 @@ export default function ChatWorkspace({
         </div>
       )}
 
-      {/* Main Scrollable Conversation Area */}
-      <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-6">
+      {/* Main Scrollable Conversation & Output Review Area (Primary Workspace Focus) */}
+      <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-5">
         <div className="max-w-4xl mx-auto space-y-6">
           {messages.length === 0 ? (
             /* A. NEW CONVERSATION WELCOME STATE */
-            <div className="py-8 sm:py-14 text-center space-y-6">
+            <div className="py-6 sm:py-10 text-center space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-selected border border-border text-text-primary text-xs font-semibold">
                 <Sparkles className="w-3.5 h-3.5 text-primary dark:text-accent" />
                 <span>InfoFlip-AI Content Transformation Workspace</span>
@@ -367,7 +520,7 @@ export default function ChatWorkspace({
                   What would you like to create?
                 </h2>
                 <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
-                  Paste source text or attach a document/image below, choose your target output formats in the right panel, and generate source-grounded, human-reviewed communications.
+                  Follow the 5-step workflow above: provide your <strong>Source Document</strong> below, confirm your <strong>Selected Formats</strong> in the right Output Config panel, then review, approve, and export your <strong>Generated Outputs</strong>.
                 </p>
               </div>
 
@@ -408,9 +561,17 @@ export default function ChatWorkspace({
               </div>
             </div>
           ) : (
-            /* C. CHRONOLOGICAL CONVERSATION HISTORY */
-            messages.map((msg) => {
+            /* C. CHRONOLOGICAL CONVERSATION & OUTPUT REVIEW WORKSPACE */
+            messages.map((msg, msgIndex) => {
               if (msg.role === 'user') {
+                const isSourceExpanded = Boolean(expandedSourceByMessage[msg.messageId]);
+                const fullSourceText =
+                  msg.sourceAttachment?.sourceText ||
+                  conversation?.activeSource?.extractedText ||
+                  conversation?.activeSource?.rawText ||
+                  msg.sourceAttachment?.previewSnippet ||
+                  '';
+
                 return (
                   <div
                     key={msg.messageId}
@@ -424,34 +585,69 @@ export default function ChatWorkspace({
                         borderColor: 'var(--color-border)'
                       }}
                     >
+                      <div className="flex items-center justify-between gap-2 text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+                        <span>Stage 1 & 2 • Source Document & Selected Formats</span>
+                        {msg.sourceAttachment?.sourceId && (
+                          <span className="font-mono">{msg.sourceAttachment.sourceId}</span>
+                        )}
+                      </div>
+
                       <div className="text-xs sm:text-sm font-medium text-text-primary whitespace-pre-wrap leading-relaxed">
                         {msg.prompt}
                       </div>
 
-                      {/* Source Attachment Reference */}
+                      {/* Source Document Preview & Provenance Card */}
                       {msg.sourceAttachment && (
                         <div
-                          className="p-2.5 rounded-xl bg-surface border border-border text-[11px] text-text-primary space-y-1"
+                          className="p-2.5 rounded-xl bg-surface border border-border text-[11px] text-text-primary space-y-1.5"
                           style={{
                             backgroundColor: 'var(--color-surface)',
                             borderColor: 'var(--color-border)',
                             color: 'var(--color-text-primary)'
                           }}
                         >
-                          <div className="flex items-center justify-between gap-2 font-semibold">
+                          <div className="flex flex-wrap items-center justify-between gap-2 font-semibold">
                             <span className="flex items-center gap-1.5 truncate">
                               <FileText className="w-3.5 h-3.5 text-primary dark:text-accent shrink-0" />
                               <span className="truncate">{msg.sourceAttachment.fileName || 'Source Content'}</span>
+                              {msg.sourceAttachment.wordCount > 0 && (
+                                <span className="text-[10px] font-normal text-text-secondary">
+                                  ({msg.sourceAttachment.wordCount} words)
+                                </span>
+                              )}
                             </span>
-                            <span className="font-mono text-[10px] text-text-secondary shrink-0">
-                              {msg.sourceAttachment.sourceId}
-                            </span>
+
+                            <div className="flex items-center gap-2 shrink-0">
+                              {fullSourceText && (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setExpandedSourceByMessage((prev) => ({
+                                      ...prev,
+                                      [msg.messageId]: !prev[msg.messageId]
+                                    }))
+                                  }
+                                  className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary dark:text-accent hover:underline"
+                                >
+                                  <Eye className="w-3 h-3" />
+                                  <span>{isSourceExpanded ? 'Hide Source Preview' : 'Source Document Preview'}</span>
+                                </button>
+                              )}
+                            </div>
                           </div>
-                          {msg.sourceAttachment.previewSnippet && (
-                            <p className="text-[10px] text-text-secondary line-clamp-2">
-                              "{msg.sourceAttachment.previewSnippet}..."
-                            </p>
+
+                          {isSourceExpanded ? (
+                            <div className="p-2.5 rounded-lg bg-sidebar-bg border border-border text-[11px] text-text-primary whitespace-pre-wrap max-h-60 overflow-y-auto leading-relaxed">
+                              {fullSourceText}
+                            </div>
+                          ) : (
+                            msg.sourceAttachment.previewSnippet && (
+                              <p className="text-[10px] text-text-secondary line-clamp-2">
+                                "{msg.sourceAttachment.previewSnippet}..."
+                              </p>
+                            )
                           )}
+
                           {msg.sourceAttachment.isFollowUpContext && msg.sourceAttachment.adjustments?.length > 0 && (
                             <div className="text-[10px] text-primary dark:text-accent font-medium">
                               Applied follow-up adjustments: {msg.sourceAttachment.adjustments.join(' • ')}
@@ -463,6 +659,9 @@ export default function ChatWorkspace({
                       {/* Requested Format Pills */}
                       {Array.isArray(msg.requestedFormats) && msg.requestedFormats.length > 0 && (
                         <div className="flex flex-wrap items-center gap-1 pt-0.5">
+                          <span className="text-[10px] font-semibold text-text-secondary mr-1">
+                            Selected Formats:
+                          </span>
                           {msg.requestedFormats.map((fmtId) => {
                             const fmt = getWorkspaceFormatById(fmtId);
                             return (
@@ -481,16 +680,37 @@ export default function ChatWorkspace({
                 );
               }
 
-              // Assistant Message Turn
+              // Assistant Message Turn (Primary Focus: Generated Outputs -> Quality Review -> Approved Export)
               const turnOutputs = msg.outputs || [];
               const activeFormatId = activeTabByMessage[msg.messageId] || turnOutputs[0]?.formatId || '';
               const activeItem = turnOutputs.find(o => o.formatId === activeFormatId) || turnOutputs[0];
               const isAllExpanded = Boolean(expandedAllByMessage[msg.messageId]);
               const isAnalysisExpanded = Boolean(expandedAnalysisByMessage[msg.messageId]);
+              const isTurnSourceExpanded = Boolean(expandedSourceByMessage[msg.messageId]);
+
               const approvedInTurn = turnOutputs.filter(o => o.approvalStatus === APPROVAL_STATUSES.APPROVED);
-              const passedInTurn = turnOutputs.filter(
-                o => o.overallStatus === CHECK_STATUSES.PASS && o.approvalStatus !== APPROVAL_STATUSES.APPROVED
-              );
+              const rejectedInTurn = turnOutputs.filter(o => o.approvalStatus === APPROVAL_STATUSES.REJECTED);
+              const pendingInTurn = turnOutputs.filter(o => o.approvalStatus === APPROVAL_STATUSES.PENDING_REVIEW);
+
+              // Strict eligibility for Approve Passed: only pending outputs that passed all required checks with 0 warnings/failures
+              const passedInTurn = turnOutputs.filter(o => isEligibleForApprovePassed(o));
+
+              // Resolve source summary for this turn (from msg.sourceSummary, preceding user message, or conversation.activeSource)
+              const prevUserMsg = msgIndex > 0 && messages[msgIndex - 1]?.role === 'user' ? messages[msgIndex - 1] : null;
+              const turnSourceDoc = msg.sourceSummary || {
+                sourceId: msg.lineage?.sourceId || conversation?.activeSource?.sourceId || 'src-1',
+                sourceType: prevUserMsg?.sourceAttachment?.sourceType || conversation?.activeSource?.sourceType || 'text',
+                fileName: prevUserMsg?.sourceAttachment?.fileName || conversation?.activeSource?.fileName || 'Pasted Source Text',
+                wordCount: prevUserMsg?.sourceAttachment?.wordCount || conversation?.activeSource?.metadata?.wordCount || 0,
+                characterCount: prevUserMsg?.sourceAttachment?.characterCount || conversation?.activeSource?.metadata?.characterCount || 0,
+                excerpt:
+                  prevUserMsg?.sourceAttachment?.sourceText ||
+                  conversation?.activeSource?.extractedText ||
+                  conversation?.activeSource?.rawText ||
+                  prevUserMsg?.sourceAttachment?.previewSnippet ||
+                  '',
+                mainTopic: msg.analysisSummary?.mainTopic || 'Source Document'
+              };
 
               return (
                 <section
@@ -498,14 +718,18 @@ export default function ChatWorkspace({
                   aria-label="Generated Content Response"
                   className="bg-surface rounded-2xl border border-border shadow-2xs overflow-hidden space-y-4 p-4 sm:p-5 animate-fade-in transition-colors"
                 >
-                  {/* Module 2 Source Analysis & Grounding Context Strip */}
+                  {/* Turn Source Document -> Grounded Analysis Provenance Header */}
                   {msg.analysisSummary && (
-                    <div className="rounded-xl bg-sidebar-bg border border-border p-3 space-y-2">
+                    <div className="rounded-xl bg-sidebar-bg border border-border p-3.5 space-y-2.5">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex flex-wrap items-center gap-2 text-xs">
                           <span className="inline-flex items-center gap-1.5 font-bold text-text-primary">
                             <BrainCircuit className="w-3.5 h-3.5 text-primary dark:text-accent" />
                             <span>{msg.analysisSummary.mainTopic}</span>
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-surface text-text-primary border border-border">
+                            <FileText className="w-3 h-3 text-primary dark:text-accent" />
+                            <span>{turnSourceDoc.fileName}</span>
                           </span>
                           <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-surface-selected text-text-primary border border-border">
                             {msg.analysisSummary.keyFactsCount} Grounded Facts
@@ -518,20 +742,54 @@ export default function ChatWorkspace({
                           )}
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setExpandedAnalysisByMessage(prev => ({
-                              ...prev,
-                              [msg.messageId]: !prev[msg.messageId]
-                            }))
-                          }
-                          className="text-[11px] font-semibold text-primary dark:text-accent hover:underline flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring rounded"
-                        >
-                          <span>{isAnalysisExpanded ? 'Hide Analysis' : 'Source Facts & Lineage'}</span>
-                          {isAnalysisExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                        </button>
+                        <div className="flex items-center gap-3">
+                          {turnSourceDoc.excerpt && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setExpandedSourceByMessage(prev => ({
+                                  ...prev,
+                                  [msg.messageId]: !prev[msg.messageId]
+                                }))
+                              }
+                              className="text-[11px] font-semibold text-primary dark:text-accent hover:underline flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring rounded"
+                            >
+                              <FileText className="w-3 h-3" />
+                              <span>{isTurnSourceExpanded ? 'Hide Source Document' : 'Source Document Preview'}</span>
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setExpandedAnalysisByMessage(prev => ({
+                                ...prev,
+                                [msg.messageId]: !prev[msg.messageId]
+                              }))
+                            }
+                            className="text-[11px] font-semibold text-primary dark:text-accent hover:underline flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring rounded"
+                          >
+                            <span>{isAnalysisExpanded ? 'Hide Analysis' : 'Source Facts & Lineage'}</span>
+                            {isAnalysisExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                          </button>
+                        </div>
                       </div>
+
+                      {/* Expandable Source Document Preview right inside the Generated Outputs card */}
+                      {isTurnSourceExpanded && turnSourceDoc.excerpt && (
+                        <div className="p-3 rounded-xl bg-surface border border-border space-y-1.5 text-xs">
+                          <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+                            <span>Source Document Preview • {turnSourceDoc.fileName}</span>
+                            <span className="font-mono">
+                              Source ID: {turnSourceDoc.sourceId}
+                              {turnSourceDoc.wordCount ? ` • ${turnSourceDoc.wordCount} words` : ''}
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-text-primary whitespace-pre-wrap leading-relaxed max-h-56 overflow-y-auto">
+                            {turnSourceDoc.excerpt}
+                          </div>
+                        </div>
+                      )}
 
                       {isAnalysisExpanded && (
                         <div className="pt-2 border-t border-divider space-y-2 text-xs">
@@ -575,9 +833,33 @@ export default function ChatWorkspace({
                     </div>
                   )}
 
-                  {/* D. Multi-Format Output Tabs & Controls */}
+                  {/* D. Generated Outputs & Quality Review Primary Focus Area */}
                   {turnOutputs.length > 0 && (
                     <div className="space-y-4">
+                      {/* Quality Review Status Overview Bar */}
+                      <div className="p-3 rounded-xl bg-sidebar-bg border border-border flex flex-wrap items-center justify-between gap-2.5 text-xs">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-bold text-text-primary">
+                            Generated Outputs ({turnOutputs.length})
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                            {approvedInTurn.length} Approved
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                            {pendingInTurn.length} Pending Review
+                          </span>
+                          {rejectedInTurn.length > 0 && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800">
+                              {rejectedInTurn.length} Rejected
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="text-[10px] text-text-secondary">
+                          Human approval authorizes export readiness • Source claims not independently verified
+                        </div>
+                      </div>
+
                       <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-divider">
                         {/* Format Tabs */}
                         <div className="flex items-center gap-1.5 overflow-x-auto py-0.5" role="tablist" aria-label="Generated format tabs">
@@ -615,14 +897,14 @@ export default function ChatWorkspace({
                                       ? 'bg-amber-400'
                                       : 'bg-accent'
                                   }`}
-                                  title={`Status: ${out.approvalStatus}`}
+                                  title={`Status: ${out.approvalStatus} • QA: ${out.overallStatus}`}
                                 />
                               </button>
                             );
                           })}
                         </div>
 
-                        {/* View All / Batch Approve Controls */}
+                        {/* View All / Batch Approve Passed Controls */}
                         <div className="flex items-center gap-2">
                           {turnOutputs.length > 1 && (
                             <button
@@ -642,7 +924,8 @@ export default function ChatWorkspace({
                           {passedInTurn.length > 0 && onApproveAllInTurn && (
                             <button
                               type="button"
-                              onClick={() => onApproveAllInTurn(turnOutputs.map(o => o.itemId))}
+                              onClick={() => onApproveAllInTurn(passedInTurn.map(o => o.itemId))}
+                              title="Approves only pending outputs that passed all 10 required QA checks with 0 warnings/failures. Does not independently verify source facts."
                               className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-success-subtle text-success border border-success/30 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                             >
                               Approve Passed ({passedInTurn.length})
@@ -659,10 +942,18 @@ export default function ChatWorkspace({
                               <GeneratedOutputRenderer
                                 item={out}
                                 config={msg.configSnapshot || conversation?.config}
+                                sourceDocument={turnSourceDoc}
                                 onEdit={onEditItem}
                                 onApprove={onApproveItem}
                                 onReject={onRejectItem}
                                 onRegenerate={onRegenerateItem}
+                                onRestoreApproved={onRestoreApprovedItem}
+                                onInspectSource={() =>
+                                  setExpandedSourceByMessage(prev => ({
+                                    ...prev,
+                                    [msg.messageId]: true
+                                  }))
+                                }
                                 isRegenerating={regeneratingItemId === out.itemId}
                               />
                             </div>
@@ -673,10 +964,18 @@ export default function ChatWorkspace({
                           <GeneratedOutputRenderer
                             item={activeItem}
                             config={msg.configSnapshot || conversation?.config}
+                            sourceDocument={turnSourceDoc}
                             onEdit={onEditItem}
                             onApprove={onApproveItem}
                             onReject={onRejectItem}
                             onRegenerate={onRegenerateItem}
+                            onRestoreApproved={onRestoreApprovedItem}
+                            onInspectSource={() =>
+                              setExpandedSourceByMessage(prev => ({
+                                ...prev,
+                                [msg.messageId]: true
+                              }))
+                            }
                             isRegenerating={regeneratingItemId === activeItem.itemId}
                           />
                         )
@@ -801,8 +1100,8 @@ export default function ChatWorkspace({
         </div>
       </div>
 
-      {/* B. CENTRAL MESSAGE COMPOSER */}
-      <div className="p-3 sm:px-6 sm:pb-4 bg-app-bg border-t border-border shrink-0">
+      {/* B. FOLLOW-UP & SOURCE COMPOSER (Compact when outputs exist so Generated Outputs remain primary focus) */}
+      <div className="p-2.5 sm:px-6 sm:pb-3.5 bg-app-bg border-t border-border shrink-0">
         <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-2">
           {/* Input Validation Error Alert */}
           {inputError && (
@@ -878,7 +1177,7 @@ export default function ChatWorkspace({
           <div className="rounded-2xl bg-input-bg border border-input-border focus-within:border-primary dark:focus-within:border-accent focus-within:ring-2 focus-within:ring-focus-ring/25 shadow-xs transition-all p-2.5 space-y-2">
             <textarea
               ref={promptTextareaRef}
-              rows={2}
+              rows={totalGeneratedCount > 0 ? 1 : 2}
               value={promptValue}
               onChange={(e) => handlePromptChange(e.target.value)}
               onKeyDown={(e) => {
@@ -891,7 +1190,7 @@ export default function ChatWorkspace({
               aria-label="Message composer prompt or source text"
               placeholder={
                 hasExistingSource
-                  ? 'Ask for follow-up changes (e.g. "Make the LinkedIn post shorter", "Switch tone to Urgent") or paste a new source...'
+                  ? 'Follow-up instruction for active source (e.g. "Make tone Urgent", "Simplify for students") or attach a new source...'
                   : 'Paste your source content or enter instructions to transform (Press Enter to generate)...'
               }
               className="w-full bg-transparent text-xs sm:text-sm text-text-primary placeholder:text-placeholder resize-none focus:outline-none leading-relaxed px-1"
@@ -914,7 +1213,7 @@ export default function ChatWorkspace({
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isGenerating}
                   title="Attach PDF, DOCX, TXT, PNG, or JPG (Max 10 MB)"
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                 >
                   <Paperclip className="w-3.5 h-3.5 text-primary dark:text-accent" />
                   <span>Attach File</span>
@@ -924,7 +1223,7 @@ export default function ChatWorkspace({
                   type="button"
                   onClick={() => setShowSourceDrawer(!showSourceDrawer)}
                   disabled={isGenerating}
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
                     showSourceDrawer || sourceTextValue.trim()
                       ? 'bg-surface-selected text-text-primary border border-border'
                       : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'
@@ -934,8 +1233,8 @@ export default function ChatWorkspace({
                   <span>{sourceTextValue.trim() ? 'Source Text Attached' : 'Paste Source'}</span>
                 </button>
 
-                {/* Active Formats Summary Pills */}
-                <div className="hidden sm:flex items-center gap-1 pl-1">
+                {/* Active Formats Summary Indicator (Read-only badge referencing Right Output Config) */}
+                <div className="hidden sm:flex items-center gap-1 pl-1" title="Configured in Right Output Config panel">
                   {selectedFormats.slice(0, 3).map((fmtId) => {
                     const fmt = getWorkspaceFormatById(fmtId);
                     return (
@@ -967,7 +1266,13 @@ export default function ChatWorkspace({
                   aria-label="Submit request to generate content"
                   className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold bg-primary hover:bg-primary-hover text-primary-foreground disabled:opacity-50 shadow-2xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                 >
-                  <span>{isGenerating ? 'Generating...' : 'Generate'}</span>
+                  <span>
+                    {isGenerating
+                      ? 'Generating...'
+                      : hasExistingSource
+                      ? 'Generate Follow-Up'
+                      : 'Generate'}
+                  </span>
                   <Send className="w-3.5 h-3.5" />
                 </button>
               </div>

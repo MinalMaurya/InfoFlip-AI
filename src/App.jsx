@@ -39,8 +39,10 @@ import {
   executeChatTurn,
   editCanonicalContentItem,
   approveCanonicalContentItem,
+  approvePassedCanonicalContentItems,
   rejectCanonicalContentItem,
-  regenerateCanonicalContentItem
+  regenerateCanonicalContentItem,
+  restoreApprovedCanonicalContentItem
 } from './services/workspace/chatPipelineOrchestrator';
 import { DEMO_SCENARIOS } from './data/demoScenarios';
 import { SAMPLE_ANALYSIS } from './services/analysisService';
@@ -92,13 +94,17 @@ export default function App() {
   const [showContractModal, setShowContractModal] = useState(false);
   const [showAnalysisContractModal, setShowAnalysisContractModal] = useState(false);
 
-  // Persist Workspace State Helper
-  const persistWorkspace = useCallback((nextState) => {
-    setWorkspaceState(nextState);
-    const saveResult = defaultWorkspaceStorage.saveWorkspaceState(nextState);
-    if (!saveResult.success && saveResult.error) {
-      setStorageWarning(saveResult.error);
-    }
+  // Persist Workspace State Helper (supports both direct state and functional updater to prevent async stale-closure overwrites)
+  const persistWorkspace = useCallback((nextStateOrUpdater) => {
+    setWorkspaceState((prev) => {
+      const nextState =
+        typeof nextStateOrUpdater === 'function' ? nextStateOrUpdater(prev) : nextStateOrUpdater;
+      const saveResult = defaultWorkspaceStorage.saveWorkspaceState(nextState);
+      if (!saveResult.success && saveResult.error) {
+        setStorageWarning(saveResult.error);
+      }
+      return nextState;
+    });
   }, []);
 
   // Persist UI Preferences Helper
@@ -366,29 +372,30 @@ export default function App() {
           draft: { prompt: '', sourceText: '' }
         };
 
-        // Merge canonical items into contentItemsById
-        const nextItemsById = { ...workspaceState.contentItemsById };
-        for (const item of turnResult.canonicalItems) {
-          nextItemsById[item.itemId] = item;
-        }
+        persistWorkspace((prev) => {
+          const nextItemsById = { ...prev.contentItemsById };
+          for (const item of turnResult.canonicalItems) {
+            nextItemsById[item.itemId] = item;
+          }
 
-        const existingIndex = workspaceState.conversations.findIndex(
-          (c) => c.conversationId === updatedConversation.conversationId
-        );
-        let nextConversations;
-        if (existingIndex >= 0) {
-          nextConversations = [...workspaceState.conversations];
-          nextConversations[existingIndex] = updatedConversation;
-        } else {
-          nextConversations = [updatedConversation, ...workspaceState.conversations];
-        }
+          const existingIndex = prev.conversations.findIndex(
+            (c) => c.conversationId === updatedConversation.conversationId
+          );
+          let nextConversations;
+          if (existingIndex >= 0) {
+            nextConversations = [...prev.conversations];
+            nextConversations[existingIndex] = updatedConversation;
+          } else {
+            nextConversations = [updatedConversation, ...prev.conversations];
+          }
 
-        persistWorkspace({
-          ...workspaceState,
-          activeConversationId: updatedConversation.conversationId,
-          conversations: nextConversations,
-          contentItemsById: nextItemsById,
-          updatedAt: nowIso
+          return {
+            ...prev,
+            activeConversationId: updatedConversation.conversationId,
+            conversations: nextConversations,
+            contentItemsById: nextItemsById,
+            updatedAt: nowIso
+          };
         });
 
         // Also sync with classic 6-module inspector state
@@ -401,7 +408,7 @@ export default function App() {
         setIsGenerating(false);
       }
     },
-    [activeConversation, workspaceState, persistWorkspace]
+    [activeConversation, persistWorkspace]
   );
 
   // ============================================================================
@@ -410,79 +417,87 @@ export default function App() {
 
   const handleEditItem = useCallback(
     (itemId, newContentOrStructured) => {
-      const existingItem = workspaceState.contentItemsById?.[itemId];
-      if (!existingItem) return;
+      persistWorkspace((prev) => {
+        const existingItem = prev.contentItemsById?.[itemId];
+        if (!existingItem) return prev;
 
-      const conv = workspaceState.conversations.find(
-        (c) => c.conversationId === existingItem.conversationId
-      );
-      const updatedItem = editCanonicalContentItem(existingItem, newContentOrStructured, conv || {});
-      if (!updatedItem) return;
+        const conv = prev.conversations.find(
+          (c) => c.conversationId === existingItem.conversationId
+        );
+        const updatedItem = editCanonicalContentItem(existingItem, newContentOrStructured, conv || {});
+        if (!updatedItem) return prev;
 
-      persistWorkspace({
-        ...workspaceState,
-        contentItemsById: {
-          ...workspaceState.contentItemsById,
-          [itemId]: updatedItem
-        }
+        return {
+          ...prev,
+          contentItemsById: {
+            ...prev.contentItemsById,
+            [itemId]: updatedItem
+          }
+        };
       });
     },
-    [workspaceState, persistWorkspace]
+    [persistWorkspace]
   );
 
   const handleApproveItem = useCallback(
     (itemId, notes = '') => {
-      const existingItem = workspaceState.contentItemsById?.[itemId];
-      if (!existingItem) return;
+      persistWorkspace((prev) => {
+        const existingItem = prev.contentItemsById?.[itemId];
+        if (!existingItem) return prev;
 
-      const approvedItem = approveCanonicalContentItem(existingItem, notes);
-      if (!approvedItem) return;
+        const approvedItem = approveCanonicalContentItem(existingItem, notes);
+        if (!approvedItem) return prev;
 
-      persistWorkspace({
-        ...workspaceState,
-        contentItemsById: {
-          ...workspaceState.contentItemsById,
-          [itemId]: approvedItem
-        }
+        return {
+          ...prev,
+          contentItemsById: {
+            ...prev.contentItemsById,
+            [itemId]: approvedItem
+          }
+        };
       });
     },
-    [workspaceState, persistWorkspace]
+    [persistWorkspace]
   );
 
   const handleRejectItem = useCallback(
     (itemId, reason = 'Needs revision') => {
-      const existingItem = workspaceState.contentItemsById?.[itemId];
-      if (!existingItem) return;
+      persistWorkspace((prev) => {
+        const existingItem = prev.contentItemsById?.[itemId];
+        if (!existingItem) return prev;
 
-      const rejectedItem = rejectCanonicalContentItem(existingItem, reason);
-      if (!rejectedItem) return;
+        const rejectedItem = rejectCanonicalContentItem(existingItem, reason);
+        if (!rejectedItem) return prev;
 
-      persistWorkspace({
-        ...workspaceState,
-        contentItemsById: {
-          ...workspaceState.contentItemsById,
-          [itemId]: rejectedItem
-        }
+        return {
+          ...prev,
+          contentItemsById: {
+            ...prev.contentItemsById,
+            [itemId]: rejectedItem
+          }
+        };
       });
     },
-    [workspaceState, persistWorkspace]
+    [persistWorkspace]
   );
 
   const handleApproveAllInTurn = useCallback(
     (itemIds = []) => {
       if (!Array.isArray(itemIds) || itemIds.length === 0) return;
-      const nextItemsById = { ...workspaceState.contentItemsById };
-      for (const id of itemIds) {
-        if (nextItemsById[id]) {
-          nextItemsById[id] = approveCanonicalContentItem(nextItemsById[id], 'Batch approved in workspace');
-        }
-      }
-      persistWorkspace({
-        ...workspaceState,
-        contentItemsById: nextItemsById
+      persistWorkspace((prev) => {
+        const { updatedItemsById, approvedCount } = approvePassedCanonicalContentItems(
+          prev.contentItemsById,
+          itemIds,
+          'Batch approved in workspace (passed all required checks)'
+        );
+        if (approvedCount === 0) return prev;
+        return {
+          ...prev,
+          contentItemsById: updatedItemsById
+        };
       });
     },
-    [workspaceState, persistWorkspace]
+    [persistWorkspace]
   );
 
   const handleRegenerateItem = useCallback(
@@ -499,19 +514,38 @@ export default function App() {
       try {
         const regeneratedItem = await regenerateCanonicalContentItem(existingItem, conv);
         if (regeneratedItem) {
-          persistWorkspace({
-            ...workspaceState,
+          persistWorkspace((prev) => ({
+            ...prev,
             contentItemsById: {
-              ...workspaceState.contentItemsById,
+              ...prev.contentItemsById,
               [itemId]: regeneratedItem
             }
-          });
+          }));
         }
       } finally {
         setRegeneratingItemId(null);
       }
     },
     [workspaceState, activeConversation, persistWorkspace]
+  );
+
+  const handleRestoreApprovedItem = useCallback(
+    (itemId) => {
+      persistWorkspace((prev) => {
+        const existingItem = prev.contentItemsById?.[itemId];
+        if (!existingItem) return prev;
+        const restoredItem = restoreApprovedCanonicalContentItem(existingItem);
+        if (!restoredItem) return prev;
+        return {
+          ...prev,
+          contentItemsById: {
+            ...prev.contentItemsById,
+            [itemId]: restoredItem
+          }
+        };
+      });
+    },
+    [persistWorkspace]
   );
 
   // ============================================================================
@@ -663,6 +697,7 @@ export default function App() {
             onRejectItem={handleRejectItem}
             onApproveAllInTurn={handleApproveAllInTurn}
             onRegenerateItem={handleRegenerateItem}
+            onRestoreApprovedItem={handleRestoreApprovedItem}
             regeneratingItemId={regeneratingItemId}
             isGenerating={isGenerating}
             progressState={progressState}
@@ -743,6 +778,8 @@ export default function App() {
                 onApproveItem={handleApproveItem}
                 onRejectItem={handleRejectItem}
                 onRegenerateItem={handleRegenerateItem}
+                onRestoreApprovedItem={handleRestoreApprovedItem}
+                regeneratingItemId={regeneratingItemId}
                 onStartNewChat={handleNewChat}
               />
             ) : activeSection === 'scheduled' ? (

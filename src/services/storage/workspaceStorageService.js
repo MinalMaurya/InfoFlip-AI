@@ -142,6 +142,8 @@ export function sanitizeWorkspaceState(raw) {
           summary: item.summary && typeof item.summary === 'object' ? item.summary : { passed: 0, warnings: 0, failed: 0 },
           metadata: item.metadata && typeof item.metadata === 'object' ? item.metadata : {},
           sourceTraceability: Array.isArray(item.sourceTraceability) ? item.sourceTraceability : [],
+          sourceReference: item.sourceReference && typeof item.sourceReference === 'object' ? item.sourceReference : null,
+          previousApprovedVersion: item.previousApprovedVersion && typeof item.previousApprovedVersion === 'object' ? item.previousApprovedVersion : null,
           approvalInfo: item.approvalInfo && typeof item.approvalInfo === 'object' ? item.approvalInfo : null,
           lineage: item.lineage && typeof item.lineage === 'object' ? item.lineage : {
             sourceId: item.sourceId || 'src-unknown',
@@ -181,6 +183,7 @@ export function sanitizeWorkspaceState(raw) {
               : [],
             unsupportedFormats: Array.isArray(msg.unsupportedFormats) ? msg.unsupportedFormats : [],
             analysisSummary: msg.analysisSummary && typeof msg.analysisSummary === 'object' ? msg.analysisSummary : null,
+            sourceSummary: msg.sourceSummary && typeof msg.sourceSummary === 'object' ? msg.sourceSummary : null,
             lineage: msg.lineage && typeof msg.lineage === 'object' ? msg.lineage : null,
             createdAt: msg.createdAt || new Date().toISOString()
           });

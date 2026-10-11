@@ -37,14 +37,17 @@ export default function LibraryView({
   onApproveItem,
   onRejectItem,
   onRegenerateItem,
+  onRestoreApprovedItem,
+  regeneratingItemId: externalRegeneratingItemId = null,
   onStartNewChat
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL'); // 'ALL' | 'APPROVED' | 'PENDING_REVIEW' | 'FLAGGED'
   const [localFormatFilter, setLocalFormatFilter] = useState('ALL');
   const [expandedItemId, setExpandedItemId] = useState(null);
-  const [regeneratingItemId, setRegeneratingItemId] = useState(null);
+  const [localRegeneratingItemId, setLocalRegeneratingItemId] = useState(null);
 
+  const regeneratingItemId = externalRegeneratingItemId || localRegeneratingItemId;
   const effectiveFormatFilter = collectionFormatId || (localFormatFilter === 'ALL' ? null : localFormatFilter);
   const activeFormatSpec = effectiveFormatFilter ? WORKSPACE_FORMAT_MAP[effectiveFormatFilter] : null;
 
@@ -106,11 +109,11 @@ export default function LibraryView({
 
   const handleRegenerate = async (itemId) => {
     if (!onRegenerateItem) return;
-    setRegeneratingItemId(itemId);
+    setLocalRegeneratingItemId(itemId);
     try {
       await onRegenerateItem(itemId);
     } finally {
-      setRegeneratingItemId(null);
+      setLocalRegeneratingItemId(null);
     }
   };
 
@@ -182,21 +185,21 @@ export default function LibraryView({
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
           {/* Search input */}
           <div className="relative flex-1">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-text-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search saved content by title, text, format, or conversation..."
               aria-label="Search library items"
-              className="w-full pl-8 pr-7 py-2 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+              className="w-full pl-8 pr-7 py-2 text-xs rounded-lg bg-input-bg border border-input-border text-text-primary placeholder:text-placeholder focus:outline-none focus:ring-2 focus:ring-focus-ring/30 focus:border-primary"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
                 aria-label="Clear search"
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -206,12 +209,12 @@ export default function LibraryView({
           {/* Format selector (only shown when not locked to a sidebar collection) */}
           {!collectionFormatId && (
             <div className="flex items-center gap-1.5">
-              <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0 hidden sm:block" />
+              <Filter className="w-3.5 h-3.5 text-text-muted shrink-0 hidden sm:block" />
               <select
                 value={localFormatFilter}
                 onChange={(e) => setLocalFormatFilter(e.target.value)}
                 aria-label="Filter by content format"
-                className="px-2.5 py-2 rounded-lg text-xs font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 focus:outline-none focus:border-accent"
+                className="px-2.5 py-2 rounded-lg text-xs font-medium bg-input-bg border border-input-border text-text-primary focus:outline-none focus:border-primary"
               >
                 <option value="ALL">All Formats ({allItems.length})</option>
                 {WORKSPACE_FORMATS.map((fmt) => {
@@ -227,7 +230,7 @@ export default function LibraryView({
           )}
 
           {/* Review status filter */}
-          <div className="flex items-center gap-1 bg-white dark:bg-slate-900 p-1 rounded-lg border border-slate-200 dark:border-slate-800">
+          <div className="flex items-center gap-1 bg-surface p-1 rounded-lg border border-border">
             {[
               { id: 'ALL', label: 'All' },
               { id: 'APPROVED', label: 'Approved' },
@@ -238,10 +241,10 @@ export default function LibraryView({
                 key={tab.id}
                 type="button"
                 onClick={() => setStatusFilter(tab.id)}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
                   statusFilter === tab.id
                     ? 'bg-primary text-primary-foreground'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'
                 }`}
               >
                 {tab.label}
@@ -252,19 +255,19 @@ export default function LibraryView({
 
         {/* Empty State */}
         {filteredItems.length === 0 ? (
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 p-8 text-center space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto text-slate-400">
+          <div className="bg-surface rounded-xl border border-border p-8 text-center space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-sidebar-bg border border-border flex items-center justify-center mx-auto text-text-muted">
               <FileText className="w-5 h-5" />
             </div>
             <div className="space-y-1">
-              <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+              <h2 className="text-sm font-semibold text-text-primary">
                 {allItems.length === 0
                   ? 'No saved content items yet'
                   : activeFormatSpec
                   ? `No saved ${activeFormatSpec.name} items yet`
                   : 'No items match your current filter'}
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+              <p className="text-xs text-text-secondary max-w-md mx-auto">
                 {allItems.length === 0
                   ? 'Start a conversation and generate content in LinkedIn, X/Twitter, WhatsApp, Email, SMS, or Summary formats. Every generated output is automatically saved here.'
                   : 'Try clearing the search filter or generating new content in the conversation workspace.'}
@@ -275,7 +278,7 @@ export default function LibraryView({
                 <button
                   type="button"
                   onClick={onStartNewChat}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-primary text-primary-foreground hover:opacity-95 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-primary text-primary-foreground hover:opacity-95 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                 >
                   <MessageSquare className="w-3.5 h-3.5" />
                   Create Content in Chat
@@ -294,6 +297,10 @@ export default function LibraryView({
               const formatLabel = formatSpec?.name || item.formatId;
               const isApproved = item.approvalStatus === APPROVAL_STATUSES.APPROVED;
               const isRejected = item.approvalStatus === APPROVAL_STATUSES.REJECTED;
+              const sourceFileName =
+                item.sourceReference?.fileName ||
+                conv?.activeSource?.fileName ||
+                'Source Document';
               const previewSnippet = (item.content || '')
                 .replace(/\s+/g, ' ')
                 .trim()
@@ -302,7 +309,7 @@ export default function LibraryView({
               return (
                 <div
                   key={item.itemId}
-                  className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-2xs overflow-hidden transition-all"
+                  className="bg-surface rounded-xl border border-border shadow-2xs overflow-hidden transition-all"
                 >
                   {/* Summary Header Row */}
                   <div className="px-4 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -329,18 +336,23 @@ export default function LibraryView({
                           </span>
                         )}
 
-                        <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] bg-sidebar-bg text-text-secondary border border-border">
+                          <FileText className="w-3 h-3 text-primary dark:text-accent" />
+                          <span className="truncate max-w-[140px]">{sourceFileName}</span>
+                        </span>
+
+                        <span className="inline-flex items-center gap-1 text-[11px] text-text-muted">
                           <Clock className="w-3 h-3" />
                           {formatTimestamp(item.updatedAt || item.createdAt)}
                         </span>
                       </div>
 
-                      <h3 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">
+                      <h3 className="text-xs sm:text-sm font-semibold text-text-primary truncate">
                         {item.title || `${formatLabel} Output`}
                       </h3>
 
                       {!isExpanded && previewSnippet && (
-                        <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+                        <p className="text-xs text-text-secondary line-clamp-2">
                           {previewSnippet}
                           {(item.content || '').length > 200 ? '...' : ''}
                         </p>
@@ -354,7 +366,7 @@ export default function LibraryView({
                           type="button"
                           onClick={() => onOpenConversation(item.conversationId)}
                           title={`Open conversation: ${convTitle}`}
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-surface-hover dark:hover:bg-surface-hover hover:text-primary dark:hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-text-secondary bg-sidebar-bg border border-border hover:bg-surface-hover hover:text-primary dark:hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                         >
                           <MessageSquare className="w-3 h-3" />
                           <span className="max-w-[130px] truncate">{convTitle}</span>
@@ -365,7 +377,7 @@ export default function LibraryView({
                       <button
                         type="button"
                         onClick={() => setExpandedItemId(isExpanded ? null : item.itemId)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-surface-selected text-primary dark:text-accent hover:bg-surface-hover dark:hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-surface-selected text-primary dark:text-accent border border-border hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                       >
                         {isExpanded ? (
                           <>
@@ -384,14 +396,16 @@ export default function LibraryView({
 
                   {/* Expanded Full Output View (Reuses GeneratedOutputRenderer for full edit/review/export) */}
                   {isExpanded && (
-                    <div className="px-4 pb-4 pt-2 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-950/40">
+                    <div className="px-4 pb-4 pt-2 border-t border-border bg-sidebar-bg">
                       <GeneratedOutputRenderer
                         item={item}
                         config={conv?.config || {}}
+                        sourceDocument={conv?.activeSource || item.sourceReference}
                         onEdit={onEditItem}
                         onApprove={onApproveItem}
                         onReject={onRejectItem}
                         onRegenerate={() => handleRegenerate(item.itemId)}
+                        onRestoreApproved={onRestoreApprovedItem}
                         isRegenerating={regeneratingItemId === item.itemId}
                         onOpenOriginConversation={
                           item.conversationId && onOpenConversation

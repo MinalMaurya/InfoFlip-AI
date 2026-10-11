@@ -11,7 +11,11 @@ import {
   ShieldCheck,
   Download,
   FileText,
-  ExternalLink
+  ExternalLink,
+  Link2,
+  RotateCcw,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 // Existing Module 4 Communication Previews
@@ -53,10 +57,13 @@ const CHECK_LABELS = {
 export default function GeneratedOutputRenderer({
   item,
   config = {},
+  sourceDocument = null,
   onEdit,
   onApprove,
   onReject,
   onRegenerate,
+  onRestoreApproved = null,
+  onInspectSource = null,
   isRegenerating = false,
   onOpenOriginConversation = null
 }) {
@@ -65,6 +72,8 @@ export default function GeneratedOutputRenderer({
   const [draftStructured, setDraftStructured] = useState(item?.structuredData || null);
   const [copied, setCopied] = useState(false);
   const [showReviewChecks, setShowReviewChecks] = useState(false);
+  const [showSourceProvenance, setShowSourceProvenance] = useState(false);
+  const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false);
 
   if (!item) return null;
 
@@ -73,17 +82,42 @@ export default function GeneratedOutputRenderer({
   const isApproved = item.approvalStatus === APPROVAL_STATUSES.APPROVED;
   const isRejected = item.approvalStatus === APPROVAL_STATUSES.REJECTED;
 
-  // Determine content status flag
-  const statusFlag = item.metadata?.contentStatusFlag ||
-    (isApproved
-      ? CONTENT_STATUS_FLAGS.APPROVED_FOR_EXPORT
-      : item.isEdited
-      ? CONTENT_STATUS_FLAGS.HUMAN_REVIEWED
-      : item.metadata?.isFallback
-      ? CONTENT_STATUS_FLAGS.RULE_BASED_FALLBACK
-      : CONTENT_STATUS_FLAGS.AI_GENERATED);
+  // Determine content status flag accurately from current approval & edit state
+  const statusFlag = isApproved
+    ? CONTENT_STATUS_FLAGS.APPROVED_FOR_EXPORT
+    : item.isEdited
+    ? CONTENT_STATUS_FLAGS.HUMAN_REVIEWED
+    : item.metadata?.contentStatusFlag &&
+      item.metadata.contentStatusFlag !== CONTENT_STATUS_FLAGS.APPROVED_FOR_EXPORT
+    ? item.metadata.contentStatusFlag
+    : item.metadata?.isFallback
+    ? CONTENT_STATUS_FLAGS.RULE_BASED_FALLBACK
+    : CONTENT_STATUS_FLAGS.AI_GENERATED;
 
   const verificationLabel = item.metadata?.verificationStatus || 'Source not independently verified';
+
+  // Resolve source provenance reference from item.sourceReference, passed sourceDocument, or lineage
+  const sourceRef = item.sourceReference || (sourceDocument
+    ? {
+        sourceId: sourceDocument.sourceId || item.lineage?.sourceId || 'src-1',
+        sourceType: sourceDocument.sourceType || 'text',
+        fileName: sourceDocument.fileName || 'Pasted Source Text',
+        wordCount: sourceDocument.metadata?.wordCount || sourceDocument.wordCount || 0,
+        characterCount: sourceDocument.metadata?.characterCount || sourceDocument.characterCount || 0,
+        excerpt: (sourceDocument.extractedText || sourceDocument.rawText || sourceDocument.excerpt || '').slice(0, 260),
+        mainTopic: sourceDocument.mainTopic || 'Source Document'
+      }
+    : {
+        sourceId: item.lineage?.sourceId || 'src-1',
+        sourceType: 'text',
+        fileName: 'Source Document',
+        wordCount: 0,
+        characterCount: 0,
+        excerpt: '',
+        mainTopic: 'Source Document'
+      });
+
+  const traceabilityList = Array.isArray(item.sourceTraceability) ? item.sourceTraceability : [];
 
   // Collect warnings from Module 5 checks
   const checkEntries = Object.entries(item.checks || {});
@@ -107,6 +141,24 @@ export default function GeneratedOutputRenderer({
       onEdit(item.itemId, draftStructured);
     } else {
       onEdit(item.itemId, draftText);
+    }
+  };
+
+  const handleRegenerateClick = () => {
+    if (!onRegenerate || isRegenerating) return;
+    // Protect approved content from accidental silent overwrite
+    if (isApproved && !showRegenerateConfirm) {
+      setShowRegenerateConfirm(true);
+      return;
+    }
+    setShowRegenerateConfirm(false);
+    onRegenerate(item.itemId);
+  };
+
+  const handleConfirmRegenerateApproved = () => {
+    setShowRegenerateConfirm(false);
+    if (onRegenerate) {
+      onRegenerate(item.itemId);
     }
   };
 
@@ -295,7 +347,7 @@ export default function GeneratedOutputRenderer({
 
   return (
     <div className="space-y-3">
-      {/* Top Action & Status Bar */}
+      {/* Top Action & Review Status Bar */}
       <div className="p-3 rounded-xl bg-sidebar-bg border border-border flex flex-wrap items-center justify-between gap-2.5">
         {/* Left: Format Title, Status Flag, Review Approval Status */}
         <div className="flex flex-wrap items-center gap-2">
@@ -327,12 +379,15 @@ export default function GeneratedOutputRenderer({
             </span>
           )}
 
-          {/* Truthful Verification Status */}
-          <span className="text-[10px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200/70 dark:border-slate-700/70">
+          {/* Truthful Verification Status (Never claims independent factual verification) */}
+          <span
+            className="text-[10px] px-2 py-0.5 rounded bg-surface-elevated text-text-secondary border border-border"
+            title="Human approval authorizes export readiness; it does not independently verify source facts against external databases."
+          >
             {verificationLabel}
           </span>
 
-          <span className="text-[10px] text-slate-400 dark:text-slate-500">
+          <span className="text-[10px] text-text-muted">
             {item.metadata?.wordCount || 0}w • {item.metadata?.characterCount || (item.content?.length || 0)}c
           </span>
         </div>
@@ -343,7 +398,7 @@ export default function GeneratedOutputRenderer({
             <button
               type="button"
               onClick={onOpenOriginConversation}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-primary dark:text-accent hover:bg-surface-hover dark:hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-surface border border-border text-primary dark:text-accent hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <ExternalLink className="w-3 h-3" />
               <span>Open Chat</span>
@@ -353,10 +408,10 @@ export default function GeneratedOutputRenderer({
           <button
             type="button"
             onClick={() => setShowReviewChecks(!showReviewChecks)}
-            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
               showReviewChecks
                 ? 'bg-surface-selected border-primary/40 text-primary dark:text-accent'
-                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                : 'bg-surface border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover'
             }`}
           >
             <ShieldCheck className="w-3 h-3 text-primary dark:text-accent" />
@@ -367,10 +422,10 @@ export default function GeneratedOutputRenderer({
             <button
               type="button"
               onClick={isEditing ? handleSaveEdit : handleStartEdit}
-              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
                 isEditing
                   ? 'bg-primary text-primary-foreground'
-                  : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  : 'bg-surface border border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover'
               }`}
             >
               {isEditing ? <Save className="w-3 h-3" /> : <Edit3 className="w-3 h-3" />}
@@ -381,19 +436,37 @@ export default function GeneratedOutputRenderer({
           {onRegenerate && (
             <button
               type="button"
-              onClick={() => onRegenerate(item.itemId)}
+              onClick={handleRegenerateClick}
               disabled={isRegenerating}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              title={
+                isApproved
+                  ? 'Regenerate only this format output (requires confirmation because this output is currently approved)'
+                  : 'Regenerate only this format output without affecting other outputs'
+              }
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-surface border border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover disabled:opacity-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <RefreshCw className={`w-3 h-3 ${isRegenerating ? 'animate-spin text-primary' : ''}`} />
               <span>{isRegenerating ? 'Regenerating...' : 'Regenerate'}</span>
             </button>
           )}
 
+          {/* Restore Previously Approved Snapshot if this item was regenerated after approval */}
+          {!isApproved && item.previousApprovedVersion && onRestoreApproved && (
+            <button
+              type="button"
+              onClick={() => onRestoreApproved(item.itemId)}
+              title="Restore the previously approved version of this output"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Restore Approved</span>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={handleCopy}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-surface border border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
             <span>{copied ? 'Copied' : 'Copy'}</span>
@@ -404,7 +477,7 @@ export default function GeneratedOutputRenderer({
             <button
               type="button"
               onClick={() => onApprove(item.itemId, 'Human reviewed and approved in chat workspace')}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <Check className="w-3 h-3 stroke-[2.5]" />
               <span>Approve</span>
@@ -415,7 +488,7 @@ export default function GeneratedOutputRenderer({
             <button
               type="button"
               onClick={() => onReject(item.itemId, 'Flagged for revision during human review')}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <XCircle className="w-3 h-3" />
               <span>Reject</span>
@@ -427,7 +500,7 @@ export default function GeneratedOutputRenderer({
             <button
               type="button"
               onClick={handleDownloadApprovedSingle}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-primary text-primary-foreground hover:opacity-95 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-primary text-primary-foreground hover:opacity-95 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
               title="Download this approved deliverable (.txt)"
             >
               <Download className="w-3 h-3" />
@@ -435,6 +508,139 @@ export default function GeneratedOutputRenderer({
             </button>
           )}
         </div>
+      </div>
+
+      {/* Confirmation Guard Before Regenerating an Approved Output */}
+      {showRegenerateConfirm && (
+        <div
+          role="alert"
+          className="p-3 rounded-xl bg-amber-50/90 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200 flex flex-wrap items-center justify-between gap-2.5"
+        >
+          <div className="flex items-start gap-2 min-w-0 flex-1">
+            <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <div className="space-y-0.5">
+              <div className="font-bold">
+                Protect Approved Content — Confirm Single-Format Regeneration
+              </div>
+              <p className="text-[11px] text-amber-800 dark:text-amber-300 leading-relaxed">
+                This <strong>{formatMeta?.name || formatId}</strong> output is currently approved for export. Regenerating will create a new draft for this format only and reset its status to Pending Human Approval. Your approved version will be preserved so you can restore it, and no other format outputs will be modified.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={handleConfirmRegenerateApproved}
+              className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-600 hover:bg-amber-700 text-white transition-colors"
+            >
+              Regenerate {formatMeta?.name || formatId}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowRegenerateConfirm(false)}
+              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-surface border border-border text-text-secondary hover:text-text-primary transition-colors"
+            >
+              Keep Approved
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Source Provenance & Grounding Connection Bar (Always Visible) */}
+      <div className="px-3 py-2 rounded-xl bg-surface border border-border flex flex-col gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-[11px]">
+          <div className="flex flex-wrap items-center gap-1.5 text-text-secondary min-w-0">
+            <span className="inline-flex items-center gap-1 font-semibold text-text-primary">
+              <Link2 className="w-3.5 h-3.5 text-primary dark:text-accent shrink-0" />
+              <span>Grounded in Source:</span>
+            </span>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sidebar-bg border border-border text-text-primary font-medium truncate max-w-[240px]">
+              <FileText className="w-3 h-3 text-primary dark:text-accent shrink-0" />
+              <span className="truncate">{sourceRef.fileName || 'Source Document'}</span>
+            </span>
+            {sourceRef.mainTopic && sourceRef.mainTopic !== 'Source Document' && (
+              <span className="px-2 py-0.5 rounded-md bg-sidebar-bg border border-border text-text-secondary truncate max-w-[200px]">
+                Topic: {sourceRef.mainTopic}
+              </span>
+            )}
+            <span className="text-[10px] font-mono text-text-muted">
+              ID: {item.lineage?.sourceId || sourceRef.sourceId}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {onInspectSource && (
+              <button
+                type="button"
+                onClick={onInspectSource}
+                className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary dark:text-accent hover:underline focus-visible:outline-none"
+              >
+                <FileText className="w-3 h-3" />
+                <span>View Source Document</span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setShowSourceProvenance(!showSourceProvenance)}
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sidebar-bg hover:bg-surface-hover border border-border text-[10px] font-semibold text-text-secondary hover:text-text-primary transition-colors"
+            >
+              <span>
+                Source References ({traceabilityList.length})
+              </span>
+              {showSourceProvenance ? (
+                <ChevronUp className="w-3 h-3" />
+              ) : (
+                <ChevronDown className="w-3 h-3" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Expandable Source References & Provenance Details */}
+        {showSourceProvenance && (
+          <div className="pt-2 border-t border-border space-y-2 text-[11px]">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-text-muted font-mono">
+              <span>
+                Provenance Lineage: {item.lineage?.sourceId || 'src'} → {item.lineage?.analysisId || 'ana'} → {item.lineage?.transformationId || 'trans'} → {item.lineage?.communicationId || 'comm'} → {item.lineage?.reviewId || 'rev'}
+              </span>
+              {sourceRef.wordCount > 0 && (
+                <span>Source Length: {sourceRef.wordCount} words</span>
+              )}
+            </div>
+
+            {sourceRef.excerpt && (
+              <div className="p-2.5 rounded-lg bg-sidebar-bg border border-border text-text-secondary">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1">
+                  Source Document Excerpt
+                </div>
+                <p className="text-[11px] text-text-primary leading-relaxed line-clamp-3">
+                  {sourceRef.excerpt}
+                </p>
+              </div>
+            )}
+
+            {traceabilityList.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                {traceabilityList.map((trace, idx) => (
+                  <div
+                    key={idx}
+                    className="p-2 rounded-lg bg-sidebar-bg border border-border text-[11px] text-text-primary"
+                  >
+                    <div className="font-medium leading-snug">{trace.fact}</div>
+                    <div className="text-[10px] text-text-muted font-mono mt-0.5">
+                      Origin: {trace.origin || 'Extracted from source'} • {trace.sourceId || item.lineage?.sourceId}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-[11px] text-text-muted italic">
+                Derived directly from active source document ({item.lineage?.sourceId || 'src-1'}).
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Visible Warning Banner when Module 5 detects warnings/issues */}
@@ -456,13 +662,13 @@ export default function GeneratedOutputRenderer({
 
       {/* Expandable 10-Dimension Module 5 QA & Source Traceability Drawer */}
       {showReviewChecks && (
-        <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 text-xs animate-fade-in">
-          <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-200/70 dark:border-slate-800">
-            <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+        <div className="p-3.5 rounded-xl bg-sidebar-bg border border-border space-y-3 text-xs animate-fade-in">
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-border">
+            <span className="font-bold text-text-primary flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-primary dark:text-accent" />
               <span>Module 5 Quality Review & Grounding Audit</span>
             </span>
-            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
+            <span className="text-[10px] font-mono text-text-muted">
               src: {item.lineage?.sourceId || 'src'} • ana: {item.lineage?.analysisId || 'ana'} • rev: {item.lineage?.reviewId || 'rev'}
             </span>
           </div>
@@ -476,7 +682,7 @@ export default function GeneratedOutputRenderer({
                   key={key}
                   className={`p-2 rounded-lg border text-[11px] flex items-start gap-2 ${
                     isPass
-                      ? 'bg-white dark:bg-slate-800/50 border-slate-200/70 dark:border-slate-800 text-slate-700 dark:text-slate-300'
+                      ? 'bg-surface border-border text-text-primary'
                       : isWarn
                       ? 'bg-amber-50/70 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200'
                       : 'bg-rose-50/70 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200'
@@ -497,19 +703,19 @@ export default function GeneratedOutputRenderer({
           </div>
 
           {/* Grounded Source Traceability Excerpts */}
-          {Array.isArray(item.sourceTraceability) && item.sourceTraceability.length > 0 && (
-            <div className="pt-2 border-t border-slate-200/70 dark:border-slate-800 space-y-1.5">
-              <div className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                Source Traceability References ({item.sourceTraceability.length})
+          {traceabilityList.length > 0 && (
+            <div className="pt-2 border-t border-border space-y-1.5">
+              <div className="text-[11px] font-bold text-text-secondary">
+                Source Traceability References ({traceabilityList.length})
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                {item.sourceTraceability.map((trace, idx) => (
+                {traceabilityList.map((trace, idx) => (
                   <div
                     key={idx}
-                    className="p-2 rounded-lg bg-white dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70 text-[11px] text-slate-700 dark:text-slate-300"
+                    className="p-2 rounded-lg bg-surface border border-border text-[11px] text-text-primary"
                   >
                     <div className="font-medium leading-snug">{trace.fact}</div>
-                    <div className="text-[10px] text-slate-400 font-mono mt-0.5">
+                    <div className="text-[10px] text-text-muted font-mono mt-0.5">
                       Origin: {trace.origin || 'Extracted from source'} • {trace.sourceId || item.lineage?.sourceId}
                     </div>
                   </div>

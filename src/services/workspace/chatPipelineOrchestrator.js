@@ -31,7 +31,8 @@ import {
 } from '../review/reviewService.js';
 import { OUTPUT_FORMAT_IDS } from '../../types/transformation.js';
 import { COMMUNICATION_CHANNEL_IDS } from '../../types/communication.js';
-import { APPROVAL_STATUSES } from '../../types/review.js';
+import { APPROVAL_STATUSES, CHECK_STATUSES } from '../../types/review.js';
+import { CONTENT_STATUS_FLAGS } from '../../types/contentConfidence.js';
 import { DEFAULT_GENERATION_CONFIG } from '../storage/workspaceStorageService.js';
 
 /**
@@ -751,8 +752,10 @@ export async function executeChatTurn({
         if (isFollowUpTurn && followUp.wantsShorter && (followUp.mentionedFormatIds.length === 0 || followUp.mentionedFormatIds.includes(formatId))) {
           finalText = applyConciseRefinement(finalText);
         }
+        const uniqueOutputId = commItem.outputId || `out-${formatId}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
         combinedOutputsForReview.push({
           ...commItem,
+          outputId: uniqueOutputId,
           channelId: formatId,
           title: commItem.title || `${fmtMeta.name} — ${currentAnalysis.overview?.mainTopic || 'Content'}`,
           content: finalText
@@ -768,8 +771,9 @@ export async function executeChatTurn({
       if (isFollowUpTurn && followUp.wantsShorter && (followUp.mentionedFormatIds.length === 0 || followUp.mentionedFormatIds.includes(formatId))) {
         serializedText = applyConciseRefinement(serializedText);
       }
+      const uniqueOutputId = mod3Item.outputId || `out-${formatId}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
       combinedOutputsForReview.push({
-        outputId: mod3Item.outputId,
+        outputId: uniqueOutputId,
         channelId: formatId,
         title: mod3Item.content?.title || `${fmtMeta.name} — ${currentAnalysis.overview?.mainTopic || 'Content'}`,
         content: serializedText,
@@ -824,6 +828,22 @@ export async function executeChatTurn({
     reviewId: reviewResult.reviewId
   };
 
+  const fullSourceText = currentSource.extractedText || currentSource.rawText || '';
+  const sourceFileName = currentSource.fileName || 'Pasted Source Text';
+
+  const sourceReference = {
+    sourceId: currentSource.sourceId,
+    sourceType: currentSource.sourceType || 'text',
+    fileName: sourceFileName,
+    wordCount: currentSource.metadata?.wordCount || fullSourceText.split(/\s+/).filter(Boolean).length,
+    characterCount: currentSource.metadata?.characterCount || fullSourceText.length,
+    mainTopic: currentAnalysis.overview?.mainTopic || 'Source Document',
+    analysisId: currentAnalysis.analysisId,
+    previewSnippet: fullSourceText.slice(0, 220),
+    excerpt: fullSourceText.slice(0, 260),
+    sourceText: fullSourceText
+  };
+
   const canonicalItems = reviewResult.items.map((revItem) => {
     const rawMatch = combinedOutputsForReview.find(o => o.outputId === revItem.outputId);
     return {
@@ -835,6 +855,7 @@ export async function executeChatTurn({
       formatId: revItem.channelId,
       channelId: revItem.channelId,
       structuredData: rawMatch?.structuredData || revItem.structuredData || null,
+      sourceReference,
       lineage,
       createdAt: nowIso,
       updatedAt: nowIso
@@ -849,15 +870,20 @@ export async function executeChatTurn({
       ? {
           sourceId: currentSource.sourceId,
           sourceType: currentSource.sourceType,
-          fileName: currentSource.fileName || 'Pasted Source Text',
+          fileName: sourceFileName,
           wordCount: currentSource.metadata?.wordCount || 0,
           characterCount: currentSource.metadata?.characterCount || 0,
-          previewSnippet: (currentSource.extractedText || currentSource.rawText || '').slice(0, 220)
+          previewSnippet: fullSourceText.slice(0, 220),
+          sourceText: fullSourceText
         }
       : {
           sourceId: currentSource.sourceId,
           sourceType: currentSource.sourceType,
           fileName: currentSource.fileName || 'Active Conversation Source',
+          wordCount: currentSource.metadata?.wordCount || 0,
+          characterCount: currentSource.metadata?.characterCount || 0,
+          previewSnippet: fullSourceText.slice(0, 220),
+          sourceText: fullSourceText,
           isFollowUpContext: true,
           adjustments: followUp.adjustments
         },
@@ -874,6 +900,7 @@ export async function executeChatTurn({
     unsupportedFormats,
     configSnapshot: finalConfig,
     outputItemIds: canonicalItems.map(i => i.itemId),
+    sourceSummary: sourceReference,
     analysisSummary: {
       analysisId: currentAnalysis.analysisId,
       mainTopic: currentAnalysis.overview?.mainTopic || 'Document Analysis',
@@ -963,6 +990,68 @@ export function approveCanonicalContentItem(item, notes = '') {
 }
 
 /**
+ * Determines whether a canonical content item is eligible for batch "Approve Passed".
+ * Strictly requires:
+ * - overallStatus === PASS
+ * - 0 failed checks and 0 warning checks across all evaluated dimensions
+ * - Every check present has status === PASS
+ * - Item is currently PENDING_REVIEW (not already APPROVED and not explicitly REJECTED)
+ */
+export function isEligibleForApprovePassed(item) {
+  if (!item || typeof item !== 'object') return false;
+  if (item.approvalStatus === APPROVAL_STATUSES.APPROVED) return false;
+  if (item.approvalStatus === APPROVAL_STATUSES.REJECTED) return false;
+  if (item.overallStatus !== CHECK_STATUSES.PASS) return false;
+  if ((item.summary?.failed || 0) > 0 || (item.summary?.warnings || 0) > 0) return false;
+
+  const checkValues = Object.values(item.checks || {});
+  if (checkValues.length > 0 && checkValues.some(c => c?.status !== CHECK_STATUSES.PASS)) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Batch-approves ONLY eligible outputs that have passed all required checks (`isEligibleForApprovePassed`).
+ * Outputs with warnings, failed checks, or rejected status are never approved by this batch action.
+ * Human approval authorizes export and never treats unverified claims as independently verified.
+ */
+export function approvePassedCanonicalContentItems(
+  itemsById = {},
+  candidateItemIds = [],
+  notes = 'Batch approved passed outputs in workspace'
+) {
+  const nextItemsById = { ...itemsById };
+  const targetIds = Array.isArray(candidateItemIds) && candidateItemIds.length > 0
+    ? candidateItemIds
+    : Object.keys(nextItemsById);
+
+  const approvedIds = [];
+  const skippedIds = [];
+
+  for (const id of targetIds) {
+    const existing = nextItemsById[id];
+    if (!existing) continue;
+    if (isEligibleForApprovePassed(existing)) {
+      nextItemsById[id] = approveCanonicalContentItem(existing, notes);
+      approvedIds.push(id);
+    } else {
+      skippedIds.push(id);
+    }
+  }
+
+  return {
+    contentItemsById: nextItemsById,
+    updatedItemsById: nextItemsById,
+    approvedIds,
+    skippedIds,
+    approvedCount: approvedIds.length,
+    skippedCount: skippedIds.length
+  };
+}
+
+/**
  * Rejects a single canonical content item via Module 5 `rejectOutput`.
  */
 export function rejectCanonicalContentItem(item, reason = 'Needs revision') {
@@ -980,16 +1069,35 @@ export function rejectCanonicalContentItem(item, reason = 'Needs revision') {
 /**
  * Regenerates a single canonical content item using its conversation's source, analysis, and active configuration,
  * then re-evaluates it through Module 5 `revalidateOutput`.
+ * - Never affects sibling outputs in the conversation or workspace.
+ * - If `options.protectApproved === true` and the item is already APPROVED, returns the item unchanged.
+ * - If regenerating an item that was previously APPROVED, snapshots the approved content in `previousApprovedVersion`
+ *   so approved content is never silently lost, and cleanly resets the item's review state to `PENDING_REVIEW`.
  */
 export async function regenerateCanonicalContentItem(item, conversation, options = {}) {
   if (!item || !conversation?.activeSource || !conversation?.activeAnalysis) {
     throw new Error('Cannot regenerate without source and analysis context.');
   }
 
+  if (options.protectApproved && item.approvalStatus === APPROVAL_STATUSES.APPROVED) {
+    return item;
+  }
+
   const formatId = item.formatId || item.channelId;
   const config = conversation.config || DEFAULT_GENERATION_CONFIG;
   const sourceData = conversation.activeSource;
   const analysisData = conversation.activeAnalysis;
+
+  const previousApprovedVersion =
+    item.approvalStatus === APPROVAL_STATUSES.APPROVED
+      ? {
+          content: item.content,
+          structuredData: item.structuredData || null,
+          approvedAt: item.approvalInfo?.approvedAt || item.reviewedAt || item.updatedAt,
+          approvalInfo: item.approvalInfo || null,
+          reviewerNotes: item.reviewerNotes || ''
+        }
+      : item.previousApprovedVersion || null;
 
   let newContentText = item.content;
   let newStructuredData = item.structuredData;
@@ -1049,6 +1157,21 @@ export async function regenerateCanonicalContentItem(item, conversation, options
     };
   }
 
+  const isFallback = Boolean(newMetadata.isFallback);
+  const isIndependentlyVerified = Boolean(newMetadata.isIndependentlyVerified);
+  newMetadata = {
+    ...newMetadata,
+    isEdited: false,
+    humanReviewed: false,
+    contentStatusFlag: isFallback
+      ? CONTENT_STATUS_FLAGS.RULE_BASED_FALLBACK
+      : CONTENT_STATUS_FLAGS.AI_GENERATED,
+    isIndependentlyVerified,
+    verificationStatus: isIndependentlyVerified
+      ? newMetadata.verificationStatus
+      : 'Source not independently verified'
+  };
+
   const revalidated = revalidateOutput(
     {
       ...item,
@@ -1057,6 +1180,8 @@ export async function regenerateCanonicalContentItem(item, conversation, options
       isEdited: false,
       approvalStatus: APPROVAL_STATUSES.PENDING_REVIEW,
       requiresHumanReview: true,
+      approvalInfo: null,
+      previousApprovedVersion,
       metadata: newMetadata
     },
     {
@@ -1073,6 +1198,43 @@ export async function regenerateCanonicalContentItem(item, conversation, options
     outputId: item.outputId,
     content: newContentText,
     structuredData: newStructuredData,
+    approvalStatus: APPROVAL_STATUSES.PENDING_REVIEW,
+    requiresHumanReview: true,
+    approvalInfo: null,
+    previousApprovedVersion,
+    updatedAt: new Date().toISOString()
+  };
+}
+
+/**
+ * Restores the last human-approved version of an item if it was regenerated after approval.
+ */
+export function restoreApprovedCanonicalContentItem(item) {
+  if (!item || !item.previousApprovedVersion) return item;
+  const prev = item.previousApprovedVersion;
+  return {
+    ...item,
+    content: prev.content,
+    structuredData: prev.structuredData || null,
+    approvalStatus: APPROVAL_STATUSES.APPROVED,
+    requiresHumanReview: false,
+    approvalInfo: prev.approvalInfo || {
+      approvedBy: 'Human Reviewer',
+      approvedAt: prev.approvedAt || new Date().toISOString(),
+      isIndependentlyVerified: false,
+      verificationNote: 'Restored previously approved version.'
+    },
+    reviewerNotes: prev.reviewerNotes || item.reviewerNotes || '',
+    metadata: {
+      ...item.metadata,
+      contentStatusFlag: CONTENT_STATUS_FLAGS.APPROVED_FOR_EXPORT,
+      humanReviewed: true,
+      isIndependentlyVerified: Boolean(item.metadata?.isIndependentlyVerified),
+      verificationStatus: item.metadata?.isIndependentlyVerified
+        ? item.metadata.verificationStatus
+        : 'Source not independently verified'
+    },
+    previousApprovedVersion: null,
     updatedAt: new Date().toISOString()
   };
 }
