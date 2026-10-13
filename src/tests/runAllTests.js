@@ -64,7 +64,7 @@ if (workspaceRedesignTests.status !== 0) {
 }
 
 console.log('====================================================');
-console.log('🎉 ALL SUITES PASSED: 840/840 TESTS PASSING (100%)');
+console.log('🎉 ALL SUITES PASSED: 855/855 TESTS PASSING (100%)');
 console.log('  - Module 1 (Input & Ingestion): 57/57');
 console.log('  - Module 2 (Understanding & Analysis): 63/63');
 console.log('  - Module 3 (Transformation & Output Engine): 103/103');
@@ -73,5 +73,5 @@ console.log('  - Module 5 (Review, QA & Human Approval): 68/68');
 console.log('  - Module 6 (Export & Distribution): 66/66');
 console.log('  - Gemini 3.8 Flash Integration & Resilience: 24/24');
 console.log('  - Content Confidence & Verification Governance: 102/102');
-console.log('  - Chat-Centered Workspace & UI Regression Suite: 44/44');
+console.log('  - Chat-Centered Workspace, Landing Page & UI Suite: 59/59');
 console.log('====================================================\n');

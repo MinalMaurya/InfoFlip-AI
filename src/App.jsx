@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Menu,
+  Home,
   Sliders,
   MessageSquare,
   Layers,
   ArrowLeft
 } from 'lucide-react';
 
-// Chat-Centered Workspace Components
+// Landing Page & Chat-Centered Workspace Components
+import LandingPage from './components/LandingPage';
 import LeftSidebar from './components/workspace/LeftSidebar';
 import RightSidebar from './components/workspace/RightSidebar';
 import ChatWorkspace from './components/workspace/ChatWorkspace';
@@ -62,6 +64,9 @@ export default function App() {
   const [workspaceState, setWorkspaceState] = useState(initialLoad.workspaceState);
   const [uiPreferences, setUiPreferences] = useState(initialLoad.uiPreferences);
   const [storageWarning, setStorageWarning] = useState(initialLoad.storageWarning);
+
+  // Landing Page is the first page visitors see when opening the website
+  const [showLandingPage, setShowLandingPage] = useState(true);
 
   // In-memory draft conversation when starting a new unsaved chat (prevents polluting Recent Chats with empty sessions)
   const [pendingConversation, setPendingConversation] = useState(() =>
@@ -617,6 +622,26 @@ export default function App() {
   const leftCollapsed = Boolean(uiPreferences.leftSidebarCollapsed);
   const rightCollapsed = Boolean(uiPreferences.rightSidebarCollapsed);
 
+  const handleEnterWorkspace = useCallback(() => {
+    setShowLandingPage(false);
+  }, []);
+
+  const handleOpenLandingPage = useCallback(() => {
+    setMobileLeftDrawerOpen(false);
+    setMobileRightDrawerOpen(false);
+    setShowLandingPage(true);
+  }, []);
+
+  if (showLandingPage) {
+    return (
+      <LandingPage
+        onGetStarted={handleEnterWorkspace}
+        savedConversationsCount={workspaceState.conversations?.length || 0}
+        savedItemsCount={Object.keys(workspaceState.contentItemsById || {}).length}
+      />
+    );
+  }
+
   return (
     <div className="h-screen w-screen overflow-hidden bg-background flex font-sans text-foreground transition-colors">
       {/* =====================================================================
@@ -633,6 +658,7 @@ export default function App() {
           onSelectSection={handleSelectSection}
           onSelectCollection={handleSelectCollection}
           onSelectConversation={handleSelectConversation}
+          onOpenLandingPage={handleOpenLandingPage}
           isCollapsed={leftCollapsed}
           onCollapseDesktop={() => updateUIPreferences({ leftSidebarCollapsed: true })}
           onExpandDesktop={() => updateUIPreferences({ leftSidebarCollapsed: false })}
@@ -663,6 +689,7 @@ export default function App() {
               onSelectSection={handleSelectSection}
               onSelectCollection={handleSelectCollection}
               onSelectConversation={handleSelectConversation}
+              onOpenLandingPage={handleOpenLandingPage}
               onCloseMobileDrawer={() => setMobileLeftDrawerOpen(false)}
               isMobileDrawer={true}
             />
@@ -716,6 +743,7 @@ export default function App() {
               setPipelineTab('export');
               handleSelectSection('pipeline');
             }}
+            onOpenLandingPage={handleOpenLandingPage}
             composerFocusTrigger={composerFocusTrigger}
           />
         ) : (
@@ -747,6 +775,16 @@ export default function App() {
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleOpenLandingPage}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover border border-border bg-surface transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                  title="Return to Landing Page"
+                >
+                  <Home className="w-3.5 h-3.5 text-primary dark:text-accent shrink-0" />
+                  <span className="hidden sm:inline">Landing Page</span>
+                </button>
+
                 <ThemeToggle />
 
                 <button

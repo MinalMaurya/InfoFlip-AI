@@ -1142,6 +1142,77 @@ async function runTests() {
     '54. GeneratedOutputRenderer and LibraryView use 100% semantic Graphite + Steel Blue surface/border/text tokens across Light, Dark, and System themes'
   );
 
+  // =========================================================================
+  // SUITE J: PROFESSIONAL LANDING PAGE & NAVIGATION (ITEMS 55–59)
+  // =========================================================================
+  console.log('\n--- Suite J: Professional Landing Page & Navigation (Items 55–59) ---');
+
+  const landingPageSource = fs.readFileSync(
+    path.join(SRC_DIR, 'components/LandingPage.jsx'),
+    'utf8'
+  );
+
+  // Item 55: Landing page is the initial view and includes logo, headline, Get Started, How It Works, and ThemeToggle
+  assert(
+    appSource.includes('const [showLandingPage, setShowLandingPage] = useState(true)') &&
+      appSource.includes('<LandingPage') &&
+      landingPageSource.includes('/infoflip-logo.png') &&
+      landingPageSource.includes('One source. Multiple formats. Smarter communication.') &&
+      landingPageSource.includes('<span>Get Started</span>') &&
+      landingPageSource.includes('<span>How It Works</span>') &&
+      landingPageSource.includes('<ThemeToggle />'),
+    '55. Landing page is the first page visitors see and includes the InfoFlip-AI logo, headline, Get Started CTA, How It Works button, and ThemeToggle'
+  );
+
+  // Item 56: How It Works section displays all 6 stages accurately with honest scope disclosures
+  assert(
+    landingPageSource.includes('id="how-it-works"') &&
+      landingPageSource.includes("title: 'Input'") &&
+      landingPageSource.includes("summary: 'Upload or paste source content.'") &&
+      landingPageSource.includes("title: 'Understand'") &&
+      landingPageSource.includes("summary: 'Extract context, facts, and intent.'") &&
+      landingPageSource.includes("title: 'Transform'") &&
+      landingPageSource.includes("summary: 'Generate selected content formats.'") &&
+      landingPageSource.includes("title: 'Communicate'") &&
+      landingPageSource.includes("summary: 'Prepare channel-specific content.'") &&
+      landingPageSource.includes("title: 'Review'") &&
+      landingPageSource.includes("summary: 'Run quality checks and perform human review.'") &&
+      landingPageSource.includes("title: 'Export'") &&
+      landingPageSource.includes("summary: 'Export eligible approved content.'") &&
+      landingPageSource.includes('Coming soon'),
+    '56. How It Works section accurately presents all 6 stages (Input, Understand, Transform, Communicate, Review, Export) and labels unfinished features honestly'
+  );
+
+  // Item 57: Key capabilities cover multi-format generation, source traceability, quality checks, human review, and approved-content export
+  assert(
+    landingPageSource.includes("title: 'Multi-Format Generation'") &&
+      landingPageSource.includes("title: 'Source Traceability'") &&
+      landingPageSource.includes("title: 'Quality Checks'") &&
+      landingPageSource.includes("title: 'Human Review'") &&
+      landingPageSource.includes("title: 'Approved-Content Export'") &&
+      landingPageSource.includes('Source-to-Multiple-Outputs Architecture'),
+    '57. Landing page highlights all five key capabilities and makes the source-to-multiple-outputs workflow the central visual idea'
+  );
+
+  // Item 58: Footer includes project information and verified GitHub repository link ("View Source Code") without exposing secrets
+  assert(
+    landingPageSource.includes('https://github.com/MinalMaurya/InfoFlip-AI') &&
+      landingPageSource.includes('<span>View Source Code</span>') &&
+      landingPageSource.includes('SIH26154') &&
+      !landingPageSource.includes('AIza') &&
+      !landingPageSource.includes('sk-'),
+    '58. Footer includes SIH26154 project information and verified GitHub repository link ("View Source Code") with zero exposed credentials'
+  );
+
+  // Item 59: Get Started opens the existing workspace and users can easily return to the landing page from LeftSidebar and ChatWorkspace
+  assert(
+    appSource.includes('onGetStarted={handleEnterWorkspace}') &&
+      appSource.includes('onOpenLandingPage={handleOpenLandingPage}') &&
+      leftSidebarSource.includes('<span>Landing Page</span>') &&
+      chatWorkspaceSource.includes('<span className="hidden sm:inline">Landing Page</span>'),
+    '59. Get Started opens the existing functional InfoFlip-AI workspace and users can return to the Landing Page from LeftSidebar and top workspace headers'
+  );
+
   console.log('\n========================================');
   console.log(`WORKSPACE REDESIGN SUITE: ${passed} PASSED, ${failed} FAILED`);
   console.log('========================================\n');
@@ -1155,3 +1226,4 @@ runTests().catch((err) => {
   console.error('Unhandled error in workspaceRedesign.test.js:', err);
   process.exit(1);
 });
+

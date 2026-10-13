@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Menu,
+  Home,
   Sliders,
   Send,
   Paperclip,
@@ -72,6 +73,7 @@ export default function ChatWorkspace({
   onDismissStorageWarning,
   onOpenPipelineInspector,
   onOpenExportInspector,
+  onOpenLandingPage,
   composerFocusTrigger
 }) {
   const [showSourceDrawer, setShowSourceDrawer] = useState(false);
@@ -309,8 +311,20 @@ export default function ChatWorkspace({
           </div>
         </div>
 
-        {/* Right: Previous Prototype Button, Theme Toggle, Mobile Right Drawer Toggle */}
+        {/* Right: Landing Page Button, Previous Prototype Button, Theme Toggle, Mobile Right Drawer Toggle */}
         <div className="flex items-center gap-2 shrink-0">
+          {onOpenLandingPage && (
+            <button
+              type="button"
+              onClick={onOpenLandingPage}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover border border-border bg-surface transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              title="Return to Landing Page"
+            >
+              <Home className="w-3.5 h-3.5 text-primary dark:text-accent shrink-0" />
+              <span className="hidden sm:inline">Landing Page</span>
+            </button>
+          )}
+
           {onOpenPipelineInspector && (
             <button
               type="button"
