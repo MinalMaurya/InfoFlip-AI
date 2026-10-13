@@ -173,13 +173,13 @@ export default function LandingPage({
             <a
               href="#how-it-works"
               onClick={handleScrollToHowItWorks}
-              className="hidden md:inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="hidden md:inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               How It Works
             </a>
             <a
               href="#capabilities"
-              className="hidden md:inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="hidden md:inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               Capabilities
             </a>
@@ -187,7 +187,7 @@ export default function LandingPage({
               href={GITHUB_REPOSITORY_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <Code2 className="w-3.5 h-3.5 text-primary dark:text-accent" />
               <span>View Source Code</span>
@@ -198,7 +198,7 @@ export default function LandingPage({
             <button
               type="button"
               onClick={onGetStarted}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-primary hover:bg-primary-hover text-primary-foreground shadow-2xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-primary hover:bg-primary-hover active:scale-[0.98] text-primary-foreground shadow-2xs transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <span>Get Started</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -230,11 +230,15 @@ export default function LandingPage({
                 id="landing-hero-heading"
                 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-text-primary leading-[1.15]"
               >
-                One source. Multiple formats. Smarter communication.
+                Turn information into something more.
               </h1>
 
+              <div className="text-base sm:text-lg font-bold text-primary dark:text-accent">
+                One source. Multiple formats. Smarter communication.
+              </div>
+
               <p className="text-sm sm:text-base text-text-secondary leading-relaxed max-w-2xl">
-                InfoFlip-AI is a source-grounded content transformation studio that turns a single document, policy circular, or press release into structured briefings and channel-ready communications—complete with automated quality checks, source fact traceability, and mandatory human review before export.
+                Transform source documents into clear, audience-ready content across multiple formats, with source traceability, quality checks, human review, and controlled export.
               </p>
 
               {/* Primary & Secondary Action Buttons */}
@@ -242,7 +246,7 @@ export default function LandingPage({
                 <button
                   type="button"
                   onClick={onGetStarted}
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold bg-primary hover:bg-primary-hover text-primary-foreground shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold bg-primary hover:bg-primary-hover active:scale-[0.98] text-primary-foreground shadow-xs transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                 >
                   <span>Get Started</span>
                   <ArrowRight className="w-4 h-4" />
@@ -251,7 +255,7 @@ export default function LandingPage({
                 <button
                   type="button"
                   onClick={handleScrollToHowItWorks}
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold bg-sidebar-bg hover:bg-surface-hover text-text-primary border border-border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold bg-sidebar-bg hover:bg-surface-hover active:scale-[0.98] text-text-primary border border-border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                 >
                   <span>How It Works</span>
                 </button>
@@ -436,7 +440,7 @@ export default function LandingPage({
                 return (
                   <li
                     key={stage.id}
-                    className="p-5 rounded-2xl bg-surface border border-border flex flex-col justify-between gap-4 shadow-2xs"
+                    className="p-5 rounded-2xl bg-surface border border-border flex flex-col justify-between gap-4 shadow-2xs cursor-default"
                   >
                     <div className="space-y-3">
                       <div className="flex items-center justify-between gap-2">
@@ -481,7 +485,7 @@ export default function LandingPage({
               <button
                 type="button"
                 onClick={onGetStarted}
-                className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-primary hover:bg-primary-hover text-primary-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-primary hover:bg-primary-hover active:scale-[0.98] text-primary-foreground shadow-2xs transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
               >
                 <span>Open Workspace</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -520,7 +524,7 @@ export default function LandingPage({
                 return (
                   <div
                     key={cap.id}
-                    className="p-5 rounded-2xl bg-sidebar-bg border border-border space-y-3"
+                    className="p-5 rounded-2xl bg-sidebar-bg border border-border space-y-3 cursor-default"
                   >
                     <div className="w-9 h-9 rounded-xl bg-surface border border-border flex items-center justify-center text-primary dark:text-accent">
                       <Icon className="w-4 h-4" />
@@ -536,7 +540,11 @@ export default function LandingPage({
               })}
 
               {/* 6th Card: Direct CTA into the Existing Workspace */}
-              <div className="p-5 rounded-2xl bg-surface-selected border border-border flex flex-col justify-between gap-4">
+              <div
+                role="region"
+                aria-label="Get started in workspace"
+                className="p-5 rounded-2xl bg-surface-selected border border-border flex flex-col justify-between gap-4"
+              >
                 <div className="space-y-2">
                   <div className="inline-flex items-center gap-1.5 text-xs font-bold text-primary dark:text-accent">
                     <Clock className="w-3.5 h-3.5" />
@@ -553,7 +561,7 @@ export default function LandingPage({
                   <button
                     type="button"
                     onClick={onGetStarted}
-                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-primary hover:bg-primary-hover text-primary-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-primary hover:bg-primary-hover active:scale-[0.98] text-primary-foreground shadow-2xs transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                   >
                     <span>Get Started in Workspace</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -596,7 +604,7 @@ export default function LandingPage({
             <button
               type="button"
               onClick={onGetStarted}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface hover:bg-surface-hover text-text-primary border border-border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface hover:bg-surface-hover active:scale-[0.98] text-text-primary border border-border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <span>Open Workspace</span>
             </button>
@@ -606,7 +614,7 @@ export default function LandingPage({
               target="_blank"
               rel="noopener noreferrer"
               aria-label="View Source Code on GitHub"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-surface hover:bg-surface-hover text-text-primary border border-border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-surface hover:bg-surface-hover active:scale-[0.98] text-text-primary border border-border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <Code2 className="w-3.5 h-3.5 text-primary dark:text-accent" />
               <span>View Source Code</span>

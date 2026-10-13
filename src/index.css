@@ -4,38 +4,38 @@
 
 @layer base {
   :root {
-    /* Approved Graphite + Steel Blue Palette — Light Mode */
-    --color-app-background: #F4F6F8;
-    --color-sidebar-background: #E9EDF2;
+    /* Minimal White + Slate + Soft Steel Blue Theme — Light Mode */
+    --color-app-background: #F7F8FA;
+    --color-sidebar-background: #F1F3F6;
     --color-surface: #FFFFFF;
     --color-surface-elevated: #FFFFFF;
-    --color-surface-hover: #E3E8EE;
-    --color-surface-selected: #D8E1EA;
-    --color-primary: #526B88;
-    --color-primary-hover: #445A73;
-    --color-accent: #8298B0;
-    --color-text-primary: #202833;
-    --color-text-secondary: #657180;
-    --color-text-muted: #7A8696;
-    --color-border: #DCE2E8;
-    --color-divider: #DCE2E8;
-    --color-focus-ring: #526B88;
+    --color-surface-hover: #F1F3F6;
+    --color-surface-selected: #EAF0F8;
+    --color-primary: #6485B5;
+    --color-primary-hover: #4F719F;
+    --color-accent: #6485B5;
+    --color-text-primary: #273449;
+    --color-text-secondary: #667085;
+    --color-text-muted: #8F9AA9;
+    --color-border: #E1E5EC;
+    --color-divider: #E1E5EC;
+    --color-focus-ring: #6485B5;
     --color-input-background: #FFFFFF;
-    --color-input-border: #DCE2E8;
-    --color-placeholder: #657180;
-    --color-disabled-background: #E3E8EE;
-    --color-disabled-text: #8A96A6;
-    --color-overlay: rgba(22, 24, 28, 0.55);
-    --color-scrollbar-track: #E9EDF2;
-    --color-scrollbar-thumb: #B8C3CF;
+    --color-input-border: #E1E5EC;
+    --color-placeholder: #8F9AA9;
+    --color-disabled-background: #F1F3F6;
+    --color-disabled-text: #A2ABB9;
+    --color-overlay: rgba(39, 52, 73, 0.45);
+    --color-scrollbar-track: #F7F8FA;
+    --color-scrollbar-thumb: #D1D7E2;
 
     /* Semantic Status Tokens — Harmonized for Light Mode */
-    --color-success: #23845B;
-    --color-success-subtle: #EAF6F0;
-    --color-warning: #B7791F;
-    --color-warning-subtle: #FEF6E7;
-    --color-error: #C43D4B;
-    --color-error-subtle: #FCECEE;
+    --color-success: #287A52;
+    --color-success-subtle: #EBF5F0;
+    --color-warning: #98651A;
+    --color-warning-subtle: #FAF1E4;
+    --color-error: #B93B35;
+    --color-error-subtle: #FBECEB;
 
     /* Unified Aliases for Component Compatibility */
     --brand-primary: var(--color-primary);
@@ -68,38 +68,38 @@
   }
 
   .dark {
-    /* Approved Graphite + Steel Blue Palette — Dark Mode */
-    --color-app-background: #16181C;
-    --color-sidebar-background: #242831;
-    --color-surface: #242831;
-    --color-surface-elevated: #2C313B;
-    --color-surface-hover: #303642;
-    --color-surface-selected: #344252;
-    --color-primary: #526B88;
-    --color-primary-hover: #617C9C;
-    --color-accent: #8298B0;
-    --color-text-primary: #F3F4F6;
-    --color-text-secondary: #ADB5C2;
-    --color-text-muted: #8892A2;
-    --color-border: #343943;
-    --color-divider: #343943;
-    --color-focus-ring: #8298B0;
-    --color-input-background: #242831;
-    --color-input-border: #343943;
-    --color-placeholder: #ADB5C2;
-    --color-disabled-background: #1E222A;
-    --color-disabled-text: #6E7785;
-    --color-overlay: rgba(12, 14, 18, 0.72);
-    --color-scrollbar-track: #16181C;
-    --color-scrollbar-thumb: #343943;
+    /* Minimal White + Slate + Soft Steel Blue Theme — Dark Mode */
+    --color-app-background: #111318;
+    --color-sidebar-background: #15171D;
+    --color-surface: #191B21;
+    --color-surface-elevated: #20232A;
+    --color-surface-hover: #262933;
+    --color-surface-selected: #252F40;
+    --color-primary: #8EACD8;
+    --color-primary-hover: #A8BFE3;
+    --color-accent: #8EACD8;
+    --color-text-primary: #F5F7FA;
+    --color-text-secondary: #A7B0BF;
+    --color-text-muted: #7D8799;
+    --color-border: #303540;
+    --color-divider: #303540;
+    --color-focus-ring: #8EACD8;
+    --color-input-background: #191B21;
+    --color-input-border: #303540;
+    --color-placeholder: #7D8799;
+    --color-disabled-background: #15171D;
+    --color-disabled-text: #646D7D;
+    --color-overlay: rgba(12, 14, 18, 0.75);
+    --color-scrollbar-track: #111318;
+    --color-scrollbar-thumb: #303540;
 
     /* Semantic Status Tokens — Harmonized for Dark Mode */
-    --color-success: #34A876;
-    --color-success-subtle: #162E25;
-    --color-warning: #D69E2E;
-    --color-warning-subtle: #332712;
-    --color-error: #E05260;
-    --color-error-subtle: #38191E;
+    --color-success: #2E9362;
+    --color-success-subtle: #142B20;
+    --color-warning: #E69D45;
+    --color-warning-subtle: #332210;
+    --color-error: #E0524C;
+    --color-error-subtle: #361614;
 
     /* Unified Aliases for Component Compatibility */
     --brand-primary: var(--color-primary);
@@ -112,14 +112,14 @@
     --card-subtle: var(--color-surface-elevated);
     --border: var(--color-border);
     --primary: var(--color-primary);
-    --primary-foreground: #F3F4F6;
+    --primary-foreground: #FFFFFF;
     --primary-hover: var(--color-primary-hover);
     --secondary: var(--color-surface-elevated);
     --secondary-foreground: var(--color-text-primary);
     --muted: var(--color-surface);
     --muted-foreground: var(--color-text-secondary);
     --accent: var(--color-accent);
-    --accent-foreground: #16181C;
+    --accent-foreground: #111318;
     --accent-subtle: var(--color-surface-selected);
     --secondary-accent: var(--color-accent);
     --secondary-accent-subtle: var(--color-surface-hover);
@@ -129,6 +129,10 @@
     --warning-subtle: var(--color-warning-subtle);
     --error: var(--color-error);
     --error-subtle: var(--color-error-subtle);
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 
   html,
@@ -331,6 +335,9 @@
 
 /* Accessibility: Respect user's motion preferences */
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
   *, ::before, ::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;

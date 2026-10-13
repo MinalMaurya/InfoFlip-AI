@@ -78,14 +78,14 @@ export default function ClaimsCard({ claims, sourceText = '' }) {
       verificationStatus: isHighRisk ? 'Verification required' : 'Extracted from source',
       icon: isHighRisk ? AlertTriangle : FileText,
       badgeClass: isHighRisk
-        ? 'bg-orange-50 dark:bg-orange-950/60 text-orange-800 dark:text-orange-300 border-orange-200 dark:border-orange-800'
-        : 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+        ? 'bg-warning-subtle text-warning border-warning/30'
+        : 'bg-surface-selected text-primary border-border',
       cardClass: isHighRisk
-        ? 'bg-orange-50/25 dark:bg-orange-950/20 border-orange-200/80 dark:border-orange-900/40'
-        : 'bg-slate-50/50 dark:bg-slate-800/30 border-slate-200/80 dark:border-slate-800',
+        ? 'bg-warning-subtle/40 border-warning/30'
+        : 'bg-surface dark:bg-surface-elevated border-border',
       iconClass: isHighRisk
-        ? 'bg-orange-100 dark:bg-orange-900/80 text-orange-700 dark:text-orange-300'
-        : 'bg-blue-100 dark:bg-blue-900/80 text-blue-700 dark:text-blue-300',
+        ? 'bg-warning-subtle text-warning'
+        : 'bg-surface-selected text-primary',
       note: isHighRisk
         ? 'High-risk claim from source — ' + UNVERIFIED_SOURCE_NOTICE
         : 'Extracted directly from supplied source text'
@@ -118,8 +118,8 @@ export default function ClaimsCard({ claims, sourceText = '' }) {
           <span className="px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Inferred
           </span>
-          <span className="px-2 py-0.5 rounded-full bg-orange-50 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-orange-500" /> Verification required
+          <span className="px-2 py-0.5 rounded-full bg-warning-subtle text-warning border border-warning/30 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-warning" /> Verification required
           </span>
         </div>
       </div>
@@ -166,7 +166,7 @@ export default function ClaimsCard({ claims, sourceText = '' }) {
                     {evidence.origin}
                   </span>
                   {evidence.isHighRisk && (
-                    <span className="px-2 py-0.5 rounded font-bold uppercase bg-orange-100 dark:bg-orange-950/80 text-orange-800 dark:text-orange-300 border border-orange-300 dark:border-orange-800">
+                    <span className="px-2 py-0.5 rounded font-bold uppercase bg-warning-subtle text-warning border border-warning/30">
                       ⚠️ High-Risk Claim • Verification required
                     </span>
                   )}

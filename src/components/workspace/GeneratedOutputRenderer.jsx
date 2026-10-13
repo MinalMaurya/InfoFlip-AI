@@ -363,18 +363,18 @@ export default function GeneratedOutputRenderer({
 
           {/* Approval Status Pill */}
           {isApproved ? (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-              <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-success-subtle text-success border border-success/30">
+              <CheckCircle2 className="w-3 h-3 text-success" />
               <span>Approved for Export</span>
             </span>
           ) : isRejected ? (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800">
-              <XCircle className="w-3 h-3 text-rose-600 dark:text-rose-400" />
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-error-subtle text-error border border-error/30">
+              <XCircle className="w-3 h-3 text-error" />
               <span>Rejected — Needs Revision</span>
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-              <AlertTriangle className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-warning-subtle text-warning border border-warning/30">
+              <AlertTriangle className="w-3 h-3 text-warning" />
               <span>Pending Human Approval</span>
             </span>
           )}
@@ -398,7 +398,7 @@ export default function GeneratedOutputRenderer({
             <button
               type="button"
               onClick={onOpenOriginConversation}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-surface border border-border text-primary dark:text-accent hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-surface border border-border text-primary dark:text-accent hover:bg-surface-hover active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <ExternalLink className="w-3 h-3" />
               <span>Open Chat</span>
@@ -408,7 +408,7 @@ export default function GeneratedOutputRenderer({
           <button
             type="button"
             onClick={() => setShowReviewChecks(!showReviewChecks)}
-            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
+            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold border active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
               showReviewChecks
                 ? 'bg-surface-selected border-primary/40 text-primary dark:text-accent'
                 : 'bg-surface border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover'
@@ -422,7 +422,7 @@ export default function GeneratedOutputRenderer({
             <button
               type="button"
               onClick={isEditing ? handleSaveEdit : handleStartEdit}
-              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
                 isEditing
                   ? 'bg-primary text-primary-foreground'
                   : 'bg-surface border border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover'
@@ -443,7 +443,7 @@ export default function GeneratedOutputRenderer({
                   ? 'Regenerate only this format output (requires confirmation because this output is currently approved)'
                   : 'Regenerate only this format output without affecting other outputs'
               }
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-surface border border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover disabled:opacity-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-surface border border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover disabled:opacity-50 active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <RefreshCw className={`w-3 h-3 ${isRegenerating ? 'animate-spin text-primary' : ''}`} />
               <span>{isRegenerating ? 'Regenerating...' : 'Regenerate'}</span>
@@ -456,7 +456,7 @@ export default function GeneratedOutputRenderer({
               type="button"
               onClick={() => onRestoreApproved(item.itemId)}
               title="Restore the previously approved version of this output"
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-success-subtle border border-success/30 text-success hover:opacity-90 active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <RotateCcw className="w-3 h-3" />
               <span>Restore Approved</span>
@@ -466,9 +466,9 @@ export default function GeneratedOutputRenderer({
           <button
             type="button"
             onClick={handleCopy}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-surface border border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-surface border border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
-            {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+            {copied ? <Check className="w-3 h-3 text-success" /> : <Copy className="w-3 h-3" />}
             <span>{copied ? 'Copied' : 'Copy'}</span>
           </button>
 
@@ -477,7 +477,7 @@ export default function GeneratedOutputRenderer({
             <button
               type="button"
               onClick={() => onApprove(item.itemId, 'Human reviewed and approved in chat workspace')}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-success hover:opacity-90 text-white shadow-2xs active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <Check className="w-3 h-3 stroke-[2.5]" />
               <span>Approve</span>
@@ -488,7 +488,7 @@ export default function GeneratedOutputRenderer({
             <button
               type="button"
               onClick={() => onReject(item.itemId, 'Flagged for revision during human review')}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-error-subtle hover:opacity-90 text-error border border-error/30 active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <XCircle className="w-3 h-3" />
               <span>Reject</span>
@@ -500,7 +500,7 @@ export default function GeneratedOutputRenderer({
             <button
               type="button"
               onClick={handleDownloadApprovedSingle}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-primary text-primary-foreground hover:opacity-95 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-primary text-primary-foreground hover:opacity-95 active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
               title="Download this approved deliverable (.txt)"
             >
               <Download className="w-3 h-3" />
@@ -514,15 +514,15 @@ export default function GeneratedOutputRenderer({
       {showRegenerateConfirm && (
         <div
           role="alert"
-          className="p-3 rounded-xl bg-amber-50/90 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200 flex flex-wrap items-center justify-between gap-2.5"
+          className="p-3 rounded-xl bg-warning-subtle border border-warning/30 text-xs text-warning flex flex-wrap items-center justify-between gap-2.5 animate-slide-down"
         >
           <div className="flex items-start gap-2 min-w-0 flex-1">
-            <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <AlertTriangle className="w-4 h-4 text-warning shrink-0 mt-0.5" />
             <div className="space-y-0.5">
               <div className="font-bold">
                 Protect Approved Content — Confirm Single-Format Regeneration
               </div>
-              <p className="text-[11px] text-amber-800 dark:text-amber-300 leading-relaxed">
+              <p className="text-[11px] text-text-secondary leading-relaxed">
                 This <strong>{formatMeta?.name || formatId}</strong> output is currently approved for export. Regenerating will create a new draft for this format only and reset its status to Pending Human Approval. Your approved version will be preserved so you can restore it, and no other format outputs will be modified.
               </p>
             </div>
@@ -531,14 +531,14 @@ export default function GeneratedOutputRenderer({
             <button
               type="button"
               onClick={handleConfirmRegenerateApproved}
-              className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-600 hover:bg-amber-700 text-white transition-colors"
+              className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-warning hover:opacity-90 text-white active:scale-[0.98] transition-all duration-150"
             >
               Regenerate {formatMeta?.name || formatId}
             </button>
             <button
               type="button"
               onClick={() => setShowRegenerateConfirm(false)}
-              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-surface border border-border text-text-secondary hover:text-text-primary transition-colors"
+              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-surface border border-border text-text-secondary hover:text-text-primary active:scale-[0.98] transition-all duration-150"
             >
               Keep Approved
             </button>
@@ -583,7 +583,7 @@ export default function GeneratedOutputRenderer({
             <button
               type="button"
               onClick={() => setShowSourceProvenance(!showSourceProvenance)}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sidebar-bg hover:bg-surface-hover border border-border text-[10px] font-semibold text-text-secondary hover:text-text-primary transition-colors"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sidebar-bg hover:bg-surface-hover border border-border text-[10px] font-semibold text-text-secondary hover:text-text-primary active:scale-[0.98] transition-all duration-150"
             >
               <span>
                 Source References ({traceabilityList.length})
@@ -599,7 +599,7 @@ export default function GeneratedOutputRenderer({
 
         {/* Expandable Source References & Provenance Details */}
         {showSourceProvenance && (
-          <div className="pt-2 border-t border-border space-y-2 text-[11px]">
+          <div className="pt-2 border-t border-border space-y-2 text-[11px] animate-slide-down">
             <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-text-muted font-mono">
               <span>
                 Provenance Lineage: {item.lineage?.sourceId || 'src'} → {item.lineage?.analysisId || 'ana'} → {item.lineage?.transformationId || 'trans'} → {item.lineage?.communicationId || 'comm'} → {item.lineage?.reviewId || 'rev'}
@@ -645,12 +645,12 @@ export default function GeneratedOutputRenderer({
 
       {/* Visible Warning Banner when Module 5 detects warnings/issues */}
       {warningChecks.length > 0 && (
-        <div className="p-3 rounded-xl bg-amber-50/90 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 text-xs text-amber-900 dark:text-amber-200 space-y-1">
+        <div className="p-3 rounded-xl bg-warning-subtle border border-warning/30 text-xs text-warning space-y-1 animate-slide-down">
           <div className="font-bold flex items-center gap-1.5">
-            <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+            <AlertTriangle className="w-3.5 h-3.5 text-warning shrink-0" />
             <span>Module 5 Quality & Verification Warnings ({warningChecks.length})</span>
           </div>
-          <ul className="list-disc list-inside space-y-0.5 text-[11px] text-amber-800 dark:text-amber-300">
+          <ul className="list-disc list-inside space-y-0.5 text-[11px] text-text-secondary">
             {warningChecks.map(([key, check]) => (
               <li key={key}>
                 <strong>{CHECK_LABELS[key] || key}:</strong> {check.message || check.explanation}
@@ -662,7 +662,7 @@ export default function GeneratedOutputRenderer({
 
       {/* Expandable 10-Dimension Module 5 QA & Source Traceability Drawer */}
       {showReviewChecks && (
-        <div className="p-3.5 rounded-xl bg-sidebar-bg border border-border space-y-3 text-xs animate-fade-in">
+        <div className="p-3.5 rounded-xl bg-sidebar-bg border border-border space-y-3 text-xs animate-slide-down">
           <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-border">
             <span className="font-bold text-text-primary flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-primary dark:text-accent" />
@@ -684,14 +684,14 @@ export default function GeneratedOutputRenderer({
                     isPass
                       ? 'bg-surface border-border text-text-primary'
                       : isWarn
-                      ? 'bg-amber-50/70 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200'
-                      : 'bg-rose-50/70 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200'
+                      ? 'bg-warning-subtle border-warning/30 text-warning'
+                      : 'bg-error-subtle border-error/30 text-error'
                   }`}
                 >
                   {isPass ? (
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0 mt-0.5" />
                   ) : (
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                    <AlertTriangle className="w-3.5 h-3.5 text-warning shrink-0 mt-0.5" />
                   )}
                   <div className="min-w-0">
                     <div className="font-bold">{CHECK_LABELS[key] || key}</div>

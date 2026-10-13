@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Menu,
   Home,
@@ -7,6 +7,10 @@ import {
   Layers,
   ArrowLeft
 } from 'lucide-react';
+import {
+  parseCurrentRoute,
+  syncRouteToUrl
+} from './services/routing/routeService';
 
 // Landing Page & Chat-Centered Workspace Components
 import LandingPage from './components/LandingPage';
@@ -14,8 +18,6 @@ import LeftSidebar from './components/workspace/LeftSidebar';
 import RightSidebar from './components/workspace/RightSidebar';
 import ChatWorkspace from './components/workspace/ChatWorkspace';
 import LibraryView from './components/workspace/LibraryView';
-import ScheduledPostsView from './components/workspace/ScheduledPostsView';
-import ExploreView from './components/workspace/ExploreView';
 import ThemeToggle from './components/ThemeToggle';
 
 // Classic 6-Module Pipeline Inspector Views & Modals
@@ -50,14 +52,37 @@ import { DEMO_SCENARIOS } from './data/demoScenarios';
 import { SAMPLE_ANALYSIS } from './services/analysisService';
 
 export default function App() {
-  // 1. Initialize Workspace State & UI Preferences from Browser Storage
+  // 1. Resolve initial URL route synchronously (preserves screen across browser refreshes & direct links)
+  const [initialRoute] = useState(() =>
+    parseCurrentRoute(typeof window !== 'undefined' ? window.location : null)
+  );
+
+  // 2. Initialize Workspace State & UI Preferences from Browser Storage + URL route
   const [initialLoad] = useState(() => {
     const loadedWorkspace = defaultWorkspaceStorage.loadWorkspaceState();
     const loadedPrefs = defaultWorkspaceStorage.loadUIPreferences();
+
+    const resolvedPrefs = {
+      ...loadedPrefs,
+      ...(initialRoute.showLandingPage
+        ? {}
+        : {
+            activeSection: initialRoute.activeSection || loadedPrefs.activeSection || 'chat',
+            activeCollectionFormat: initialRoute.activeCollectionFormat || null
+          })
+    };
+
+    const resolvedWorkspaceState = {
+      ...loadedWorkspace.state,
+      ...(initialRoute.conversationId
+        ? { activeConversationId: initialRoute.conversationId }
+        : {})
+    };
+
     return {
-      workspaceState: loadedWorkspace.state,
+      workspaceState: resolvedWorkspaceState,
       storageWarning: loadedWorkspace.warning,
-      uiPreferences: loadedPrefs
+      uiPreferences: resolvedPrefs
     };
   });
 
@@ -66,7 +91,8 @@ export default function App() {
   const [storageWarning, setStorageWarning] = useState(initialLoad.storageWarning);
 
   // Landing Page is the first page visitors see when opening the website
-  const [showLandingPage, setShowLandingPage] = useState(true);
+  // const [showLandingPage, setShowLandingPage] = useState(true);
+  const [showLandingPage, setShowLandingPage] = useState(() => initialRoute.showLandingPage);
 
   // In-memory draft conversation when starting a new unsaved chat (prevents polluting Recent Chats with empty sessions)
   const [pendingConversation, setPendingConversation] = useState(() =>
@@ -89,7 +115,7 @@ export default function App() {
   const [composerFocusTrigger, setComposerFocusTrigger] = useState(0);
 
   // Classic 6-Module Pipeline Inspector State (preserved for deep module inspection)
-  const [pipelineTab, setPipelineTab] = useState('create'); // 'create' | 'understand' | 'transform' | 'communicate' | 'review' | 'export'
+  const [pipelineTab, setPipelineTab] = useState(() => initialRoute.pipelineTab || 'create');
   const [source, setSource] = useState(DEMO_SCENARIOS[0].source);
   const [ingestedContract, setIngestedContract] = useState(null);
   const [analysisData, setAnalysisData] = useState(null);
@@ -98,6 +124,80 @@ export default function App() {
   const [exportPackage, setExportPackage] = useState(null);
   const [showContractModal, setShowContractModal] = useState(false);
   const [showAnalysisContractModal, setShowAnalysisContractModal] = useState(false);
+
+  // Ref to differentiate between browser navigation (popstate/hashchange) and user interactions
+  const isPopStateRef = useRef(false);
+
+  // Listen for browser Back/Forward (popstate and hashchange)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleLocationChange = () => {
+      isPopStateRef.current = true;
+      const nextRoute = parseCurrentRoute(window.location);
+
+      setShowLandingPage(nextRoute.showLandingPage);
+
+      if (!nextRoute.showLandingPage) {
+        setUiPreferences((prev) => {
+          const next = {
+            ...prev,
+            activeSection: nextRoute.activeSection || 'chat',
+            activeCollectionFormat: nextRoute.activeCollectionFormat || null
+          };
+          defaultWorkspaceStorage.saveUIPreferences(next);
+          return next;
+        });
+
+        if (nextRoute.pipelineTab) {
+          setPipelineTab(nextRoute.pipelineTab);
+        }
+
+        if (nextRoute.conversationId) {
+          setWorkspaceState((prev) => {
+            const exists = (prev.conversations || []).some(
+              (c) => c.conversationId === nextRoute.conversationId
+            );
+            if (exists && prev.activeConversationId !== nextRoute.conversationId) {
+              const updated = { ...prev, activeConversationId: nextRoute.conversationId };
+              defaultWorkspaceStorage.saveWorkspaceState(updated);
+              return updated;
+            }
+            return prev;
+          });
+        }
+      }
+    };
+
+    window.addEventListener('popstate', handleLocationChange);
+    window.addEventListener('hashchange', handleLocationChange);
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      window.removeEventListener('hashchange', handleLocationChange);
+    };
+  }, []);
+
+  // Synchronize state changes to browser URL (preserves route on refresh and updates browser history)
+  useEffect(() => {
+    if (isPopStateRef.current) {
+      isPopStateRef.current = false;
+      return;
+    }
+
+    syncRouteToUrl({
+      showLandingPage,
+      activeSection: uiPreferences.activeSection,
+      activeCollectionFormat: uiPreferences.activeCollectionFormat,
+      pipelineTab,
+      activeConversationId: workspaceState.activeConversationId
+    });
+  }, [
+    showLandingPage,
+    uiPreferences.activeSection,
+    uiPreferences.activeCollectionFormat,
+    pipelineTab,
+    workspaceState.activeConversationId
+  ]);
 
   // Persist Workspace State Helper (supports both direct state and functional updater to prevent async stale-closure overwrites)
   const persistWorkspace = useCallback((nextStateOrUpdater) => {
@@ -154,6 +254,7 @@ export default function App() {
 
   // Start a New Chat (Section 3A: preserve unsaved work if present, reset config/input to defaults, focus composer)
   const handleNewChat = useCallback(() => {
+    setShowLandingPage(false);
     let nextConversations = [...workspaceState.conversations];
 
     // If the user is in a pending (unsaved) conversation and has typed unsaved draft content, save it first
@@ -198,6 +299,7 @@ export default function App() {
   // Select a section in Left Sidebar ('chat' | 'library' | 'scheduled' | 'explore' | 'pipeline' | 'about')
   const handleSelectSection = useCallback(
     (sectionId) => {
+      setShowLandingPage(false);
       updateUIPreferences({
         activeSection: sectionId,
         activeCollectionFormat: null
@@ -209,6 +311,7 @@ export default function App() {
   // Select a Content Collection format filter in Left Sidebar
   const handleSelectCollection = useCallback(
     (formatId) => {
+      setShowLandingPage(false);
       if (!formatId) {
         updateUIPreferences({
           activeSection: 'library',
@@ -228,6 +331,7 @@ export default function App() {
   const handleSelectConversation = useCallback(
     (conversationId) => {
       if (!conversationId) return;
+      setShowLandingPage(false);
 
       // Save any unsaved pending draft before switching
       let nextConversations = [...workspaceState.conversations];
@@ -600,25 +704,10 @@ export default function App() {
     }
   };
 
-  const handleUseDemoScenarioFromExplore = (scenario) => {
-    if (!scenario) return;
-    handleUpdateDraft({
-      prompt: `Create multi-format communications for ${scenario.name} (${scenario.audience}, ${scenario.tone} tone).`,
-      sourceText: scenario.source
-    });
-    handleUpdateConfig({
-      targetAudience: scenario.audience,
-      tone: scenario.tone,
-      language: scenario.language
-    });
-    updateUIPreferences({
-      activeSection: 'chat',
-      activeCollectionFormat: null
-    });
-    setComposerFocusTrigger((c) => c + 1);
-  };
-
-  const activeSection = uiPreferences.activeSection || 'chat';
+  const activeSection =
+    uiPreferences.activeSection === 'explore' || uiPreferences.activeSection === 'scheduled'
+      ? 'chat'
+      : uiPreferences.activeSection || 'chat';
   const leftCollapsed = Boolean(uiPreferences.leftSidebarCollapsed);
   const rightCollapsed = Boolean(uiPreferences.rightSidebarCollapsed);
 
@@ -634,20 +723,22 @@ export default function App() {
 
   if (showLandingPage) {
     return (
-      <LandingPage
-        onGetStarted={handleEnterWorkspace}
-        savedConversationsCount={workspaceState.conversations?.length || 0}
-        savedItemsCount={Object.keys(workspaceState.contentItemsById || {}).length}
-      />
+      <div className="w-full min-h-screen animate-fade-in">
+        <LandingPage
+          onGetStarted={handleEnterWorkspace}
+          savedConversationsCount={workspaceState.conversations?.length || 0}
+          savedItemsCount={Object.keys(workspaceState.contentItemsById || {}).length}
+        />
+      </div>
     );
   }
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-background flex font-sans text-foreground transition-colors">
+    <div className="h-screen w-screen overflow-hidden bg-background flex font-sans text-foreground transition-colors animate-fade-in">
       {/* =====================================================================
           A. LEFT SIDEBAR (Desktop Collapsible Icon Rail + Mobile Slide-Out Drawer)
          ===================================================================== */}
-      <div className="hidden lg:block h-full shrink-0">
+      <div className="hidden lg:block h-full shrink-0 transition-[width] duration-200 ease-in-out">
         <LeftSidebar
           activeSection={activeSection}
           activeCollectionFormat={uiPreferences.activeCollectionFormat}
@@ -674,11 +765,11 @@ export default function App() {
           aria-label="Navigation Drawer"
         >
           <div
-            className="fixed inset-0 bg-overlay backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-overlay backdrop-blur-xs transition-opacity duration-200 animate-fade-in"
             onClick={() => setMobileLeftDrawerOpen(false)}
             aria-label="Close navigation drawer backdrop"
           />
-          <div className="relative z-10 h-full max-w-[85vw]">
+          <div className="relative z-10 h-full max-w-[85vw] animate-slide-in-left shadow-2xl">
             <LeftSidebar
               activeSection={activeSection}
               activeCollectionFormat={uiPreferences.activeCollectionFormat}
@@ -820,13 +911,6 @@ export default function App() {
                 regeneratingItemId={regeneratingItemId}
                 onStartNewChat={handleNewChat}
               />
-            ) : activeSection === 'scheduled' ? (
-              <ScheduledPostsView onBackToChat={() => handleSelectSection('chat')} />
-            ) : activeSection === 'explore' ? (
-              <ExploreView
-                onBackToChat={() => handleSelectSection('chat')}
-                onUseDemoScenario={handleUseDemoScenarioFromExplore}
-              />
             ) : activeSection === 'about' ? (
               <div className="flex-1 overflow-y-auto">
                 <AboutView onStartTransforming={() => handleSelectSection('chat')} />
@@ -963,7 +1047,7 @@ export default function App() {
       {/* =====================================================================
           C. RIGHT SIDEBAR (Desktop Collapsible Icon Rail + Mobile Slide-Out Drawer)
          ===================================================================== */}
-      <div className="hidden lg:block h-full shrink-0">
+      <div className="hidden lg:block h-full shrink-0 transition-[width] duration-200 ease-in-out">
         <RightSidebar
           config={activeConversation?.config || DEFAULT_GENERATION_CONFIG}
           onUpdateConfig={handleUpdateConfig}
@@ -982,11 +1066,11 @@ export default function App() {
           aria-label="Output Formats & Settings Drawer"
         >
           <div
-            className="fixed inset-0 bg-overlay backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-overlay backdrop-blur-xs transition-opacity duration-200 animate-fade-in"
             onClick={() => setMobileRightDrawerOpen(false)}
             aria-label="Close output formats drawer backdrop"
           />
-          <div className="relative z-10 h-full max-w-[85vw]">
+          <div className="relative z-10 h-full max-w-[85vw] animate-slide-in-right shadow-2xl">
             <RightSidebar
               config={activeConversation?.config || DEFAULT_GENERATION_CONFIG}
               onUpdateConfig={handleUpdateConfig}

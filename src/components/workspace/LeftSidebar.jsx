@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import {
   Plus,
   Home,
-  Compass,
   Library,
-  CalendarClock,
   MessageSquare,
   Search,
   PanelLeftClose,
@@ -111,7 +109,7 @@ export default function LeftSidebar({
       <aside
         aria-label="Collapsed Workspace Navigation Rail"
         data-collapsed="true"
-        className="h-full w-16 bg-sidebar-bg border-r border-border flex flex-col items-center select-none text-text-primary shrink-0 transition-colors"
+        className="h-full w-16 bg-sidebar-bg border-r border-border flex flex-col items-center select-none text-text-primary shrink-0 transition-all duration-200 ease-in-out"
       >
         {/* Top Direct Expand Control */}
         <div className="h-14 w-full flex items-center justify-center border-b border-border shrink-0">
@@ -155,22 +153,6 @@ export default function LeftSidebar({
               </button>
             )}
 
-            {/* Explore */}
-            <button
-              type="button"
-              onClick={() => onSelectSection('explore')}
-              aria-label="Explore"
-              aria-current={activeSection === 'explore' ? 'page' : undefined}
-              title="Explore (Preview)"
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
-                activeSection === 'explore'
-                  ? 'bg-surface-selected text-text-primary border border-border'
-                  : 'text-text-secondary hover:bg-surface-hover hover:text-text-primary'
-              }`}
-            >
-              <Compass className="w-4 h-4" />
-            </button>
-
             {/* Library */}
             <button
               type="button"
@@ -190,26 +172,6 @@ export default function LeftSidebar({
                   {totalLibraryCount > 99 ? '99+' : totalLibraryCount}
                 </span>
               )}
-            </button>
-
-            {/* Scheduled Posts — Coming Soon */}
-            <button
-              type="button"
-              onClick={() => onSelectSection('scheduled')}
-              aria-label="Scheduled Posts — Coming soon"
-              aria-current={activeSection === 'scheduled' ? 'page' : undefined}
-              title="Scheduled Posts (Coming soon)"
-              className={`relative w-10 h-10 rounded-xl flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
-                activeSection === 'scheduled'
-                  ? 'bg-surface-selected text-text-primary border border-border'
-                  : 'text-text-secondary hover:bg-surface-hover hover:text-text-primary'
-              }`}
-            >
-              <CalendarClock className="w-4 h-4" />
-              <span
-                className="w-2 h-2 rounded-full bg-warning absolute top-1.5 right-1.5"
-                aria-hidden="true"
-              />
             </button>
           </nav>
 
@@ -315,7 +277,7 @@ export default function LeftSidebar({
     <aside
       aria-label="Workspace Navigation Sidebar"
       data-collapsed="false"
-      className="h-full w-64 sm:w-68 bg-sidebar-bg border-r border-border flex flex-col select-none text-text-primary transition-colors"
+      className="h-full w-64 sm:w-68 bg-sidebar-bg border-r border-border flex flex-col select-none text-text-primary transition-all duration-200 ease-in-out"
     >
       {/* Top Brand Header & Collapse Control */}
       <div className="h-14 px-3.5 flex items-center justify-between border-b border-border shrink-0">
@@ -396,36 +358,14 @@ export default function LeftSidebar({
             <button
               type="button"
               onClick={() => handleNavAction(onOpenLandingPage)}
-              className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="w-full flex items-center px-2.5 py-2 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <span className="flex items-center gap-2.5">
                 <Home className="w-4 h-4 text-text-secondary" />
                 <span>Landing Page</span>
               </span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface text-text-secondary border border-border font-medium">
-                Home
-              </span>
             </button>
           )}
-          {/* Explore */}
-          <button
-            type="button"
-            onClick={() => handleNavAction(() => onSelectSection('explore'))}
-            className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
-              activeSection === 'explore'
-                ? 'bg-surface-selected text-text-primary'
-                : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'
-            }`}
-          >
-            <span className="flex items-center gap-2.5">
-              <Compass className={`w-4 h-4 ${activeSection === 'explore' ? 'text-primary dark:text-accent' : 'text-text-secondary'}`} />
-              <span>Explore</span>
-            </span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface text-text-secondary border border-border font-medium">
-              Preview
-            </span>
-          </button>
-
           {/* Library */}
           <button
             type="button"
@@ -442,25 +382,6 @@ export default function LeftSidebar({
             </span>
             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-surface text-text-primary border border-border font-bold">
               {totalLibraryCount}
-            </span>
-          </button>
-
-          {/* Scheduled Posts — Coming Soon */}
-          <button
-            type="button"
-            onClick={() => handleNavAction(() => onSelectSection('scheduled'))}
-            className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
-              activeSection === 'scheduled'
-                ? 'bg-surface-selected text-text-primary'
-                : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'
-            }`}
-          >
-            <span className="flex items-center gap-2.5 min-w-0">
-              <CalendarClock className={`w-4 h-4 shrink-0 ${activeSection === 'scheduled' ? 'text-primary dark:text-accent' : 'text-text-secondary'}`} />
-              <span className="truncate">Scheduled Posts</span>
-            </span>
-            <span className="text-[9px] px-1.5 py-0.5 rounded bg-warning-subtle text-warning border border-warning/30 font-bold shrink-0">
-              Soon
             </span>
           </button>
         </nav>

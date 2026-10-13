@@ -73,86 +73,109 @@ export default {
           subtle: 'var(--color-error-subtle)',
         },
 
-        // Approved Graphite Neutral Scale mapped to slate utilities for 100% theme consistency
+        // Minimal White + Slate + Soft Steel Blue Neutral Scale mapped to slate utilities for 100% theme consistency
         slate: {
-          0: '#FFFFFF',   // Light cards, input & elevated surfaces
-          50: '#F4F6F8',  // Light main application background
-          100: '#E9EDF2', // Light sidebar background
-          150: '#E3E8EE', // Light hover surfaces
-          200: '#DCE2E8', // Light borders & dividers
-          250: '#F3F4F6', // Dark primary text
-          300: '#C2CCD6', // Light subtle border / control accent
-          400: '#ADB5C2', // Dark secondary text
-          500: '#657180', // Light secondary text
-          600: '#4B5665', // Light strong secondary text
-          700: '#343943', // Dark borders & dividers
-          750: '#303642', // Dark hover surfaces
-          800: '#2C313B', // Dark elevated surfaces & popovers
-          850: '#202833', // Light primary text / deep graphite surface
-          900: '#242831', // Dark sidebar, card & input surfaces
-          950: '#16181C', // Dark main application background
+          0: '#FFFFFF',   // Main card surface (light)
+          50: '#F7F8FA',  // Page background (light)
+          100: '#F1F3F6', // Muted surface / sidebar (light)
+          150: '#EAF0F8', // Selected surface (light)
+          200: '#E1E5EC', // Borders (light)
+          250: '#F5F7FA', // Primary text (dark)
+          300: '#D1D7E2', // Scrollbar thumb / subtle border (light)
+          400: '#A7B0BF', // Secondary text (dark)
+          500: '#667085', // Secondary text (light)
+          600: '#4B5565', // Neutral grey
+          700: '#303540', // Borders (dark)
+          750: '#252F40', // Selected surface (dark)
+          800: '#20232A', // Elevated surface (dark)
+          850: '#273449', // Primary text (light)
+          900: '#191B21', // Main card surface (dark)
+          925: '#15171D', // Sidebar background (dark)
+          950: '#111318', // Page background (dark)
         },
 
-        // Approved Steel Blue Brand & Accent Scale (#526B88 / #8298B0)
+        // Minimal White + Slate + Soft Steel Blue Brand & Accent Scale (#6485B5 / #4F719F / #8EACD8 / #A8BFE3)
         brand: {
-          50: '#F4F6F8',
-          100: '#E9EDF2',
-          200: '#D8E1EA', // Light selected navigation background
-          300: '#B4C3D4',
-          400: '#8298B0', // Secondary accent & dark focus ring
-          500: '#68809B',
-          600: '#526B88', // Primary accent & light focus ring
-          700: '#445A73', // Primary hover (light)
-          800: '#344252', // Dark selected navigation background
-          900: '#242831', // Dark surface
-          950: '#16181C', // Dark app background
+          50: '#F7F8FA',  // Page background (light)
+          100: '#EAF0F8', // Soft steel blue selected surface (light)
+          200: '#D1D7E2',
+          300: '#A8BFE3', // Steel blue hover (dark)
+          400: '#8EACD8', // Steel blue accent (dark)
+          500: '#6485B5', // Steel blue primary (light)
+          600: '#6485B5', // Steel blue primary (light)
+          700: '#4F719F', // Steel blue hover (light)
+          800: '#3D5980',
+          900: '#273449', // Primary text (light)
+          950: '#111318', // Page background (dark)
+        },
+
+        copper: {
+          50: '#F7F8FA',
+          100: '#EAF0F8',
+          200: '#D1D7E2',
+          300: '#A8BFE3',
+          400: '#8EACD8',
+          500: '#6485B5',
+          600: '#6485B5',
+          700: '#4F719F',
+          800: '#3D5980',
+          900: '#273449',
+          950: '#111318',
+        },
+
+        champagne: {
+          DEFAULT: '#EAF0F8',
+          light: '#F1F3F6',
+          dark: '#252F40',
         },
 
         // Unified Steel Blue mapping for legacy indigo/purple/violet classes
         indigo: {
-          50: '#F4F6F8',
-          100: '#E9EDF2',
-          200: '#D8E1EA',
-          300: '#B4C3D4',
-          400: '#8298B0',
-          500: '#68809B',
-          600: '#526B88',
-          700: '#445A73',
-          800: '#344252',
-          900: '#242831',
-          950: '#16181C',
+          50: '#F7F8FA',
+          100: '#EAF0F8',
+          200: '#E1E5EC',
+          300: '#A8BFE3',
+          400: '#8EACD8',
+          500: '#6485B5',
+          600: '#6485B5',
+          700: '#4F719F',
+          800: '#303540',
+          900: '#191B21',
+          950: '#111318',
         },
         purple: {
-          50: '#F4F6F8',
-          100: '#E9EDF2',
-          200: '#D8E1EA',
-          300: '#B4C3D4',
-          400: '#8298B0',
-          500: '#68809B',
-          600: '#526B88',
-          700: '#445A73',
-          800: '#344252',
-          900: '#242831',
-          950: '#16181C',
+          50: '#F7F8FA',
+          100: '#EAF0F8',
+          200: '#E1E5EC',
+          300: '#A8BFE3',
+          400: '#8EACD8',
+          500: '#6485B5',
+          600: '#6485B5',
+          700: '#4F719F',
+          800: '#303540',
+          900: '#191B21',
+          950: '#111318',
         },
         violet: {
-          50: '#F4F6F8',
-          100: '#E9EDF2',
-          200: '#D8E1EA',
-          300: '#B4C3D4',
-          400: '#8298B0',
-          500: '#68809B',
-          600: '#526B88',
-          700: '#445A73',
-          800: '#344252',
-          900: '#242831',
-          950: '#16181C',
+          50: '#F7F8FA',
+          100: '#EAF0F8',
+          200: '#E1E5EC',
+          300: '#A8BFE3',
+          400: '#8EACD8',
+          500: '#6485B5',
+          600: '#6485B5',
+          700: '#4F719F',
+          800: '#303540',
+          900: '#191B21',
+          950: '#111318',
         },
         ai: {
-          purple: '#526B88',
-          cyan: '#8298B0',
-          emerald: '#23845B',
-          amber: '#B7791F',
+          blue: '#6485B5',
+          purple: '#6485B5',
+          cyan: '#8EACD8',
+          emerald: '#287A52',
+          amber: '#98651A',
+          rose: '#B93B35',
         }
       },
       fontFamily: {
@@ -161,8 +184,12 @@ export default {
       },
       animation: {
         'pulse-subtle': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'fade-in': 'fadeIn 0.2s ease-in-out',
-        'slide-up': 'slideUp 0.25s ease-out',
+        'fade-in': 'fadeIn 0.2s ease-out',
+        'slide-up': 'slideUp 0.2s ease-out',
+        'slide-down': 'slideDown 0.2s ease-out',
+        'slide-in-left': 'slideInLeft 0.22s ease-out',
+        'slide-in-right': 'slideInRight 0.22s ease-out',
+        'scale-in': 'scaleIn 0.18s ease-out',
       },
       keyframes: {
         fadeIn: {
@@ -170,8 +197,24 @@ export default {
           '100%': { opacity: '1' },
         },
         slideUp: {
-          '0%': { transform: 'translateY(8px)', opacity: '0' },
+          '0%': { transform: 'translateY(6px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        slideDown: {
+          '0%': { transform: 'translateY(-6px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        slideInLeft: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
+        slideInRight: {
+          '0%': { transform: 'translateX(100%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
+        scaleIn: {
+          '0%': { transform: 'scale(0.97)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
         }
       }
     },

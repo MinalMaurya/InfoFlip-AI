@@ -60,6 +60,7 @@ export default function RightSidebar({
   isMobileDrawer = false
 }) {
   const [expandedGroup, setExpandedGroup] = useState(null); // 'tone' | 'audience' | 'language' | 'detail' | 'objective' | null
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [formatHint, setFormatHint] = useState('');
 
   const selectedFormats = Array.isArray(config?.selectedFormats)
@@ -110,7 +111,7 @@ export default function RightSidebar({
       <aside
         aria-label="Collapsed Output Formats Rail"
         data-collapsed="true"
-        className="h-full w-16 bg-sidebar-bg border-l border-border flex flex-col items-center select-none text-text-primary shrink-0 transition-colors"
+        className="h-full w-16 bg-sidebar-bg border-l border-border flex flex-col items-center select-none text-text-primary shrink-0 transition-all duration-200 ease-in-out"
       >
         {/* Top Direct Expand Control */}
         <div className="h-14 w-full flex flex-col items-center justify-center border-b border-border shrink-0">
@@ -211,9 +212,9 @@ export default function RightSidebar({
             handleToggleFormat(fmt.id);
           }
         }}
-        className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg border text-xs cursor-pointer transition-colors select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
+        className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg border text-xs cursor-pointer select-none active:scale-[0.99] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
           isSelected
-            ? 'bg-surface-selected border-border text-text-primary font-semibold'
+            ? 'bg-surface-selected border-border text-text-primary font-semibold shadow-2xs'
             : 'bg-surface border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover'
         }`}
       >
@@ -223,13 +224,13 @@ export default function RightSidebar({
         </div>
 
         <div
-          className={`w-4 h-4 rounded flex items-center justify-center border shrink-0 transition-colors ${
+          className={`w-4 h-4 rounded flex items-center justify-center border shrink-0 transition-all duration-150 ${
             isSelected
               ? 'bg-primary border-primary text-primary-foreground'
               : 'border-input-border bg-input-bg'
           }`}
         >
-          {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
+          {isSelected && <Check className="w-3 h-3 stroke-[3] animate-scale-in" />}
         </div>
       </div>
     );
@@ -239,7 +240,7 @@ export default function RightSidebar({
     <aside
       aria-label="Output Formats and Generation Settings Sidebar"
       data-collapsed="false"
-      className="h-full w-72 bg-sidebar-bg border-l border-border flex flex-col select-none text-text-primary transition-colors"
+      className="h-full w-72 bg-sidebar-bg border-l border-border flex flex-col select-none text-text-primary transition-all duration-200 ease-in-out"
     >
       {/* Panel Header */}
       <div className="h-14 px-3.5 flex items-center justify-between border-b border-border shrink-0">
@@ -330,23 +331,43 @@ export default function RightSidebar({
           </div>
         </div>
 
-        {/* B. Expandable Generation Settings */}
+        {/* B. Collapsible Generation Settings */}
         <div className="pt-3 border-t border-divider space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-text-primary flex items-center gap-1.5">
-              <Sliders className="w-3.5 h-3.5 text-primary dark:text-accent" />
-              <span>Generation Settings</span>
-            </span>
             <button
               type="button"
-              onClick={handleResetDefaults}
-              className="text-[10px] text-text-secondary hover:text-text-primary flex items-center gap-1 focus-visible:outline-none"
-              title="Reset settings to default"
+              onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+              aria-expanded={isSettingsOpen}
+              className="text-[11px] font-bold text-text-primary flex items-center gap-1.5 hover:text-primary dark:hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring rounded-md py-0.5"
             >
-              <RotateCcw className="w-3 h-3" />
-              <span>Reset</span>
+              <Sliders className="w-3.5 h-3.5 text-primary dark:text-accent" />
+              <span>Generation Settings</span>
+              {isSettingsOpen ? (
+                <ChevronDown className="w-3.5 h-3.5 text-text-secondary" />
+              ) : (
+                <ChevronRight className="w-3.5 h-3.5 text-text-secondary" />
+              )}
             </button>
+            <div className="flex items-center gap-2">
+              {!isSettingsOpen && (
+                <span className="text-[10px] text-text-muted truncate max-w-[110px]" title={`${config.tone} • ${config.language}`}>
+                  {config.tone} • {config.language}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={handleResetDefaults}
+                className="text-[10px] text-text-secondary hover:text-text-primary flex items-center gap-1 focus-visible:outline-none"
+                title="Reset settings to default"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Reset</span>
+              </button>
+            </div>
           </div>
+
+          {isSettingsOpen && (
+            <div className="space-y-2 pt-1 animate-slide-down">
 
           {/* 1. Tone Accordion */}
           <div className="rounded-xl border border-border overflow-hidden bg-surface">
@@ -363,7 +384,7 @@ export default function RightSidebar({
               </span>
             </button>
             {expandedGroup === 'tone' && (
-              <div className="p-2.5 bg-surface flex flex-wrap gap-1.5 border-t border-border">
+              <div className="p-2.5 bg-surface flex flex-wrap gap-1.5 border-t border-border animate-slide-down">
                 {TRANSFORMATION_TONES.map(t => (
                   <button
                     key={t}
@@ -397,7 +418,7 @@ export default function RightSidebar({
               </span>
             </button>
             {expandedGroup === 'audience' && (
-              <div className="p-2.5 bg-surface space-y-2 border-t border-border">
+              <div className="p-2.5 bg-surface space-y-2 border-t border-border animate-slide-down">
                 <div className="flex flex-wrap gap-1.5">
                   {TARGET_AUDIENCES.map(aud => (
                     <button
@@ -441,7 +462,7 @@ export default function RightSidebar({
               </span>
             </button>
             {expandedGroup === 'language' && (
-              <div className="p-2.5 bg-surface grid grid-cols-3 gap-1.5 border-t border-border">
+              <div className="p-2.5 bg-surface grid grid-cols-3 gap-1.5 border-t border-border animate-slide-down">
                 {TRANSFORMATION_LANGUAGES.map(lang => (
                   <button
                     key={lang.id}
@@ -476,7 +497,7 @@ export default function RightSidebar({
               </span>
             </button>
             {expandedGroup === 'detail' && (
-              <div className="p-2.5 bg-surface grid grid-cols-3 gap-1.5 border-t border-border">
+              <div className="p-2.5 bg-surface grid grid-cols-3 gap-1.5 border-t border-border animate-slide-down">
                 {Object.values(DETAIL_LEVELS).map(lvl => (
                   <button
                     key={lvl}
@@ -510,7 +531,7 @@ export default function RightSidebar({
               </span>
             </button>
             {expandedGroup === 'objective' && (
-              <div className="p-2.5 bg-surface space-y-2.5 border-t border-border">
+              <div className="p-2.5 bg-surface space-y-2.5 border-t border-border animate-slide-down">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1">
                     Communication Objective
@@ -546,7 +567,9 @@ export default function RightSidebar({
             )}
           </div>
         </div>
-      </div>
+      )}
+    </div>
+  </div>
 
       {/* Compact Footer Note */}
       <div className="p-3 border-t border-border bg-sidebar-bg text-[10px] text-text-secondary leading-relaxed shrink-0">

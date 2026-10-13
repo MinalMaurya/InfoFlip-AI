@@ -115,7 +115,7 @@ export default function ThemeToggle({ variant = 'compact' }) {
         <div
           role="menu"
           aria-label="Theme options"
-          className="absolute right-0 top-full mt-1.5 w-40 py-1.5 bg-surface-elevated rounded-xl shadow-xl border border-border z-50 text-xs"
+          className="absolute right-0 top-full mt-1.5 w-40 py-1.5 bg-surface-elevated rounded-xl shadow-xl border border-border z-50 text-xs animate-scale-in origin-top-right"
           style={{
             backgroundColor: 'var(--color-surface-elevated)',
             borderColor: 'var(--color-border)',

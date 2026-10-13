@@ -687,14 +687,12 @@ async function runTests() {
     'utf8'
   );
 
-  // Item 30: Scheduled Posts is visible as “Coming soon” and does not pretend to schedule or publish posts
+  // Item 30: Scheduled Posts placeholder is removed from active navigation to avoid advertising unfinished features
   assert(
-    leftSidebarSource.includes('Scheduled Posts') &&
-      leftSidebarSource.includes('Soon') &&
-      scheduledPostsSource.includes('Coming soon') &&
-      scheduledPostsSource.includes('Scheduled Posts — Coming Soon') &&
-      scheduledPostsSource.includes('No external platform connections, background jobs, or scheduled deliveries are active in this prototype'),
-    '30. Scheduled Posts is clearly badged "Coming soon" in the sidebar and opens an honest placeholder without fake scheduling controls'
+    !leftSidebarSource.includes('Scheduled Posts') &&
+      !leftSidebarSource.includes("onSelectSection('scheduled')") &&
+      scheduledPostsSource.includes('Scheduled Posts — Coming Soon'),
+    '30. Scheduled Posts placeholder is cleanly removed from active sidebar navigation as requested'
   );
 
   // Item 31: Prototype account area displays “Minal Maurya” and “Free plan” without implementing fake login/logout or authentication claims
@@ -708,13 +706,12 @@ async function runTests() {
     '31. Prototype account area displays "Minal Maurya" and "Free plan" without fake login/logout buttons or authentication claims'
   );
 
-  // Item 32: Explore behaves as a minimal placeholder or supported preview without inventing unsupported features
+  // Item 32: Explore is removed from the sidebar because the feature is not implemented
   assert(
-    leftSidebarSource.includes('Explore') &&
-      exploreViewSource.includes('Coming soon') &&
-      exploreViewSource.includes('Explore Templates & Workflows — Coming Soon') &&
-      exploreViewSource.includes('DEMO_SCENARIOS'),
-    '32. Explore opens a clearly labelled "Coming soon" placeholder with optional access to existing built-in demo scenarios'
+    !leftSidebarSource.includes('Explore') &&
+      !leftSidebarSource.includes("onSelectSection('explore')") &&
+      exploreViewSource.includes('Explore Templates & Workflows — Coming Soon'),
+    '32. Explore is cleanly removed from active sidebar navigation as requested'
   );
 
   // =========================================================================
@@ -746,15 +743,15 @@ async function runTests() {
     '33. Left sidebar collapses to a visible persistent w-16 icon rail with top expand control and bottom MM account avatar'
   );
 
-  // Item 34: Left navigation icons work directly without expanding the rail first, with no redundant chat icon below the + button
+  // Item 34: Left navigation icons work directly without expanding the rail first, with Library and Content Collections preserved
   assert(
     leftSidebarSource.includes('onClick={() => onNewChat()}') &&
       !leftSidebarSource.includes('aria-label="Conversation Workspace"') &&
-      leftSidebarSource.includes("onClick={() => onSelectSection('explore')}") &&
+      !leftSidebarSource.includes("onClick={() => onSelectSection('explore')}") &&
       leftSidebarSource.includes("onClick={() => onSelectSection('library')}") &&
-      leftSidebarSource.includes("onClick={() => onSelectSection('scheduled')}") &&
+      !leftSidebarSource.includes("onClick={() => onSelectSection('scheduled')}") &&
       leftSidebarSource.includes('onClick={() => onSelectCollection(fmt.id)}'),
-    '34. Left rail navigation icons (New Chat, Explore, Library, Scheduled Posts, and all Content Collections) navigate directly without a redundant chat icon below +'
+    '34. Left rail navigation icons (New Chat, Library, and all Content Collections) navigate directly without unfinished Explore or Scheduled items'
   );
 
   // Item 35: Right sidebar collapses to a visible persistent icon rail
@@ -863,25 +860,28 @@ async function runTests() {
 
   const requiredPaletteHexes = [
     // Dark mode palette
-    '#16181C',
-    '#242831',
-    '#2C313B',
-    '#526B88',
-    '#8298B0',
-    '#F3F4F6',
-    '#ADB5C2',
-    '#343943',
-    '#303642',
-    '#344252',
+    '#111318', // Dark page background
+    '#191B21', // Dark card background
+    '#20232A', // Dark elevated surface
+    '#303540', // Dark border / divider
+    '#8EACD8', // Dark steel blue accent
+    '#A8BFE3', // Dark steel blue hover
+    '#F5F7FA', // Dark primary text
+    '#A7B0BF', // Dark secondary text
+    '#252F40', // Dark selected surface
     // Light mode palette
-    '#F4F6F8',
-    '#E9EDF2',
-    '#FFFFFF',
-    '#202833',
-    '#657180',
-    '#DCE2E8',
-    '#E3E8EE',
-    '#D8E1EA'
+    '#F7F8FA', // Light page background
+    '#FFFFFF', // Light card background
+    '#F1F3F6', // Light muted surface / sidebar
+    '#EAF0F8', // Light selected surface
+    '#6485B5', // Light steel blue primary accent
+    '#4F719F', // Light steel blue accent hover
+    '#E1E5EC', // Light border / divider
+    '#273449', // Light primary text
+    '#667085', // Light secondary text
+    '#287A52', // Success
+    '#98651A', // Warning
+    '#B93B35'  // Error
   ];
   const allHexesInCss = requiredPaletteHexes.every((hex) =>
     indexCssSource.toUpperCase().includes(hex.toUpperCase())
@@ -897,7 +897,7 @@ async function runTests() {
       tailwindConfigSource.includes("'app-bg': 'var(--color-app-background)'") &&
       tailwindConfigSource.includes("'sidebar-bg': 'var(--color-sidebar-background)'") &&
       tailwindConfigSource.includes("DEFAULT: 'var(--color-surface)'"),
-    '42. All 23 semantic design tokens (--color-*) and all Graphite + Steel Blue Light & Dark hex values are centrally mapped in CSS and Tailwind'
+    '42. All 23 semantic design tokens (--color-*) and all Minimal White + Slate + Soft Steel Blue Light & Dark hex values are centrally mapped in CSS and Tailwind'
   );
 
   // Item 43: Global component audit — zero remaining purple/violet classes or hardcoded dark-only preview frames across UI components

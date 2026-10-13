@@ -241,7 +241,7 @@ export default function LibraryView({
                 key={tab.id}
                 type="button"
                 onClick={() => setStatusFilter(tab.id)}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
+                className={`px-2.5 py-1 rounded-md text-[11px] font-medium active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
                   statusFilter === tab.id
                     ? 'bg-primary text-primary-foreground'
                     : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'
@@ -309,7 +309,7 @@ export default function LibraryView({
               return (
                 <div
                   key={item.itemId}
-                  className="bg-surface rounded-xl border border-border shadow-2xs overflow-hidden transition-all"
+                  className="bg-surface rounded-xl border border-border shadow-2xs overflow-hidden transition-all duration-200 hover:border-primary/40"
                 >
                   {/* Summary Header Row */}
                   <div className="px-4 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -366,7 +366,7 @@ export default function LibraryView({
                           type="button"
                           onClick={() => onOpenConversation(item.conversationId)}
                           title={`Open conversation: ${convTitle}`}
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-text-secondary bg-sidebar-bg border border-border hover:bg-surface-hover hover:text-primary dark:hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-text-secondary bg-sidebar-bg border border-border hover:bg-surface-hover hover:text-primary dark:hover:text-accent active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                         >
                           <MessageSquare className="w-3 h-3" />
                           <span className="max-w-[130px] truncate">{convTitle}</span>
@@ -377,7 +377,7 @@ export default function LibraryView({
                       <button
                         type="button"
                         onClick={() => setExpandedItemId(isExpanded ? null : item.itemId)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-surface-selected text-primary dark:text-accent border border-border hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-surface-selected text-primary dark:text-accent border border-border hover:bg-surface-hover active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                       >
                         {isExpanded ? (
                           <>
@@ -396,7 +396,7 @@ export default function LibraryView({
 
                   {/* Expanded Full Output View (Reuses GeneratedOutputRenderer for full edit/review/export) */}
                   {isExpanded && (
-                    <div className="px-4 pb-4 pt-2 border-t border-border bg-sidebar-bg">
+                    <div className="px-4 pb-4 pt-2 border-t border-border bg-sidebar-bg animate-slide-down">
                       <GeneratedOutputRenderer
                         item={item}
                         config={conv?.config || {}}

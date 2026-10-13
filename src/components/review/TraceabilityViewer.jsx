@@ -95,7 +95,7 @@ export default function TraceabilityViewer({
       <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400">
         <div className="flex items-center gap-3">
           <span className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
-            <Layers className="w-3.5 h-3.5 text-text-primary0" /> Lineage:
+            <Layers className="w-3.5 h-3.5 text-text-secondary" /> Lineage:
           </span>
           {sourceId && (
             <span className="font-mono bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">
@@ -141,8 +141,8 @@ export default function TraceabilityViewer({
                   {getOriginBadge(item)}
 
                   {isHighRisk && !isIndependentlyVerified && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300 border border-orange-300 dark:border-orange-800">
-                      <AlertTriangle className="w-3 h-3 text-orange-600 dark:text-orange-400" />
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-warning-subtle text-warning border border-warning/30">
+                      <AlertTriangle className="w-3 h-3 text-warning" />
                       Verification required
                     </span>
                   )}
@@ -153,7 +153,7 @@ export default function TraceabilityViewer({
                 {/* Source Origin */}
                 <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 space-y-1">
                   <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                    <FileText className="w-3 h-3 text-text-primary0" /> Source Excerpt
+                    <FileText className="w-3 h-3 text-text-secondary" /> Source Excerpt
                   </span>
                   <p className="text-slate-800 dark:text-slate-200 font-medium italic leading-relaxed">
                     "{sourceSnippet}"

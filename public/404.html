@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InfoFlip-AI</title>
+    <script>
+      // Single Page Application static hosting fallback
+      // Preserves pathname, query parameters, and hash fragments across direct navigation and browser refreshes
+      var path = window.location.pathname || '';
+      var query = window.location.search || '';
+      var hash = window.location.hash || '';
+
+      if (!hash && path && path !== '/') {
+        var cleanPath = path.replace(/^\/+/, '');
+        window.location.replace('/#/' + cleanPath + query);
+      } else {
+        window.location.replace('/' + query + hash);
+      }
+    </script>
+  </head>
+  <body>
+    <p>Loading InfoFlip-AI...</p>
+  </body>
+</html>

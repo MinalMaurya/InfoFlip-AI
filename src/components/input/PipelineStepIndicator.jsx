@@ -58,33 +58,31 @@ export default function PipelineStepIndicator({
   };
 
   return (
-    <div className="w-full bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-3.5 sm:p-4 shadow-xs mb-6 transition-colors">
+    <div className="w-full bg-surface rounded-xl border border-border p-3 sm:p-3.5 shadow-2xs mb-5 transition-colors">
       
       {/* Workflow Header (Requirements 13 & 19) */}
-      <div className="flex flex-wrap items-center justify-between gap-2 mb-3 px-1">
-        <div className="flex items-center gap-2.5">
-          <div className="w-2 h-2 rounded-full bg-primary dark:bg-accent/30 relative">
-            <span className="animate-ping absolute inset-0 rounded-full bg-accent/30 opacity-75"></span>
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5 px-0.5">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-primary" />
           <div>
-            <h2 className="text-xs sm:text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            <h2 className="text-xs sm:text-sm font-bold tracking-tight text-text-primary">
               Content Transformation Workflow
             </h2>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
+            <p className="text-[11px] text-text-secondary hidden sm:block">
               Six-stage human-in-the-loop GenAI pipeline
             </p>
           </div>
         </div>
 
         {/* Current Stage Indicator */}
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-primary dark:text-accent bg-surface-selected px-3 py-1 rounded-full border border-primary/30 dark:border-primary/40">
-          <Sparkles className="w-3.5 h-3.5 text-text-primary0" />
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-primary dark:text-accent bg-surface-selected px-2.5 py-0.5 rounded-full border border-border">
+          <Sparkles className="w-3.5 h-3.5 text-primary dark:text-accent" />
           <span>Stage {currentStep} of 6: {currentStepObj.title} • {currentStepObj.subtitle}</span>
         </div>
       </div>
 
       {/* 6-Stage Progress Cards (Desktop: 6 in 1 row; Tablet: 3 cols; Mobile: 2 cols) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-2.5 relative">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 relative">
         {PIPELINE_STEPS.map((step, idx) => {
           const Icon = step.icon;
           const isCurrent = step.id === currentStep;
@@ -113,30 +111,30 @@ export default function PipelineStepIndicator({
                   ? `Stage ${step.number}: ${step.title} (Available)`
                   : `Stage ${step.number}: ${step.title} (Locked - Complete preceding stages first)`
               }
-              className={`relative flex flex-col justify-between p-3 rounded-lg border transition-all select-none ${
+              className={`relative flex flex-col justify-between p-2.5 rounded-lg border transition-all select-none ${
                 onStepClick && isAllowed
-                  ? 'cursor-pointer hover:border-primary dark:hover:border-primary hover:shadow-xs active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary'
+                  ? 'cursor-pointer hover:border-primary/40 hover:bg-surface-hover active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring'
                   : isFuture
-                  ? 'cursor-not-allowed opacity-65'
+                  ? 'cursor-not-allowed opacity-60'
                   : ''
               } ${
                 isCurrent
-                  ? 'bg-surface-selected/60 border-primary/300 dark:border-primary/40 shadow-xs ring-1 ring-primary'
+                  ? 'bg-surface-selected border-primary/50 shadow-2xs ring-1 ring-primary/40'
                   : isPast
-                  ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/60'
-                  : 'bg-slate-50/70 dark:bg-slate-800/30 border-slate-200/80 dark:border-slate-800/80'
+                  ? 'bg-surface border-border'
+                  : 'bg-sidebar-bg/50 border-border/70'
               }`}
             >
               {/* Card Top: Number, Icon & Status Pill (Requirements 15 & 16) */}
-              <div className="flex items-center justify-between gap-1 mb-2">
+              <div className="flex items-center justify-between gap-1 mb-1.5">
                 <div className="flex items-center gap-1.5">
                   <div
-                    className={`w-6 h-6 rounded-md flex items-center justify-center font-bold text-[11px] shrink-0 ${
+                    className={`w-5 h-5 rounded-md flex items-center justify-center font-bold text-[10px] shrink-0 ${
                       isCurrent
-                        ? 'bg-primary text-white shadow-xs'
+                        ? 'bg-primary text-primary-foreground'
                         : isPast
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+                        ? 'bg-success/15 text-success'
+                        : 'bg-sidebar-bg text-text-muted border border-border'
                     }`}
                   >
                     {step.number}
@@ -145,24 +143,24 @@ export default function PipelineStepIndicator({
                     isCurrent 
                       ? 'text-primary dark:text-accent'
                       : isPast 
-                      ? 'text-emerald-600 dark:text-emerald-400' 
-                      : 'text-slate-400 dark:text-slate-500'
+                      ? 'text-success' 
+                      : 'text-text-muted'
                   }`} />
                 </div>
 
                 {/* Status Badges: Completed, Current, Locked */}
                 {isPast ? (
-                  <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100/70 dark:bg-emerald-900/40 px-1.5 py-0.2 rounded">
+                  <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-success px-1 py-0.2 rounded">
                     <Check className="w-2.5 h-2.5" />
                     <span>Done</span>
                   </span>
                 ) : isCurrent ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-primary dark:text-accent bg-surface-selected px-1.5 py-0.2 rounded">
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary dark:bg-accent/30 animate-pulse" />
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-primary dark:text-accent bg-surface px-1.5 py-0.2 rounded border border-border">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                     <span>Active</span>
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-slate-400 dark:text-slate-500">
+                  <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-text-muted">
                     <Lock className="w-2.5 h-2.5" />
                   </span>
                 )}
@@ -172,14 +170,14 @@ export default function PipelineStepIndicator({
               <div className="min-w-0">
                 <div className={`text-xs font-bold truncate ${
                   isCurrent 
-                    ? 'text-text-primary dark:text-accent font-extrabold' 
+                    ? 'text-text-primary' 
                     : isPast
-                    ? 'text-emerald-950 dark:text-emerald-200'
-                    : 'text-slate-700 dark:text-slate-300'
+                    ? 'text-text-primary'
+                    : 'text-text-secondary'
                 }`}>
                   {step.title}
                 </div>
-                <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                <div className="text-[10px] text-text-muted truncate">
                   {step.subtitle}
                 </div>
               </div>

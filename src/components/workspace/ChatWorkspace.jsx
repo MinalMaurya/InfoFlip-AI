@@ -25,7 +25,8 @@ import {
   FileCode,
   ExternalLink,
   Link2,
-  Eye
+  Eye,
+  RefreshCw
 } from 'lucide-react';
 import ThemeToggle from '../ThemeToggle.jsx';
 import GeneralDisclaimerNotice from '../common/GeneralDisclaimerNotice.jsx';
@@ -119,6 +120,14 @@ export default function ChatWorkspace({
   const totalRejectedCount = allConversationOutputs.filter(
     (o) => o.approvalStatus === APPROVAL_STATUSES.REJECTED
   ).length;
+
+  const activeWorkflowStage = totalApprovedCount > 0 && totalPendingCount === 0
+    ? 5
+    : totalGeneratedCount > 0
+    ? 4
+    : hasExistingSource || attachedFile || sourceTextValue.trim()
+    ? 2
+    : 1;
 
   // Focus composer when New Chat is triggered
   useEffect(() => {
@@ -355,18 +364,28 @@ export default function ChatWorkspace({
       {/* Workflow Visual Hierarchy Strip: Source Document → Selected Formats → Generated Outputs → Quality Review → Approved Export */}
       <nav
         aria-label="Transformation Workflow Hierarchy"
-        className="px-3 sm:px-5 py-2 bg-sidebar-bg border-b border-border shrink-0 overflow-x-auto"
+        className="px-3 sm:px-5 py-2 bg-sidebar-bg border-b border-border shrink-0 overflow-x-auto scrollbar-none"
       >
         <ol className="max-w-4xl mx-auto flex items-center justify-between gap-1.5 sm:gap-2 text-[11px] min-w-max">
           {/* 1. Source Document */}
           <li
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors ${
-              hasExistingSource || attachedFile || sourceTextValue.trim()
-                ? 'bg-surface border-primary/40 text-text-primary font-semibold'
-                : 'bg-surface border-border text-text-secondary'
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-all ${
+              activeWorkflowStage === 1
+                ? 'bg-surface-selected border-primary/50 text-text-primary font-semibold shadow-2xs ring-1 ring-primary/30'
+                : activeWorkflowStage > 1
+                ? 'bg-surface border-border text-text-primary'
+                : 'bg-sidebar-bg/50 border-border/60 text-text-muted'
             }`}
           >
-            <span className="w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] font-bold inline-flex items-center justify-center shrink-0">
+            <span
+              className={`w-4 h-4 rounded-full text-[10px] font-bold inline-flex items-center justify-center shrink-0 ${
+                activeWorkflowStage === 1
+                  ? 'bg-primary text-primary-foreground'
+                  : activeWorkflowStage > 1
+                  ? 'bg-success/15 text-success'
+                  : 'bg-sidebar-bg text-text-muted border border-border'
+              }`}
+            >
               1
             </span>
             <span>Source Document</span>
@@ -377,17 +396,27 @@ export default function ChatWorkspace({
             </span>
           </li>
 
-          <ChevronRight className="w-3.5 h-3.5 text-text-muted shrink-0" aria-hidden="true" />
+          <ChevronRight className="w-3.5 h-3.5 text-text-muted/50 shrink-0" aria-hidden="true" />
 
           {/* 2. Selected Formats */}
           <li
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors ${
-              selectedFormats.length > 0
-                ? 'bg-surface border-primary/40 text-text-primary font-semibold'
-                : 'bg-surface border-border text-text-secondary'
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-all ${
+              activeWorkflowStage === 2
+                ? 'bg-surface-selected border-primary/50 text-text-primary font-semibold shadow-2xs ring-1 ring-primary/30'
+                : activeWorkflowStage > 2
+                ? 'bg-surface border-border text-text-primary'
+                : 'bg-sidebar-bg/50 border-border/60 text-text-muted'
             }`}
           >
-            <span className="w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] font-bold inline-flex items-center justify-center shrink-0">
+            <span
+              className={`w-4 h-4 rounded-full text-[10px] font-bold inline-flex items-center justify-center shrink-0 ${
+                activeWorkflowStage === 2
+                  ? 'bg-primary text-primary-foreground'
+                  : activeWorkflowStage > 2
+                  ? 'bg-success/15 text-success'
+                  : 'bg-sidebar-bg text-text-muted border border-border'
+              }`}
+            >
               2
             </span>
             <span>Selected Formats</span>
@@ -396,20 +425,24 @@ export default function ChatWorkspace({
             </span>
           </li>
 
-          <ChevronRight className="w-3.5 h-3.5 text-text-muted shrink-0" aria-hidden="true" />
+          <ChevronRight className="w-3.5 h-3.5 text-text-muted/50 shrink-0" aria-hidden="true" />
 
           {/* 3. Generated Outputs */}
           <li
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors ${
-              totalGeneratedCount > 0
-                ? 'bg-surface border-primary/40 text-text-primary font-semibold'
-                : 'bg-surface border-border text-text-secondary'
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-all ${
+              activeWorkflowStage === 3
+                ? 'bg-surface-selected border-primary/50 text-text-primary font-semibold shadow-2xs ring-1 ring-primary/30'
+                : activeWorkflowStage > 3
+                ? 'bg-surface border-border text-text-primary'
+                : 'bg-sidebar-bg/50 border-border/60 text-text-muted'
             }`}
           >
             <span
               className={`w-4 h-4 rounded-full text-[10px] font-bold inline-flex items-center justify-center shrink-0 ${
-                totalGeneratedCount > 0
+                activeWorkflowStage === 3
                   ? 'bg-primary text-primary-foreground'
+                  : activeWorkflowStage > 3
+                  ? 'bg-success/15 text-success'
                   : 'bg-sidebar-bg text-text-muted border border-border'
               }`}
             >
@@ -421,20 +454,24 @@ export default function ChatWorkspace({
             </span>
           </li>
 
-          <ChevronRight className="w-3.5 h-3.5 text-text-muted shrink-0" aria-hidden="true" />
+          <ChevronRight className="w-3.5 h-3.5 text-text-muted/50 shrink-0" aria-hidden="true" />
 
           {/* 4. Quality Review */}
           <li
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors ${
-              totalGeneratedCount > 0
-                ? 'bg-surface border-primary/40 text-text-primary font-semibold'
-                : 'bg-surface border-border text-text-secondary'
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-all ${
+              activeWorkflowStage === 4
+                ? 'bg-surface-selected border-primary/50 text-text-primary font-semibold shadow-2xs ring-1 ring-primary/30'
+                : activeWorkflowStage > 4
+                ? 'bg-surface border-border text-text-primary'
+                : 'bg-sidebar-bg/50 border-border/60 text-text-muted'
             }`}
           >
             <span
               className={`w-4 h-4 rounded-full text-[10px] font-bold inline-flex items-center justify-center shrink-0 ${
-                totalGeneratedCount > 0
+                activeWorkflowStage === 4
                   ? 'bg-primary text-primary-foreground'
+                  : activeWorkflowStage > 4
+                  ? 'bg-success/15 text-success'
                   : 'bg-sidebar-bg text-text-muted border border-border'
               }`}
             >
@@ -450,19 +487,23 @@ export default function ChatWorkspace({
             </span>
           </li>
 
-          <ChevronRight className="w-3.5 h-3.5 text-text-muted shrink-0" aria-hidden="true" />
+          <ChevronRight className="w-3.5 h-3.5 text-text-muted/50 shrink-0" aria-hidden="true" />
 
           {/* 5. Approved Export */}
           <li
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors ${
-              totalApprovedCount > 0
-                ? 'bg-success-subtle border-success/40 text-success font-bold'
-                : 'bg-surface border-border text-text-secondary'
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-all ${
+              activeWorkflowStage === 5
+                ? 'bg-surface-selected border-primary/50 text-text-primary font-semibold shadow-2xs ring-1 ring-primary/30'
+                : totalApprovedCount > 0
+                ? 'bg-success-subtle border-success/30 text-success font-semibold'
+                : 'bg-sidebar-bg/50 border-border/60 text-text-muted'
             }`}
           >
             <span
               className={`w-4 h-4 rounded-full text-[10px] font-bold inline-flex items-center justify-center shrink-0 ${
-                totalApprovedCount > 0
+                activeWorkflowStage === 5
+                  ? 'bg-primary text-primary-foreground'
+                  : totalApprovedCount > 0
                   ? 'bg-success text-white'
                   : 'bg-sidebar-bg text-text-muted border border-border'
               }`}
@@ -481,7 +522,7 @@ export default function ChatWorkspace({
       {storageWarning && (
         <div
           role="alert"
-          className="mx-4 mt-3 p-3 rounded-xl bg-warning-subtle border border-warning/30 text-xs text-warning flex items-center justify-between gap-2"
+          className="mx-4 mt-3 p-3 rounded-xl bg-warning-subtle border border-warning/30 text-xs text-warning flex items-center justify-between gap-2 animate-slide-down"
         >
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-warning shrink-0" />
@@ -502,7 +543,7 @@ export default function ChatWorkspace({
       {exportToast && (
         <div
           role="status"
-          className="mx-4 mt-3 p-3 rounded-xl bg-success-subtle border border-success/30 text-xs text-success flex items-center justify-between gap-2"
+          className="mx-4 mt-3 p-3 rounded-xl bg-success-subtle border border-success/30 text-xs text-success flex items-center justify-between gap-2 animate-slide-down"
         >
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
@@ -549,7 +590,7 @@ export default function ChatWorkspace({
                       key={scen.id}
                       type="button"
                       onClick={() => handleLoadScenario(scen)}
-                      className="px-3 py-2 rounded-xl bg-surface hover:bg-surface-hover border border-border text-xs font-semibold text-text-primary transition-colors shadow-2xs flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                      className="px-3 py-2 rounded-xl bg-surface hover:bg-surface-hover border border-border text-xs font-semibold text-text-primary active:scale-[0.98] transition-all duration-150 shadow-2xs flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-primary dark:text-accent" />
                       <span>{scen.title}</span>
@@ -558,7 +599,7 @@ export default function ChatWorkspace({
                   <button
                     type="button"
                     onClick={() => handleLoadSamplePreset('pdf')}
-                    className="px-3 py-2 rounded-xl bg-surface hover:bg-surface-hover border border-border text-xs font-semibold text-text-primary transition-colors shadow-2xs flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                    className="px-3 py-2 rounded-xl bg-surface hover:bg-surface-hover border border-border text-xs font-semibold text-text-primary active:scale-[0.98] transition-all duration-150 shadow-2xs flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                   >
                     <FileText className="w-3.5 h-3.5 text-primary dark:text-accent" />
                     <span>Sample Weather PDF</span>
@@ -566,7 +607,7 @@ export default function ChatWorkspace({
                   <button
                     type="button"
                     onClick={() => handleLoadSamplePreset('docx')}
-                    className="px-3 py-2 rounded-xl bg-surface hover:bg-surface-hover border border-border text-xs font-semibold text-text-primary transition-colors shadow-2xs flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                    className="px-3 py-2 rounded-xl bg-surface hover:bg-surface-hover border border-border text-xs font-semibold text-text-primary active:scale-[0.98] transition-all duration-150 shadow-2xs flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                   >
                     <FileText className="w-3.5 h-3.5 text-success" />
                     <span>Sample Health DOCX</span>
@@ -791,7 +832,7 @@ export default function ChatWorkspace({
 
                       {/* Expandable Source Document Preview right inside the Generated Outputs card */}
                       {isTurnSourceExpanded && turnSourceDoc.excerpt && (
-                        <div className="p-3 rounded-xl bg-surface border border-border space-y-1.5 text-xs">
+                        <div className="p-3 rounded-xl bg-surface border border-border space-y-1.5 text-xs animate-slide-down">
                           <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] font-bold uppercase tracking-wider text-text-secondary">
                             <span>Source Document Preview • {turnSourceDoc.fileName}</span>
                             <span className="font-mono">
@@ -806,7 +847,7 @@ export default function ChatWorkspace({
                       )}
 
                       {isAnalysisExpanded && (
-                        <div className="pt-2 border-t border-divider space-y-2 text-xs">
+                        <div className="pt-2 border-t border-divider space-y-2 text-xs animate-slide-down">
                           {msg.analysisSummary.summary && (
                             <p className="text-text-secondary leading-relaxed">
                               {msg.analysisSummary.summary}
@@ -856,14 +897,14 @@ export default function ChatWorkspace({
                           <span className="font-bold text-text-primary">
                             Generated Outputs ({turnOutputs.length})
                           </span>
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-success-subtle text-success border border-success/30">
                             {approvedInTurn.length} Approved
                           </span>
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-warning-subtle text-warning border border-warning/30">
                             {pendingInTurn.length} Pending Review
                           </span>
                           {rejectedInTurn.length > 0 && (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-error-subtle text-error border border-error/30">
                               {rejectedInTurn.length} Rejected
                             </span>
                           )}
@@ -894,7 +935,7 @@ export default function ChatWorkspace({
                                   setExpandedAllByMessage(prev => ({ ...prev, [msg.messageId]: false }));
                                   setActiveTabByMessage(prev => ({ ...prev, [msg.messageId]: out.formatId }));
                                 }}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold active:scale-[0.98] transition-all duration-150 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
                                   isSelected
                                     ? 'bg-primary text-primary-foreground shadow-2xs'
                                     : 'bg-sidebar-bg text-text-secondary hover:text-text-primary hover:bg-surface-hover border border-border'
@@ -904,12 +945,12 @@ export default function ChatWorkspace({
                                 <span
                                   className={`w-2 h-2 rounded-full ${
                                     isOutApproved
-                                      ? 'bg-emerald-400'
+                                      ? 'bg-success'
                                       : isOutRejected
-                                      ? 'bg-rose-400'
+                                      ? 'bg-error'
                                       : hasWarn
-                                      ? 'bg-amber-400'
-                                      : 'bg-accent'
+                                      ? 'bg-warning'
+                                      : 'bg-primary'
                                   }`}
                                   title={`Status: ${out.approvalStatus} • QA: ${out.overallStatus}`}
                                 />
@@ -929,7 +970,7 @@ export default function ChatWorkspace({
                                   [msg.messageId]: !prev[msg.messageId]
                                 }))
                               }
-                              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-sidebar-bg text-text-secondary hover:text-text-primary hover:bg-surface-hover border border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-sidebar-bg text-text-secondary hover:text-text-primary hover:bg-surface-hover border border-border active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                             >
                               {isAllExpanded ? 'Tabbed View' : `Compare All (${turnOutputs.length})`}
                             </button>
@@ -940,7 +981,7 @@ export default function ChatWorkspace({
                               type="button"
                               onClick={() => onApproveAllInTurn(passedInTurn.map(o => o.itemId))}
                               title="Approves only pending outputs that passed all 10 required QA checks with 0 warnings/failures. Does not independently verify source facts."
-                              className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-success-subtle text-success border border-success/30 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                              className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-success-subtle text-success border border-success/30 hover:opacity-90 active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                             >
                               Approve Passed ({passedInTurn.length})
                             </button>
@@ -995,89 +1036,90 @@ export default function ChatWorkspace({
                         )
                       )}
 
-                      {/* Transparency Disclaimer */}
-                      <GeneralDisclaimerNotice compact />
+                      {/* Grouped Verification Notice & Module 6 Export Gate */}
+                      <div className="rounded-xl border border-border bg-sidebar-bg/60 p-3 space-y-2.5">
+                        <GeneralDisclaimerNotice compact />
 
-                      {/* Module 6 Turn Export Gate */}
-                      <div
-                        className={`p-3.5 rounded-xl border flex flex-wrap items-center justify-between gap-3 text-xs ${
-                          approvedInTurn.length > 0
-                            ? 'bg-success-subtle border-success/30'
-                            : 'bg-sidebar-bg border-border'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <ShieldCheck
-                            className={`w-4 h-4 shrink-0 ${
-                              approvedInTurn.length > 0 ? 'text-success' : 'text-text-secondary'
-                            }`}
-                          />
-                          <div>
-                            <span className="font-bold text-text-primary">
-                              Module 6 Export Gate:{' '}
-                            </span>
-                            <span className="text-text-secondary">
-                              {approvedInTurn.length > 0
-                                ? `${approvedInTurn.length} of ${turnOutputs.length} output(s) human-approved and unlocked for distribution.`
-                                : 'Locked until at least 1 output is human-approved above.'}
-                            </span>
+                        <div
+                          className={`p-2.5 sm:p-3 rounded-lg border flex flex-wrap items-center justify-between gap-2.5 text-xs ${
+                            approvedInTurn.length > 0
+                              ? 'bg-success-subtle border-success/30'
+                              : 'bg-surface border-border'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <ShieldCheck
+                              className={`w-4 h-4 shrink-0 ${
+                                approvedInTurn.length > 0 ? 'text-success' : 'text-text-secondary'
+                              }`}
+                            />
+                            <div>
+                              <span className="font-bold text-text-primary">
+                                Module 6 Export Gate:{' '}
+                              </span>
+                              <span className="text-text-secondary">
+                                {approvedInTurn.length > 0
+                                  ? `${approvedInTurn.length} of ${turnOutputs.length} output(s) human-approved and unlocked for distribution.`
+                                  : 'Locked until at least 1 output is human-approved above.'}
+                              </span>
+                            </div>
                           </div>
-                        </div>
 
-                        {approvedInTurn.length > 0 && (
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            <button
-                              type="button"
-                              onClick={() => handleTurnExport(turnOutputs, msg.lineage, 'copy')}
-                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-surface border border-border text-text-primary hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
-                            >
-                              <Copy className="w-3 h-3" />
-                              <span>Copy Approved</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleTurnExport(turnOutputs, msg.lineage, 'txt')}
-                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-surface border border-border text-text-primary hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
-                            >
-                              <Download className="w-3 h-3" />
-                              <span>TXT</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleTurnExport(turnOutputs, msg.lineage, 'json')}
-                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-surface border border-border text-text-primary hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
-                            >
-                              <FileCode className="w-3 h-3" />
-                              <span>JSON</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleTurnExport(turnOutputs, msg.lineage, 'pdf')}
-                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-surface border border-border text-text-primary hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
-                            >
-                              <FileText className="w-3 h-3" />
-                              <span>PDF</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleTurnExport(turnOutputs, msg.lineage, 'package')}
-                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-success hover:opacity-90 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
-                            >
-                              <FolderArchive className="w-3 h-3" />
-                              <span>ZIP Bundle</span>
-                            </button>
-                            {onOpenExportInspector && (
+                          {approvedInTurn.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-1.5">
                               <button
                                 type="button"
-                                onClick={() => handleTurnExport(turnOutputs, msg.lineage, 'inspector')}
-                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-primary dark:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                                onClick={() => handleTurnExport(turnOutputs, msg.lineage, 'copy')}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-surface border border-border text-text-primary hover:bg-surface-hover active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                               >
-                                <span>Audit View</span>
-                                <ExternalLink className="w-3 h-3" />
+                                <Copy className="w-3 h-3" />
+                                <span>Copy Approved</span>
                               </button>
-                            )}
-                          </div>
-                        )}
+                              <button
+                                type="button"
+                                onClick={() => handleTurnExport(turnOutputs, msg.lineage, 'txt')}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-surface border border-border text-text-primary hover:bg-surface-hover active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                              >
+                                <Download className="w-3 h-3" />
+                                <span>TXT</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleTurnExport(turnOutputs, msg.lineage, 'json')}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-surface border border-border text-text-primary hover:bg-surface-hover active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                              >
+                                <FileCode className="w-3 h-3" />
+                                <span>JSON</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleTurnExport(turnOutputs, msg.lineage, 'pdf')}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-surface border border-border text-text-primary hover:bg-surface-hover active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                              >
+                                <FileText className="w-3 h-3" />
+                                <span>PDF</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleTurnExport(turnOutputs, msg.lineage, 'package')}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-success hover:opacity-90 text-white active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                              >
+                                <FolderArchive className="w-3 h-3" />
+                                <span>ZIP Bundle</span>
+                              </button>
+                              {onOpenExportInspector && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleTurnExport(turnOutputs, msg.lineage, 'inspector')}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-primary dark:text-accent hover:underline active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                                >
+                                  <span>Audit View</span>
+                                  <ExternalLink className="w-3 h-3" />
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -1227,7 +1269,7 @@ export default function ChatWorkspace({
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isGenerating}
                   title="Attach PDF, DOCX, TXT, PNG, or JPG (Max 10 MB)"
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                 >
                   <Paperclip className="w-3.5 h-3.5 text-primary dark:text-accent" />
                   <span>Attach File</span>
@@ -1237,7 +1279,7 @@ export default function ChatWorkspace({
                   type="button"
                   onClick={() => setShowSourceDrawer(!showSourceDrawer)}
                   disabled={isGenerating}
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ${
                     showSourceDrawer || sourceTextValue.trim()
                       ? 'bg-surface-selected text-text-primary border border-border'
                       : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'
@@ -1278,7 +1320,7 @@ export default function ChatWorkspace({
                   type="submit"
                   disabled={isGenerating}
                   aria-label="Submit request to generate content"
-                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold bg-primary hover:bg-primary-hover text-primary-foreground disabled:opacity-50 shadow-2xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold bg-primary hover:bg-primary-hover text-primary-foreground disabled:opacity-50 disabled:pointer-events-none shadow-2xs active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                 >
                   <span>
                     {isGenerating
@@ -1287,7 +1329,11 @@ export default function ChatWorkspace({
                       ? 'Generate Follow-Up'
                       : 'Generate'}
                   </span>
-                  <Send className="w-3.5 h-3.5" />
+                  {isGenerating ? (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Send className="w-3.5 h-3.5" />
+                  )}
                 </button>
               </div>
             </div>
