@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Menu,
-  Home,
   Sliders,
   Send,
   Paperclip,
@@ -320,20 +319,8 @@ export default function ChatWorkspace({
           </div>
         </div>
 
-        {/* Right: Landing Page Button, Previous Prototype Button, Theme Toggle, Mobile Right Drawer Toggle */}
+        {/* Right: Previous Prototype Button, Theme Toggle, Mobile Right Drawer Toggle */}
         <div className="flex items-center gap-2 shrink-0">
-          {onOpenLandingPage && (
-            <button
-              type="button"
-              onClick={onOpenLandingPage}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover border border-border bg-surface transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
-              title="Return to Landing Page"
-            >
-              <Home className="w-3.5 h-3.5 text-primary dark:text-accent shrink-0" />
-              <span className="hidden sm:inline">Landing Page</span>
-            </button>
-          )}
-
           {onOpenPipelineInspector && (
             <button
               type="button"
@@ -361,10 +348,10 @@ export default function ChatWorkspace({
         </div>
       </header>
 
-      {/* Workflow Visual Hierarchy Strip: Source Document → Selected Formats → Generated Outputs → Quality Review → Approved Export */}
+      {/* Workflow Hierarchy (Hidden visually to reduce header clutter while preserving logic) */}
       <nav
         aria-label="Transformation Workflow Hierarchy"
-        className="px-3 sm:px-5 py-2 bg-sidebar-bg border-b border-border shrink-0 overflow-x-auto scrollbar-none"
+        className="hidden"
       >
         <ol className="max-w-4xl mx-auto flex items-center justify-between gap-1.5 sm:gap-2 text-[11px] min-w-max">
           {/* 1. Source Document */}

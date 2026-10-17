@@ -317,6 +317,36 @@
   }
 }
 
+/* ==========================================================================
+   Scroll-Triggered Reveal Animations & SaaS Interactive Card Transitions
+   ========================================================================== */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(26px);
+  transition-property: opacity, transform;
+  transition-duration: 720ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Subtle SaaS Card Interactive Lift & Highlight System */
+.saas-card-interactive {
+  transition-property: transform, box-shadow, border-color, background-color;
+  transition-duration: 250ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .saas-card-interactive:hover {
+    transform: translateY(-3px);
+  }
+}
+
 /* Custom scrollbar using global design tokens */
 ::-webkit-scrollbar {
   width: 6px;
@@ -344,4 +374,13 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  .reveal-on-scroll {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .saas-card-interactive:hover {
+    transform: none !important;
+  }
 }
+

@@ -1204,13 +1204,12 @@ async function runTests() {
     '58. Footer includes SIH26154 project information and verified GitHub repository link ("View Source Code") with zero exposed credentials'
   );
 
-  // Item 59: Get Started opens the existing workspace and users can easily return to the landing page from LeftSidebar and ChatWorkspace
+  // Item 59: Get Started opens the existing workspace and users can easily return to the landing page from LeftSidebar
   assert(
     appSource.includes('onGetStarted={handleEnterWorkspace}') &&
       appSource.includes('onOpenLandingPage={handleOpenLandingPage}') &&
-      leftSidebarSource.includes('<span>Landing Page</span>') &&
-      chatWorkspaceSource.includes('<span className="hidden sm:inline">Landing Page</span>'),
-    '59. Get Started opens the existing functional InfoFlip-AI workspace and users can return to the Landing Page from LeftSidebar and top workspace headers'
+      leftSidebarSource.includes('<span>Landing Page</span>'),
+    '59. Get Started opens the existing functional InfoFlip-AI workspace and users can return to the Landing Page from LeftSidebar'
   );
 
   console.log('\n========================================');

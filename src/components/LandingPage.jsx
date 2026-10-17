@@ -16,6 +16,7 @@ import {
   Clock
 } from 'lucide-react';
 import ThemeToggle from './ThemeToggle.jsx';
+import ScrollReveal from './common/ScrollReveal.jsx';
 
 export const GITHUB_REPOSITORY_URL =
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GITHUB_REPO_URL) ||
@@ -138,15 +139,15 @@ export default function LandingPage({
   };
 
   return (
-    <div className="min-h-screen w-full bg-app-bg text-text-primary font-sans flex flex-col selection:bg-primary selection:text-primary-foreground transition-colors">
+    <div className="min-h-screen w-full overflow-x-hidden bg-app-bg text-text-primary font-sans flex flex-col selection:bg-primary selection:text-primary-foreground transition-colors">
       {/* =====================================================================
           TOP NAVIGATION HEADER
          ===================================================================== */}
-      <header className="sticky top-0 z-40 h-16 bg-surface/95 backdrop-blur-xs border-b border-border px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto h-full flex items-center justify-between gap-4">
+      <header className="sticky top-0 z-40 h-16 bg-surface/95 backdrop-blur-xs border-b border-border px-3 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto h-full flex items-center justify-between gap-2 sm:gap-4">
           {/* Brand Logo & Product Name */}
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-xl overflow-hidden border border-border bg-sidebar-bg flex items-center justify-center shrink-0 shadow-2xs">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl overflow-hidden border border-border bg-sidebar-bg flex items-center justify-center shrink-0 shadow-2xs hover:border-primary/40 transition-colors duration-200">
               <img
                 src="/infoflip-logo.png"
                 alt="InfoFlip-AI Logo"
@@ -154,8 +155,8 @@ export default function LandingPage({
               />
             </div>
             <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-base sm:text-lg font-extrabold tracking-tight text-text-primary">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="text-sm sm:text-lg font-extrabold tracking-tight text-text-primary">
                   InfoFlip<span className="text-primary dark:text-accent">-AI</span>
                 </span>
                 <span className="hidden sm:inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold bg-surface-selected text-text-primary border border-border">
@@ -169,17 +170,17 @@ export default function LandingPage({
           </div>
 
           {/* Navigation Links + Theme Toggle + Primary CTA */}
-          <nav aria-label="Landing page navigation" className="flex items-center gap-2 sm:gap-3">
+          <nav aria-label="Landing page navigation" className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <a
               href="#how-it-works"
               onClick={handleScrollToHowItWorks}
-              className="hidden md:inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="hidden md:inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               How It Works
             </a>
             <a
               href="#capabilities"
-              className="hidden md:inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="hidden md:inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               Capabilities
             </a>
@@ -187,7 +188,7 @@ export default function LandingPage({
               href={GITHUB_REPOSITORY_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <Code2 className="w-3.5 h-3.5 text-primary dark:text-accent" />
               <span>View Source Code</span>
@@ -198,7 +199,7 @@ export default function LandingPage({
             <button
               type="button"
               onClick={onGetStarted}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-primary hover:bg-primary-hover active:scale-[0.98] text-primary-foreground shadow-2xs transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-primary hover:bg-primary-hover active:scale-[0.98] text-primary-foreground shadow-2xs hover:shadow-xs transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring shrink-0"
             >
               <span>Get Started</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -216,192 +217,208 @@ export default function LandingPage({
            ------------------------------------------------------------------- */}
         <section
           aria-labelledby="landing-hero-heading"
-          className="relative py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 border-b border-border bg-surface"
+          className="relative py-10 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 border-b border-border bg-surface overflow-hidden"
         >
-          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
             {/* Left Column: Headline, Platform Explanation, and Actions */}
-            <div className="lg:col-span-6 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-selected border border-border text-xs font-semibold text-text-primary">
-                <Sparkles className="w-3.5 h-3.5 text-primary dark:text-accent" />
-                <span>Smart India Hackathon 2026 • Problem Statement SIH26154</span>
-              </div>
+            <div className="lg:col-span-6 space-y-5 sm:space-y-6">
+              <ScrollReveal delay={0}>
+                <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:py-1 rounded-full bg-surface-selected border border-border text-[11px] sm:text-xs font-semibold text-text-primary max-w-full hover:border-primary/40 transition-colors duration-200">
+                  <Sparkles className="w-3.5 h-3.5 text-primary dark:text-accent shrink-0" />
+                  <span className="truncate sm:overflow-visible">Smart India Hackathon 2026 • Problem Statement SIH26154</span>
+                </div>
+              </ScrollReveal>
 
-              <h1
-                id="landing-hero-heading"
-                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-text-primary leading-[1.15]"
-              >
-                Turn information into something more.
-              </h1>
+              <ScrollReveal delay={90}>
+                <h1
+                  id="landing-hero-heading"
+                  className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-text-primary leading-[1.18] sm:leading-[1.15] break-words"
+                >
+                  Turn information into something more.
+                </h1>
+              </ScrollReveal>
 
-              <div className="text-base sm:text-lg font-bold text-primary dark:text-accent">
-                One source. Multiple formats. Smarter communication.
-              </div>
+              <ScrollReveal delay={180}>
+                <div className="text-sm sm:text-lg font-bold text-primary dark:text-accent transition-colors duration-200">
+                  One source. Multiple formats. Smarter communication.
+                </div>
+              </ScrollReveal>
 
-              <p className="text-sm sm:text-base text-text-secondary leading-relaxed max-w-2xl">
-                Transform source documents into clear, audience-ready content across multiple formats, with source traceability, quality checks, human review, and controlled export.
-              </p>
+              <ScrollReveal delay={270}>
+                <p className="text-xs sm:text-sm md:text-base text-text-secondary leading-relaxed max-w-2xl">
+                  Transform source documents into clear, audience-ready content across multiple formats, with source traceability, quality checks, human review, and controlled export.
+                </p>
+              </ScrollReveal>
 
               {/* Primary & Secondary Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3 pt-1">
-                <button
-                  type="button"
-                  onClick={onGetStarted}
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold bg-primary hover:bg-primary-hover active:scale-[0.98] text-primary-foreground shadow-xs transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
-                >
-                  <span>Get Started</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+              <ScrollReveal delay={360}>
+                <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 pt-1">
+                  <button
+                    type="button"
+                    onClick={onGetStarted}
+                    className="inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold bg-primary hover:bg-primary-hover active:scale-[0.98] text-primary-foreground shadow-xs hover:shadow-sm transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring w-full sm:w-auto"
+                  >
+                    <span>Get Started</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={handleScrollToHowItWorks}
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold bg-sidebar-bg hover:bg-surface-hover active:scale-[0.98] text-text-primary border border-border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
-                >
-                  <span>How It Works</span>
-                </button>
-              </div>
+                  <button
+                    type="button"
+                    onClick={handleScrollToHowItWorks}
+                    className="inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold bg-sidebar-bg hover:bg-surface-hover hover:border-primary/40 active:scale-[0.98] text-text-primary border border-border shadow-2xs hover:shadow-xs transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring w-full sm:w-auto"
+                  >
+                    <span>How It Works</span>
+                  </button>
+                </div>
+              </ScrollReveal>
 
               {/* Saved Workspace Continuity Notice (when local conversations or items exist) */}
               {(savedConversationsCount > 0 || savedItemsCount > 0) && (
-                <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-sidebar-bg border border-border text-xs text-text-secondary">
-                  <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
-                  <span>
-                    Your local workspace has{' '}
-                    <strong className="text-text-primary">{savedConversationsCount}</strong> saved conversation
-                    {savedConversationsCount === 1 ? '' : 's'} and{' '}
-                    <strong className="text-text-primary">{savedItemsCount}</strong> generated item
-                    {savedItemsCount === 1 ? '' : 's'} ready to resume.
-                  </span>
-                </div>
+                <ScrollReveal delay={430}>
+                  <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-sidebar-bg border border-border text-xs text-text-secondary hover:border-primary/30 transition-colors duration-200">
+                    <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
+                    <span>
+                      Your local workspace has{' '}
+                      <strong className="text-text-primary">{savedConversationsCount}</strong> saved conversation
+                      {savedConversationsCount === 1 ? '' : 's'} and{' '}
+                      <strong className="text-text-primary">{savedItemsCount}</strong> generated item
+                      {savedItemsCount === 1 ? '' : 's'} ready to resume.
+                    </span>
+                  </div>
+                </ScrollReveal>
               )}
 
               {/* Quick Governance Summary Pills */}
-              <div className="pt-2 grid grid-cols-3 gap-3 max-w-lg border-t border-border">
-                <div>
-                  <div className="text-xs font-extrabold text-text-primary">13 Formats</div>
-                  <div className="text-[11px] text-text-secondary">Structured & outreach</div>
+              <ScrollReveal delay={500}>
+                <div className="pt-2 grid grid-cols-3 gap-2 sm:gap-3 max-w-lg border-t border-border">
+                  <div className="group/pill hover:opacity-90 transition-opacity">
+                    <div className="text-[11px] sm:text-xs font-extrabold text-text-primary group-hover/pill:text-primary dark:group-hover/pill:text-accent transition-colors duration-200">13 Formats</div>
+                    <div className="text-[10px] sm:text-[11px] text-text-secondary">Structured & outreach</div>
+                  </div>
+                  <div className="group/pill hover:opacity-90 transition-opacity">
+                    <div className="text-[11px] sm:text-xs font-extrabold text-text-primary group-hover/pill:text-primary dark:group-hover/pill:text-accent transition-colors duration-200">10 QA Checks</div>
+                    <div className="text-[10px] sm:text-[11px] text-text-secondary">Source-claim grounded</div>
+                  </div>
+                  <div className="group/pill hover:opacity-90 transition-opacity">
+                    <div className="text-[11px] sm:text-xs font-extrabold text-text-primary group-hover/pill:text-primary dark:group-hover/pill:text-accent transition-colors duration-200">Human-Gated</div>
+                    <div className="text-[10px] sm:text-[11px] text-text-secondary">Approve before export</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-xs font-extrabold text-text-primary">10 QA Checks</div>
-                  <div className="text-[11px] text-text-secondary">Source-claim grounded</div>
-                </div>
-                <div>
-                  <div className="text-xs font-extrabold text-text-primary">Human-Gated</div>
-                  <div className="text-[11px] text-text-secondary">Approve before export</div>
-                </div>
-              </div>
+              </ScrollReveal>
             </div>
 
             {/* Right Column: Central Visual Idea — Source-to-Multiple-Outputs Workflow Diagram */}
             <div className="lg:col-span-6">
-              <div
-                aria-label="Source-to-Multiple-Outputs Workflow Diagram"
-                className="rounded-2xl bg-sidebar-bg border border-border p-4 sm:p-6 shadow-xs space-y-4"
-              >
-                <div className="flex items-center justify-between gap-2 pb-3 border-b border-border">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-primary dark:bg-accent" />
-                    <span className="text-xs font-bold uppercase tracking-wider text-text-primary">
-                      Source-to-Multiple-Outputs Architecture
+              <ScrollReveal delay={200}>
+                <div
+                  aria-label="Source-to-Multiple-Outputs Workflow Diagram"
+                  className="rounded-2xl bg-sidebar-bg border border-border p-4 sm:p-6 shadow-xs hover:shadow-md hover:border-primary/40 transition-all duration-250 ease-out space-y-3.5 sm:space-y-4"
+                >
+                  <div className="flex items-center justify-between gap-2 pb-3 border-b border-border">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-primary dark:bg-accent" />
+                      <span className="text-xs font-bold uppercase tracking-wider text-text-primary">
+                        Source-to-Multiple-Outputs Architecture
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-surface text-text-secondary border border-border hover:border-primary/30 transition-colors duration-200">
+                      End-to-End Traceable
                     </span>
                   </div>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-surface text-text-secondary border border-border">
-                    End-to-End Traceable
-                  </span>
-                </div>
 
-                {/* Stage A: Single Source Document */}
-                <div className="p-3.5 rounded-xl bg-surface border border-border space-y-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-text-primary">
-                      <FileText className="w-4 h-4 text-primary dark:text-accent" />
-                      <span>1. Single Source Document</span>
-                    </span>
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-surface-selected text-text-primary border border-border">
-                      TXT • PDF • DOCX • Image
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-text-secondary leading-relaxed">
-                    Extracts normalized text, key intent, grounded source facts (<code className="font-mono text-text-primary">fact-1</code>, <code className="font-mono text-text-primary">fact-2</code>), and flags numeric or deadline claims.
-                  </p>
-                </div>
-
-                {/* Visual Connector */}
-                <div className="flex items-center justify-center gap-2 text-[11px] font-semibold text-primary dark:text-accent">
-                  <span className="h-px flex-1 bg-border" />
-                  <span>Understand → Transform → Communicate</span>
-                  <span className="h-px flex-1 bg-border" />
-                </div>
-
-                {/* Stage B: Multi-Format Grounded Outputs */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <div className="p-3 rounded-xl bg-surface border border-border space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-text-primary">Executive Summary</span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-success-subtle text-success font-semibold">
-                        QA Passed
+                  {/* Stage A: Single Source Document */}
+                  <div className="group/stage p-3.5 rounded-xl bg-surface border border-border space-y-2 shadow-2xs hover:border-primary/50 hover:shadow-xs saas-card-interactive cursor-default">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-text-primary group-hover/stage:text-primary dark:group-hover/stage:text-accent transition-colors duration-200">
+                        <FileText className="w-4 h-4 text-primary dark:text-accent" />
+                        <span>1. Single Source Document</span>
+                      </span>
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-surface-selected text-text-primary border border-border">
+                        TXT • PDF • DOCX • Image
                       </span>
                     </div>
-                    <p className="text-[11px] text-text-secondary">
-                      Structured leadership brief with grounded key takeaways.
+                    <p className="text-[11px] text-text-secondary leading-relaxed">
+                      Extracts normalized text, key intent, grounded source facts (<code className="font-mono text-text-primary">fact-1</code>, <code className="font-mono text-text-primary">fact-2</code>), and flags numeric or deadline claims.
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-surface border border-border space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-text-primary">LinkedIn &amp; X Posts</span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-success-subtle text-success font-semibold">
-                        QA Passed
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-text-secondary">
-                      Audience-adapted social copy with character &amp; tone checks.
-                    </p>
+                  {/* Visual Connector */}
+                  <div className="flex items-center justify-center gap-2 text-[10px] sm:text-[11px] font-semibold text-primary dark:text-accent">
+                    <span className="h-px flex-1 bg-border" />
+                    <span className="text-center px-1">Understand → Transform → Communicate</span>
+                    <span className="h-px flex-1 bg-border" />
                   </div>
 
-                  <div className="p-3 rounded-xl bg-surface border border-border space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-text-primary">WhatsApp &amp; SMS Alert</span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-success-subtle text-success font-semibold">
-                        QA Passed
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-text-secondary">
-                      Concise rapid-response messaging preserving source dates.
-                    </p>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-surface border border-border space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-text-primary">Slide Deck &amp; Script</span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface-selected text-text-primary font-semibold border border-border">
-                        13 Formats Total
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-text-secondary">
-                      Presentation outlines, infographic blueprints, and video scripts.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Stage C: Human Review & Approved Export Gate */}
-                <div className="p-3.5 rounded-xl bg-surface-selected border border-border flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-primary dark:text-accent shrink-0" />
-                    <div>
-                      <div className="text-xs font-bold text-text-primary">
-                        Human Review &amp; Approved Export Gate
+                  {/* Stage B: Multi-Format Grounded Outputs */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div className="group/box p-3 rounded-xl bg-surface border border-border space-y-1.5 shadow-2xs hover:border-primary/50 hover:shadow-xs saas-card-interactive cursor-default">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-text-primary group-hover/box:text-primary dark:group-hover/box:text-accent transition-colors duration-200">Executive Summary</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-success-subtle text-success font-semibold">
+                          QA Passed
+                        </span>
                       </div>
-                      <div className="text-[11px] text-text-secondary">
-                        Approve Passed or inspect individual items → Export TXT, JSON, PDF, or ZIP
+                      <p className="text-[11px] text-text-secondary">
+                        Structured leadership brief with grounded key takeaways.
+                      </p>
+                    </div>
+
+                    <div className="group/box p-3 rounded-xl bg-surface border border-border space-y-1.5 shadow-2xs hover:border-primary/50 hover:shadow-xs saas-card-interactive cursor-default">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-text-primary group-hover/box:text-primary dark:group-hover/box:text-accent transition-colors duration-200">LinkedIn &amp; X Posts</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-success-subtle text-success font-semibold">
+                          QA Passed
+                        </span>
                       </div>
+                      <p className="text-[11px] text-text-secondary">
+                        Audience-adapted social copy with character &amp; tone checks.
+                      </p>
+                    </div>
+
+                    <div className="group/box p-3 rounded-xl bg-surface border border-border space-y-1.5 shadow-2xs hover:border-primary/50 hover:shadow-xs saas-card-interactive cursor-default">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-text-primary group-hover/box:text-primary dark:group-hover/box:text-accent transition-colors duration-200">WhatsApp &amp; SMS Alert</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-success-subtle text-success font-semibold">
+                          QA Passed
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-text-secondary">
+                        Concise rapid-response messaging preserving source dates.
+                      </p>
+                    </div>
+
+                    <div className="group/box p-3 rounded-xl bg-surface border border-border space-y-1.5 shadow-2xs hover:border-primary/50 hover:shadow-xs saas-card-interactive cursor-default">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-text-primary group-hover/box:text-primary dark:group-hover/box:text-accent transition-colors duration-200">Slide Deck &amp; Script</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface-selected text-text-primary font-semibold border border-border">
+                          13 Formats Total
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-text-secondary">
+                        Presentation outlines, infographic blueprints, and video scripts.
+                      </p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-1 rounded-lg bg-surface text-text-primary border border-border">
-                    Provenance Preserved
-                  </span>
+
+                  {/* Stage C: Human Review & Approved Export Gate */}
+                  <div className="group/gate p-3.5 rounded-xl bg-surface-selected border border-border flex flex-wrap items-center justify-between gap-2 shadow-2xs hover:border-primary/50 hover:shadow-xs saas-card-interactive cursor-default">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-primary dark:text-accent shrink-0" />
+                      <div>
+                        <div className="text-xs font-bold text-text-primary group-hover/gate:text-primary dark:group-hover/gate:text-accent transition-colors duration-200">
+                          Human Review &amp; Approved Export Gate
+                        </div>
+                        <div className="text-[11px] text-text-secondary">
+                          Approve Passed or inspect individual items → Export TXT, JSON, PDF, or ZIP
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-1 rounded-lg bg-surface text-text-primary border border-border">
+                      Provenance Preserved
+                    </span>
+                  </div>
                 </div>
-              </div>
+              </ScrollReveal>
             </div>
           </div>
         </section>
@@ -412,85 +429,95 @@ export default function LandingPage({
         <section
           id="how-it-works"
           aria-labelledby="how-it-works-heading"
-          className="py-14 sm:py-16 px-4 sm:px-6 lg:px-8 border-b border-border bg-app-bg scroll-mt-16"
+          className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 border-b border-border bg-app-bg scroll-mt-16"
         >
           <div className="max-w-7xl mx-auto space-y-8">
-            <div className="max-w-3xl space-y-2">
-              <div className="text-xs font-bold uppercase tracking-wider text-primary dark:text-accent">
-                Six-Stage Transformation Pipeline
+            <ScrollReveal>
+              <div className="max-w-3xl space-y-2">
+                <div className="text-xs font-bold uppercase tracking-wider text-primary dark:text-accent">
+                  Six-Stage Transformation Pipeline
+                </div>
+                <h2
+                  id="how-it-works-heading"
+                  className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight"
+                >
+                  How It Works
+                </h2>
+                <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
+                  InfoFlip-AI executes a structured six-stage pipeline that keeps every generated output tethered to your original source document from ingestion through final export.
+                </p>
               </div>
-              <h2
-                id="how-it-works-heading"
-                className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight"
-              >
-                How It Works
-              </h2>
-              <p className="text-sm text-text-secondary leading-relaxed">
-                InfoFlip-AI executes a structured six-stage pipeline that keeps every generated output tethered to your original source document from ingestion through final export.
-              </p>
-            </div>
+            </ScrollReveal>
 
             {/* 6-Stage Grid */}
             <ol
               aria-label="Six-stage workflow"
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5"
             >
-              {SIX_STAGE_WORKFLOW.map((stage) => {
+              {SIX_STAGE_WORKFLOW.map((stage, index) => {
                 const Icon = stage.icon;
                 return (
-                  <li
+                  <ScrollReveal
+                    as="li"
                     key={stage.id}
-                    className="p-5 rounded-2xl bg-surface border border-border flex flex-col justify-between gap-4 shadow-2xs cursor-default"
+                    delay={index * 100}
+                    className="h-full"
                   >
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="inline-flex items-center gap-2.5">
-                          <span className="w-7 h-7 rounded-lg bg-primary text-primary-foreground text-xs font-extrabold inline-flex items-center justify-center shrink-0">
-                            {stage.step}
+                    <div
+                      className="h-full group p-4 sm:p-5 rounded-2xl bg-surface border border-border flex flex-col justify-between gap-4 shadow-2xs hover:shadow-md hover:border-primary/50 saas-card-interactive cursor-default"
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="inline-flex items-center gap-2.5">
+                            <span className="w-7 h-7 rounded-lg bg-primary text-primary-foreground text-xs font-extrabold inline-flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-primary-hover group-hover:scale-105 transition-all duration-200">
+                              {stage.step}
+                            </span>
+                            <h3 className="text-base font-extrabold text-text-primary group-hover:text-primary dark:group-hover:text-accent transition-colors duration-200">
+                              {stage.title}
+                            </h3>
+                          </div>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-surface-selected text-text-primary border border-border group-hover:border-primary/30 transition-colors duration-200">
+                            <Icon className="w-3 h-3 text-primary dark:text-accent" />
+                            <span>{stage.statusLabel}</span>
                           </span>
-                          <h3 className="text-base font-extrabold text-text-primary">
-                            {stage.title}
-                          </h3>
                         </div>
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-surface-selected text-text-primary border border-border">
-                          <Icon className="w-3 h-3 text-primary dark:text-accent" />
-                          <span>{stage.statusLabel}</span>
-                        </span>
+
+                        <p className="text-xs font-bold text-primary dark:text-accent">
+                          {stage.summary}
+                        </p>
+
+                        <p className="text-xs text-text-secondary leading-relaxed">
+                          {stage.description}
+                        </p>
                       </div>
-
-                      <p className="text-xs font-bold text-primary dark:text-accent">
-                        {stage.summary}
-                      </p>
-
-                      <p className="text-xs text-text-secondary leading-relaxed">
-                        {stage.description}
-                      </p>
                     </div>
-                  </li>
+                  </ScrollReveal>
                 );
               })}
             </ol>
 
             {/* Honest Prototype Scope & Transparency Disclosure */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-surface border border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="space-y-1 max-w-3xl">
-                <div className="flex items-center gap-2 text-xs font-bold text-text-primary">
-                  <AlertTriangle className="w-4 h-4 text-warning shrink-0" />
-                  <span>Transparent Prototype Scope &amp; Verification Notice</span>
+            <ScrollReveal delay={150}>
+              <div className="p-4 sm:p-5 rounded-2xl bg-surface border border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs hover:shadow-xs hover:border-primary/40 transition-all duration-250 ease-out">
+                <div className="space-y-1 max-w-3xl">
+                  <div className="flex items-center gap-2 text-xs font-bold text-text-primary">
+                    <AlertTriangle className="w-4 h-4 text-warning shrink-0" />
+                    <span>Transparent Prototype Scope &amp; Verification Notice</span>
+                  </div>
+                  <p className="text-xs text-text-secondary leading-relaxed">
+                    All six pipeline stages, 10-dimension QA checks, browser-persisted workspace history, and multi-format exports (TXT, JSON, PDF, ZIP) run locally in this prototype without requiring user login. Automated QA checks verify alignment against the provided source document—not independent external fact verification. External social media publishing and scheduled post queues are labeled as <strong className="text-text-primary">Coming soon</strong>.
+                  </p>
                 </div>
-                <p className="text-xs text-text-secondary leading-relaxed">
-                  All six pipeline stages, 10-dimension QA checks, browser-persisted workspace history, and multi-format exports (TXT, JSON, PDF, ZIP) run locally in this prototype without requiring user login. Automated QA checks verify alignment against the provided source document—not independent external fact verification. External social media publishing and scheduled post queues are labeled as <strong className="text-text-primary">Coming soon</strong>.
-                </p>
+                <button
+                  type="button"
+                  onClick={onGetStarted}
+                  className="shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-primary hover:bg-primary-hover active:scale-[0.98] text-primary-foreground shadow-2xs hover:shadow-xs transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring w-full sm:w-auto"
+                >
+                  <span>Open Workspace</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={onGetStarted}
-                className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-primary hover:bg-primary-hover active:scale-[0.98] text-primary-foreground shadow-2xs transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
-              >
-                <span>Open Workspace</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
+            </ScrollReveal>
           </div>
         </section>
 
@@ -500,74 +527,85 @@ export default function LandingPage({
         <section
           id="capabilities"
           aria-labelledby="capabilities-heading"
-          className="py-14 sm:py-16 px-4 sm:px-6 lg:px-8 border-b border-border bg-surface scroll-mt-16"
+          className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 border-b border-border bg-surface scroll-mt-16"
         >
           <div className="max-w-7xl mx-auto space-y-8">
-            <div className="max-w-3xl space-y-2">
-              <div className="text-xs font-bold uppercase tracking-wider text-primary dark:text-accent">
-                Core Platform Architecture
+            <ScrollReveal>
+              <div className="max-w-3xl space-y-2">
+                <div className="text-xs font-bold uppercase tracking-wider text-primary dark:text-accent">
+                  Core Platform Architecture
+                </div>
+                <h2
+                  id="capabilities-heading"
+                  className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight"
+                >
+                  Key Capabilities
+                </h2>
+                <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
+                  Built for institutional, public-sector, and enterprise communication workflows where accuracy, consistency, and editorial oversight are mandatory.
+                </p>
               </div>
-              <h2
-                id="capabilities-heading"
-                className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight"
-              >
-                Key Capabilities
-              </h2>
-              <p className="text-sm text-text-secondary leading-relaxed">
-                Built for institutional, public-sector, and enterprise communication workflows where accuracy, consistency, and editorial oversight are mandatory.
-              </p>
-            </div>
+            </ScrollReveal>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-              {KEY_CAPABILITIES.map((cap) => {
+              {KEY_CAPABILITIES.map((cap, index) => {
                 const Icon = cap.icon;
                 return (
-                  <div
+                  <ScrollReveal
                     key={cap.id}
-                    className="p-5 rounded-2xl bg-sidebar-bg border border-border space-y-3 cursor-default"
+                    delay={index * 100}
+                    className="h-full"
                   >
-                    <div className="w-9 h-9 rounded-xl bg-surface border border-border flex items-center justify-center text-primary dark:text-accent">
-                      <Icon className="w-4 h-4" />
+                    <div
+                      className="h-full group p-4 sm:p-5 rounded-2xl bg-sidebar-bg border border-border space-y-3 cursor-default shadow-2xs hover:shadow-md hover:border-primary/50 saas-card-interactive flex flex-col justify-between"
+                    >
+                      <div className="space-y-3">
+                        <div className="w-9 h-9 rounded-xl bg-surface border border-border flex items-center justify-center text-primary dark:text-accent shadow-2xs group-hover:border-primary/40 group-hover:scale-105 transition-all duration-200">
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <h3 className="text-sm font-extrabold text-text-primary group-hover:text-primary dark:group-hover:text-accent transition-colors duration-200">
+                          {cap.title}
+                        </h3>
+                        <p className="text-xs text-text-secondary leading-relaxed">
+                          {cap.description}
+                        </p>
+                      </div>
                     </div>
-                    <h3 className="text-sm font-extrabold text-text-primary">
-                      {cap.title}
-                    </h3>
-                    <p className="text-xs text-text-secondary leading-relaxed">
-                      {cap.description}
-                    </p>
-                  </div>
+                  </ScrollReveal>
                 );
               })}
 
               {/* 6th Card: Direct CTA into the Existing Workspace */}
-              <div
-                role="region"
-                aria-label="Get started in workspace"
-                className="p-5 rounded-2xl bg-surface-selected border border-border flex flex-col justify-between gap-4"
-              >
-                <div className="space-y-2">
-                  <div className="inline-flex items-center gap-1.5 text-xs font-bold text-primary dark:text-accent">
-                    <Clock className="w-3.5 h-3.5" />
-                    <span>No Login Required</span>
+              <ScrollReveal delay={500} className="h-full">
+                <div
+                  role="region"
+                  aria-label="Get started in workspace"
+                  className="h-full group p-4 sm:p-5 rounded-2xl bg-surface-selected border border-border flex flex-col justify-between gap-4 shadow-2xs hover:shadow-md hover:border-primary/50 saas-card-interactive"
+                >
+                  <div className="space-y-2">
+                    <div className="inline-flex items-center gap-1.5 text-xs font-bold text-primary dark:text-accent">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>No Login Required</span>
+                    </div>
+                    <h3 className="text-sm font-extrabold text-text-primary">
+                      Ready to Evaluate in Your Browser
+                    </h3>
+                    <p className="text-xs text-text-secondary leading-relaxed">
+                      Launch the workspace directly with pre-loaded SIH demo scenarios or upload your own source document. Saved conversations and library collections remain intact.
+                    </p>
                   </div>
-                  <h3 className="text-sm font-extrabold text-text-primary">
-                    Ready to Evaluate in Your Browser
-                  </h3>
-                  <p className="text-xs text-text-secondary leading-relaxed">
-                    Launch the workspace directly with pre-loaded SIH demo scenarios or upload your own source document. Saved conversations and library collections remain intact.
-                  </p>
+                  <div>
+                    <button
+                      type="button"
+                      onClick={onGetStarted}
+                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-primary hover:bg-primary-hover active:scale-[0.98] text-primary-foreground shadow-2xs hover:shadow-xs transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+                    >
+                      <span>Get Started in Workspace</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
-                <div>
-                  <button
-                    type="button"
-                    onClick={onGetStarted}
-                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-primary hover:bg-primary-hover active:scale-[0.98] text-primary-foreground shadow-2xs transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
-                  >
-                    <span>Get Started in Workspace</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
+              </ScrollReveal>
             </div>
           </div>
         </section>
@@ -576,11 +614,12 @@ export default function LandingPage({
       {/* =====================================================================
           FOOTER WITH PROJECT INFORMATION & GITHUB REPOSITORY LINK
          ===================================================================== */}
-      <footer
+      <ScrollReveal
+        as="footer"
         aria-label="Project information and links"
-        className="bg-sidebar-bg border-t border-border py-8 px-4 sm:px-6 lg:px-8 text-xs text-text-secondary"
+        className="bg-sidebar-bg border-t border-border py-6 sm:py-8 px-4 sm:px-6 lg:px-8 text-xs text-text-secondary"
       >
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2.5">
               <img
@@ -600,11 +639,11 @@ export default function LandingPage({
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={onGetStarted}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface hover:bg-surface-hover active:scale-[0.98] text-text-primary border border-border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface hover:bg-surface-hover hover:border-primary/40 active:scale-[0.98] text-text-primary border border-border shadow-2xs hover:shadow-xs transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <span>Open Workspace</span>
             </button>
@@ -614,7 +653,7 @@ export default function LandingPage({
               target="_blank"
               rel="noopener noreferrer"
               aria-label="View Source Code on GitHub"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-surface hover:bg-surface-hover active:scale-[0.98] text-text-primary border border-border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-surface hover:bg-surface-hover hover:border-primary/40 active:scale-[0.98] text-text-primary border border-border shadow-2xs hover:shadow-xs transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <Code2 className="w-3.5 h-3.5 text-primary dark:text-accent" />
               <span>View Source Code</span>
@@ -622,7 +661,7 @@ export default function LandingPage({
             </a>
           </div>
         </div>
-      </footer>
+      </ScrollReveal>
     </div>
   );
 }

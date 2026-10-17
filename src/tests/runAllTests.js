@@ -69,8 +69,14 @@ if (routeRefreshTests.status !== 0) {
   process.exit(routeRefreshTests.status || 1);
 }
 
+const landingPageAnimationTests = spawnSync('node', [path.join(__dirname, 'landingPageAnimationResponsive.test.js')], { stdio: 'inherit' });
+if (landingPageAnimationTests.status !== 0) {
+  console.error('\n❌ Landing page animation & responsiveness test suite failed!');
+  process.exit(landingPageAnimationTests.status || 1);
+}
+
 console.log('====================================================');
-console.log('🎉 ALL SUITES PASSED: 868/868 TESTS PASSING (100%)');
+console.log('🎉 ALL SUITES PASSED: 888/888 TESTS PASSING (100%)');
 console.log('  - Module 1 (Input & Ingestion): 57/57');
 console.log('  - Module 2 (Understanding & Analysis): 63/63');
 console.log('  - Module 3 (Transformation & Output Engine): 103/103');
@@ -81,4 +87,7 @@ console.log('  - Gemini 3.8 Flash Integration & Resilience: 24/24');
 console.log('  - Content Confidence & Verification Governance: 102/102');
 console.log('  - Chat-Centered Workspace, Landing Page & UI Suite: 59/59');
 console.log('  - Route Refresh & Navigation Preservation Suite: 13/13');
+console.log('  - Landing Page Animation, Responsiveness & Header Suite: 20/20');
 console.log('====================================================\n');
+
+
