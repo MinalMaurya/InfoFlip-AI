@@ -11,12 +11,16 @@ export default function TwitterCommunicationPreview({
   const [copiedAll, setCopiedAll] = useState(false);
   const text = typeof content === 'string' ? content : content?.content || '';
 
-  // Extract thread posts if formatted with --- or stored in structuredData
-  const posts = structuredData?.posts && Array.isArray(structuredData.posts)
-    ? structuredData.posts
-    : text.includes('\n\n---\n\n')
+  // Extract thread posts: prioritize current text content so saved edits are immediately reflected
+  const postsFromText = text.includes('\n\n---\n\n')
     ? text.split('\n\n---\n\n').map(p => p.trim()).filter(Boolean)
     : text.split(/(?=\n\d+\/\d+)/).map(p => p.trim()).filter(Boolean);
+
+  const posts = (postsFromText.length > 0)
+    ? postsFromText
+    : (structuredData?.posts && Array.isArray(structuredData.posts))
+    ? structuredData.posts
+    : [text];
 
   const displayPosts = posts.length > 0 ? posts : [text];
 

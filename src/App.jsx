@@ -46,6 +46,7 @@ import {
   approvePassedCanonicalContentItems,
   rejectCanonicalContentItem,
   regenerateCanonicalContentItem,
+  regenerateCanonicalContentItems,
   restoreApprovedCanonicalContentItem
 } from './services/workspace/chatPipelineOrchestrator';
 import { DEMO_SCENARIOS } from './data/demoScenarios';
@@ -638,6 +639,38 @@ export default function App() {
     [workspaceState, activeConversation, persistWorkspace]
   );
 
+  const handleRegenerateAllInTurn = useCallback(
+    async (itemIds = []) => {
+      if (!Array.isArray(itemIds) || itemIds.length === 0) return;
+      const itemsToRegen = itemIds
+        .map((id) => workspaceState.contentItemsById?.[id])
+        .filter(Boolean);
+      if (itemsToRegen.length === 0) return;
+
+      const conv =
+        workspaceState.conversations.find((c) => c.conversationId === itemsToRegen[0]?.conversationId) ||
+        activeConversation;
+      if (!conv) return;
+
+      setIsGenerating(true);
+      try {
+        const { updatedItemsById } = await regenerateCanonicalContentItems(itemsToRegen, conv);
+        if (Object.keys(updatedItemsById).length > 0) {
+          persistWorkspace((prev) => ({
+            ...prev,
+            contentItemsById: {
+              ...prev.contentItemsById,
+              ...updatedItemsById
+            }
+          }));
+        }
+      } finally {
+        setIsGenerating(false);
+      }
+    },
+    [workspaceState, activeConversation, persistWorkspace]
+  );
+
   const handleRestoreApprovedItem = useCallback(
     (itemId) => {
       persistWorkspace((prev) => {
@@ -815,6 +848,7 @@ export default function App() {
             onRejectItem={handleRejectItem}
             onApproveAllInTurn={handleApproveAllInTurn}
             onRegenerateItem={handleRegenerateItem}
+            onRegenerateAllInTurn={handleRegenerateAllInTurn}
             onRestoreApprovedItem={handleRestoreApprovedItem}
             regeneratingItemId={regeneratingItemId}
             isGenerating={isGenerating}

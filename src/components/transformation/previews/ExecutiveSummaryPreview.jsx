@@ -46,12 +46,48 @@ export default function ExecutiveSummaryPreview({
 
         <div>
           <label className="block text-xs font-semibold text-text-primary mb-1">
-            Key Points (one per line):
+            Key Operational Points (one per line):
           </label>
           <textarea
             rows={4}
             value={keyPoints.join('\n')}
             onChange={(e) => onUpdateContent({ ...content, keyPoints: e.target.value.split('\n').filter(Boolean) })}
+            className="w-full p-3 rounded-xl border border-input-border bg-input-bg text-text-primary text-sm font-sans focus:outline-none focus:ring-2 focus:ring-focus-ring"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-text-primary mb-1">
+            Quantitative Findings & Metrics (one per line):
+          </label>
+          <textarea
+            rows={3}
+            value={importantFindings.join('\n')}
+            onChange={(e) => onUpdateContent({ ...content, importantFindings: e.target.value.split('\n').filter(Boolean) })}
+            className="w-full p-3 rounded-xl border border-input-border bg-input-bg text-text-primary text-sm font-sans focus:outline-none focus:ring-2 focus:ring-focus-ring"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-text-primary mb-1">
+            Strategic Implications (one per line):
+          </label>
+          <textarea
+            rows={3}
+            value={implications.join('\n')}
+            onChange={(e) => onUpdateContent({ ...content, implications: e.target.value.split('\n').filter(Boolean) })}
+            className="w-full p-3 rounded-xl border border-input-border bg-input-bg text-text-primary text-sm font-sans focus:outline-none focus:ring-2 focus:ring-focus-ring"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-text-primary mb-1">
+            Recommended Considerations (one per line):
+          </label>
+          <textarea
+            rows={3}
+            value={considerations.join('\n')}
+            onChange={(e) => onUpdateContent({ ...content, recommendedConsiderations: e.target.value.split('\n').filter(Boolean) })}
             className="w-full p-3 rounded-xl border border-input-border bg-input-bg text-text-primary text-sm font-sans focus:outline-none focus:ring-2 focus:ring-focus-ring"
           />
         </div>

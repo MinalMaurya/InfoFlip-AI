@@ -75,8 +75,14 @@ if (landingPageAnimationTests.status !== 0) {
   process.exit(landingPageAnimationTests.status || 1);
 }
 
+const v021Tests = spawnSync('node', [path.join(__dirname, 'outputManagementV021.test.js')], { stdio: 'inherit' });
+if (v021Tests.status !== 0) {
+  console.error('\n❌ Output management v0.2.1 test suite failed!');
+  process.exit(v021Tests.status || 1);
+}
+
 console.log('====================================================');
-console.log('🎉 ALL SUITES PASSED: 888/888 TESTS PASSING (100%)');
+console.log('🎉 ALL SUITES PASSED: 954/954 TESTS PASSING (100%)');
 console.log('  - Module 1 (Input & Ingestion): 57/57');
 console.log('  - Module 2 (Understanding & Analysis): 63/63');
 console.log('  - Module 3 (Transformation & Output Engine): 103/103');
@@ -88,6 +94,7 @@ console.log('  - Content Confidence & Verification Governance: 102/102');
 console.log('  - Chat-Centered Workspace, Landing Page & UI Suite: 59/59');
 console.log('  - Route Refresh & Navigation Preservation Suite: 13/13');
 console.log('  - Landing Page Animation, Responsiveness & Header Suite: 20/20');
+console.log('  - v0.2.1 Output Management, Regeneration & Isolation Suite: 66/66');
 console.log('====================================================\n');
 
 

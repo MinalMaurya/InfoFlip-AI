@@ -17,6 +17,23 @@ export function checkReadability(outputItem, context = {}) {
   const wordCount = words.length;
   const characterCount = clean.length;
 
+  if (wordCount === 0 || characterCount === 0) {
+    const emptyMsg = 'Output content is empty. Please provide or generate valid content.';
+    return {
+      status: CHECK_STATUSES.FAIL,
+      message: emptyMsg,
+      explanation: emptyMsg,
+      details: {
+        wordCount: 0,
+        characterCount: 0,
+        sentenceCount: 0,
+        avgSentenceLength: 0,
+        longSentenceCount: 0,
+        longSentences: []
+      }
+    };
+  }
+
   // Split into sentences (by . ! ? or newlines)
   const rawSentences = clean
     .split(/(?<=[.?!])\s+|\n+/)

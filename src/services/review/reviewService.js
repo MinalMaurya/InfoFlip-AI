@@ -196,6 +196,8 @@ function editSingleItem(reviewItem, newContent, context = {}) {
     isEdited: true,
     editedAt: new Date().toISOString(),
     approvalStatus: APPROVAL_STATUSES.PENDING_REVIEW,
+    approvalInfo: null,
+    requiresHumanReview: true,
     metadata: {
       ...reviewItem.metadata,
       characterCount: updatedContent.length,

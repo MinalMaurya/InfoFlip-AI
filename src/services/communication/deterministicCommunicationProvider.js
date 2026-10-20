@@ -113,7 +113,19 @@ export class DeterministicCommunicationProvider {
         }
 
         case COMMUNICATION_CHANNEL_IDS.TWITTER: {
-          const res = this.buildTwitter({ mainTopic, summary, keyFacts, numbers, lang, mod3Map, sourceId });
+          const res = this.buildTwitter({
+            mainTopic,
+            summary,
+            keyFacts,
+            numbers,
+            lang,
+            mod3Map,
+            sourceId,
+            audience,
+            tone,
+            detail: config.detailLevel || 'Balanced',
+            options
+          });
           content = res.content;
           title = res.title;
           structuredData = res.structuredData;
@@ -122,7 +134,20 @@ export class DeterministicCommunicationProvider {
         }
 
         case COMMUNICATION_CHANNEL_IDS.WHATSAPP: {
-          const res = this.buildWhatsApp({ mainTopic, summary, keyFacts, dates, numbers, urgency, lang, sourceId });
+          const res = this.buildWhatsApp({
+            mainTopic,
+            summary,
+            keyFacts,
+            dates,
+            numbers,
+            urgency,
+            lang,
+            sourceId,
+            audience,
+            tone,
+            detail: config.detailLevel || 'Balanced',
+            options
+          });
           content = res.content;
           title = res.title;
           structuredData = res.structuredData;
@@ -221,31 +246,80 @@ export class DeterministicCommunicationProvider {
   }
 
   // 2. X / TWITTER POST & THREAD
-  buildTwitter({ mainTopic, summary, keyFacts, numbers, lang, mod3Map, sourceId }) {
+  buildTwitter({
+    mainTopic,
+    summary,
+    keyFacts = [],
+    numbers = [],
+    lang = 'English',
+    mod3Map = {},
+    sourceId = 'src-1',
+    audience = 'General Public',
+    tone = 'Informative',
+    detail = 'Balanced',
+    options = {}
+  }) {
     const isHindi = lang === 'Hindi';
     const isMarathi = lang === 'Marathi';
 
     const numStr = numbers.length > 0 ? ` (${numbers[0].value} ${numbers[0].label || ''})` : '';
+    const isRegen = Boolean(options?.isRegeneration || options?.variantSeed);
+    const toneNormalized = String(tone || 'Informative').toLowerCase();
+
+    let tonePrefix = '📢';
+    let toneLabel = 'UPDATE';
+    if (toneNormalized.includes('urgent') || toneNormalized.includes('crisis')) {
+      tonePrefix = '🚨';
+      toneLabel = 'URGENT ADVISORY';
+    } else if (toneNormalized.includes('formal') || toneNormalized.includes('professional')) {
+      tonePrefix = '📋';
+      toneLabel = 'OFFICIAL NOTICE';
+    } else if (toneNormalized.includes('casual') || toneNormalized.includes('friendly')) {
+      tonePrefix = '💡';
+      toneLabel = 'QUICK BRIEF';
+    }
+
+    const factPool = Array.isArray(keyFacts) && keyFacts.length > 0 ? keyFacts : ['Verified information'];
+    let selectedFact1 = factPool[0];
+    let selectedFact2 = factPool[1] || factPool[0];
+    if (isRegen && factPool.length > 2) {
+      selectedFact1 = factPool[1];
+      selectedFact2 = factPool[2];
+    } else if (isRegen && factPool.length === 2) {
+      selectedFact1 = factPool[1];
+      selectedFact2 = factPool[0];
+    }
 
     let tweet1 = '';
     let tweet2 = '';
     let tweet3 = '';
 
     if (isHindi) {
-      tweet1 = `1/3 📢 ${mainTopic}${numStr}: ${summary.slice(0, 160)}...`;
-      tweet2 = `2/3 🔍 मुख्य तथ्य:\n• ${keyFacts[0] || 'सत्यापित जानकारी'}\n• ${keyFacts[1] || 'आधिकारिक निर्देश'}`;
+      tweet1 = `1/3 ${tonePrefix} ${mainTopic}${numStr}: ${summary.slice(0, 160)}...`;
+      tweet2 = `2/3 🔍 मुख्य तथ्य:\n• ${selectedFact1}\n• ${selectedFact2}`;
       tweet3 = `3/3 ℹ️ पूरी जानकारी का पालन करें और दूसरों के साथ साझा करें। #InfoFlip #${mainTopic.replace(/[^a-zA-Z0-9]/g, '')}`;
     } else if (isMarathi) {
-      tweet1 = `1/3 📢 ${mainTopic}${numStr}: ${summary.slice(0, 160)}...`;
-      tweet2 = `2/3 🔍 प्रमुख मुद्दे:\n• ${keyFacts[0] || 'सत्यापित माहिती'}\n• ${keyFacts[1] || 'अधिकृत सूचना'}`;
+      tweet1 = `1/3 ${tonePrefix} ${mainTopic}${numStr}: ${summary.slice(0, 160)}...`;
+      tweet2 = `2/3 🔍 प्रमुख मुद्दे:\n• ${selectedFact1}\n• ${selectedFact2}`;
       tweet3 = `3/3 ℹ️ ही माहिती लक्षात ठेवा आणि इतरांसोबत शेअर करा. #InfoFlip #${mainTopic.replace(/[^a-zA-Z0-9]/g, '')}`;
     } else {
-      tweet1 = `1/3 📢 ${mainTopic}${numStr}: ${summary.slice(0, 180)}`;
-      tweet2 = `2/3 🔍 Key Highlights:\n• ${keyFacts[0] || 'Verified information'}\n• ${keyFacts[1] || 'Official guidance'}`;
-      tweet3 = `3/3 ℹ️ Follow official guidelines and share with those affected. #${mainTopic.replace(/[^a-zA-Z0-9]/g, '')} #Update`;
+      const audienceTag = audience && audience !== 'General Public' ? ` [For ${audience}]` : '';
+      if (isRegen) {
+        tweet1 = `1/3 ${tonePrefix} [${toneLabel}] ${mainTopic}${numStr}:${audienceTag} ${summary.slice(0, 170)}`;
+        tweet2 = `2/3 🔍 Key Highlights & Directives:\n• ${selectedFact1}\n• ${selectedFact2}`;
+        tweet3 = `3/3 ℹ️ Verified under ${tone} protocol. Share official updates with relevant teams. #${mainTopic.replace(/[^a-zA-Z0-9]/g, '')} #InfoFlip`;
+      } else {
+        tweet1 = `1/3 ${tonePrefix} ${mainTopic}${numStr}:${audienceTag} ${summary.slice(0, 180)}`;
+        tweet2 = `2/3 🔍 Key Highlights:\n• ${selectedFact1}\n• ${selectedFact2}`;
+        tweet3 = `3/3 ℹ️ Follow official guidelines and share with those affected. #${mainTopic.replace(/[^a-zA-Z0-9]/g, '')} #Update`;
+      }
     }
 
-    const posts = [tweet1, tweet2, tweet3];
+    let posts = [tweet1, tweet2, tweet3];
+    if (detail === 'Concise') {
+      posts = [tweet1, tweet2];
+    }
+
     const content = posts.join('\n\n---\n\n');
 
     return {
@@ -253,10 +327,10 @@ export class DeterministicCommunicationProvider {
       content,
       structuredData: {
         posts,
-        isThread: true,
+        isThread: posts.length > 1,
         postCount: posts.length
       },
-      traceability: keyFacts.slice(0, 2).map(f => ({
+      traceability: [selectedFact1, selectedFact2].filter(Boolean).map(f => ({
         fact: f,
         sourceId,
         origin: 'analysis.keyFacts'
@@ -265,31 +339,65 @@ export class DeterministicCommunicationProvider {
   }
 
   // 3. WHATSAPP BROADCAST
-  buildWhatsApp({ mainTopic, summary, keyFacts, dates, numbers, urgency, lang, sourceId }) {
+  buildWhatsApp({
+    mainTopic,
+    summary,
+    keyFacts = [],
+    dates = [],
+    numbers = [],
+    urgency,
+    lang = 'English',
+    sourceId = 'src-1',
+    audience = 'General Public',
+    tone = 'Informative',
+    detail = 'Balanced',
+    options = {}
+  }) {
     const isHindi = lang === 'Hindi';
     const isMarathi = lang === 'Marathi';
+
+    const isRegen = Boolean(options?.isRegeneration || options?.variantSeed);
+    const toneNormalized = String(tone || 'Informative').toLowerCase();
+
+    let headerPrefix = '📢 OFFICIAL BROADCAST';
+    if (toneNormalized.includes('urgent') || toneNormalized.includes('crisis')) {
+      headerPrefix = '⚠️ URGENT ADVISORY';
+    } else if (toneNormalized.includes('empathetic') || toneNormalized.includes('supportive')) {
+      headerPrefix = '🤝 COMMUNITY NOTICE';
+    } else if (toneNormalized.includes('executive') || toneNormalized.includes('formal')) {
+      headerPrefix = '📋 EXECUTIVE BRIEFING';
+    }
+
+    const factPool = Array.isArray(keyFacts) && keyFacts.length > 0 ? keyFacts : ['Verified details available in documentation.'];
+    let displayFacts = factPool.slice(0, detail === 'Concise' ? 2 : 3);
+    if (isRegen && factPool.length > 2) {
+      displayFacts = [factPool[1], factPool[2], ...(detail === 'Concise' ? [] : [factPool[0]])];
+    }
 
     const dateNotice = dates.length > 0 ? `\n🗓️ *${isHindi ? 'महत्वपूर्ण तिथि' : isMarathi ? 'महत्त्वाची तारीख' : 'Important Date'}:* ${dates[0].date}` : '';
     const numberNotice = numbers.length > 0 ? `\n📊 *${isHindi ? 'संख्या / आंकड़ा' : isMarathi ? 'आकडेवारी' : 'Key Metric'}:* ${numbers[0].value} - ${numbers[0].label || numbers[0].context}` : '';
 
-    let header = `*📢 OFFICIAL BROADCAST: ${mainTopic.toUpperCase()}*`;
+    let header = `*${headerPrefix}: ${mainTopic.toUpperCase()}*`;
+    let audienceNotice = audience && audience !== 'General Public' ? `\n👥 *Audience:* ${audience}` : '';
     let section1 = `*📌 Overview:* ${summary}`;
-    let section2 = `*🔍 Crucial Details:*\n${keyFacts.slice(0, 3).map(f => `• ${f}`).join('\n')}`;
-    let cta = `*✅ Action Required:* Please note this guidance and circulate only verified information to family and colleagues.`;
+    let section2 = `*🔍 Crucial Details:*\n${displayFacts.map(f => `• ${f}`).join('\n')}`;
+    let cta = isRegen
+      ? `*✅ Action Required:* Please review these verified points for ${audience} and share official updates promptly.`
+      : `*✅ Action Required:* Please note this guidance and circulate only verified information to family and colleagues.`;
 
     if (isHindi) {
-      header = `*📢 आधिकारिक सूचना: ${mainTopic}*`;
+      header = `*${headerPrefix}: ${mainTopic}*`;
       section1 = `*📌 सारांश:* ${summary}`;
-      section2 = `*🔍 मुख्य बिंदु:*\n${keyFacts.slice(0, 3).map(f => `• ${f}`).join('\n')}`;
+      section2 = `*🔍 मुख्य बिंदु:*\n${displayFacts.map(f => `• ${f}`).join('\n')}`;
       cta = `*✅ आवश्यक कदम:* कृपया इस आधिकारिक सूचना को ध्यान से पढ़ें और केवल सत्यापित जानकारी ही साझा करें।`;
     } else if (isMarathi) {
-      header = `*📢 अधिकृत निवेदन: ${mainTopic}*`;
+      header = `*${headerPrefix}: ${mainTopic}*`;
       section1 = `*📌 थोडक्यात माहिती:* ${summary}`;
-      section2 = `*🔍 महत्त्वाचे मुद्दे:*\n${keyFacts.slice(0, 3).map(f => `• ${f}`).join('\n')}`;
+      section2 = `*🔍 महत्त्वाचे मुद्दे:*\n${displayFacts.map(f => `• ${f}`).join('\n')}`;
       cta = `*✅ आवश्यक कृती:* कृपया ही अधिकृत माहिती काळजीपूर्वक वाचा आणि सर्वांपर्यंत पोहोचवा.`;
     }
 
-    const content = `${header}\n\n${section1}\n\n${section2}${dateNotice}${numberNotice}\n\n${cta}`;
+    const content = `${header}${audienceNotice}\n\n${section1}\n\n${section2}${dateNotice}${numberNotice}\n\n${cta}`;
 
     return {
       title: 'WhatsApp Broadcast Message',
@@ -297,10 +405,10 @@ export class DeterministicCommunicationProvider {
       structuredData: {
         header,
         overview: summary,
-        keyDetails: keyFacts.slice(0, 3),
+        keyDetails: displayFacts,
         actionRequired: cta
       },
-      traceability: keyFacts.slice(0, 3).map(f => ({
+      traceability: displayFacts.map(f => ({
         fact: f,
         sourceId,
         origin: 'analysis.keyFacts'

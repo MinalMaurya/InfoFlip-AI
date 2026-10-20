@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Check,
   Copy,
@@ -65,15 +65,41 @@ export default function GeneratedOutputRenderer({
   onRestoreApproved = null,
   onInspectSource = null,
   isRegenerating = false,
-  onOpenOriginConversation = null
+  onOpenOriginConversation = null,
+  // Optional external draft control by itemId to prevent cross-format bleed & retain unsaved tab edits
+  externalDraftText = null,
+  externalDraftStructured = null,
+  onUpdateDraftText = null,
+  onUpdateDraftStructured = null,
+  isEditingExternal = null,
+  onToggleEditExternal = null
 }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [draftText, setDraftText] = useState(item?.content || '');
-  const [draftStructured, setDraftStructured] = useState(item?.structuredData || null);
+  const [internalIsEditing, setInternalIsEditing] = useState(false);
+  const [internalDraftText, setInternalDraftText] = useState(item?.content || '');
+  const [internalDraftStructured, setInternalDraftStructured] = useState(item?.structuredData || null);
   const [copied, setCopied] = useState(false);
   const [showReviewChecks, setShowReviewChecks] = useState(false);
   const [showSourceProvenance, setShowSourceProvenance] = useState(false);
   const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false);
+
+  const isEditing = isEditingExternal !== null ? isEditingExternal : internalIsEditing;
+  const draftText = externalDraftText !== null ? externalDraftText : internalDraftText;
+  const draftStructured = externalDraftStructured !== null ? externalDraftStructured : internalDraftStructured;
+
+  // Crucial: reset local editor state whenever item.itemId changes to guarantee zero cross-format bleed
+  useEffect(() => {
+    setInternalIsEditing(false);
+    setInternalDraftText(item?.content || '');
+    setInternalDraftStructured(item?.structuredData || null);
+  }, [item?.itemId]);
+
+  // Synchronize internal draft when item content changes outside edit mode
+  useEffect(() => {
+    if (!isEditing) {
+      setInternalDraftText(item?.content || '');
+      setInternalDraftStructured(item?.structuredData || null);
+    }
+  }, [item?.content, item?.structuredData, isEditing]);
 
   if (!item) return null;
 
@@ -125,14 +151,38 @@ export default function GeneratedOutputRenderer({
     ([, c]) => c?.status === CHECK_STATUSES.WARNING || c?.status === CHECK_STATUSES.FAIL
   );
 
+  const handleUpdateText = (val) => {
+    if (onUpdateDraftText) {
+      onUpdateDraftText(item.itemId, val);
+    } else {
+      setInternalDraftText(val);
+    }
+  };
+
+  const handleUpdateStructured = (val) => {
+    if (onUpdateDraftStructured) {
+      onUpdateDraftStructured(item.itemId, val);
+    } else {
+      setInternalDraftStructured(val);
+    }
+  };
+
   const handleStartEdit = () => {
-    setDraftText(item.content || '');
-    setDraftStructured(item.structuredData || null);
-    setIsEditing(true);
+    if (onToggleEditExternal) {
+      onToggleEditExternal(item.itemId, true);
+    } else {
+      setInternalDraftText(item.content || '');
+      setInternalDraftStructured(item.structuredData || null);
+      setInternalIsEditing(true);
+    }
   };
 
   const handleSaveEdit = () => {
-    setIsEditing(false);
+    if (onToggleEditExternal) {
+      onToggleEditExternal(item.itemId, false);
+    } else {
+      setInternalIsEditing(false);
+    }
     if (!onEdit) return;
     if (
       ['executive-summary', 'advisory', 'infographic', 'presentation', 'video-script'].includes(formatId) &&
@@ -193,18 +243,19 @@ export default function GeneratedOutputRenderer({
             content={isEditing ? draftText : item.content}
             structuredData={item.structuredData}
             isEditing={isEditing}
-            onUpdateContent={(val) => setDraftText(val)}
+            onUpdateContent={handleUpdateText}
             audience={audience}
             tone={tone}
           />
         );
       case 'twitter':
+      case 'x-twitter':
         return (
           <TwitterCommunicationPreview
             content={isEditing ? draftText : item.content}
             structuredData={item.structuredData}
             isEditing={isEditing}
-            onUpdateContent={(val) => setDraftText(val)}
+            onUpdateContent={handleUpdateText}
           />
         );
       case 'whatsapp':
@@ -213,7 +264,7 @@ export default function GeneratedOutputRenderer({
             content={isEditing ? draftText : item.content}
             structuredData={item.structuredData}
             isEditing={isEditing}
-            onUpdateContent={(val) => setDraftText(val)}
+            onUpdateContent={handleUpdateText}
           />
         );
       case 'email':
@@ -222,7 +273,7 @@ export default function GeneratedOutputRenderer({
             content={isEditing ? draftText : item.content}
             structuredData={item.structuredData}
             isEditing={isEditing}
-            onUpdateContent={(val) => setDraftText(val)}
+            onUpdateContent={handleUpdateText}
           />
         );
       case 'sms':
@@ -231,7 +282,7 @@ export default function GeneratedOutputRenderer({
             content={isEditing ? draftText : item.content}
             structuredData={item.structuredData}
             isEditing={isEditing}
-            onUpdateContent={(val) => setDraftText(val)}
+            onUpdateContent={handleUpdateText}
           />
         );
       case 'announcement':
@@ -240,7 +291,7 @@ export default function GeneratedOutputRenderer({
             content={isEditing ? draftText : item.content}
             structuredData={item.structuredData}
             isEditing={isEditing}
-            onUpdateContent={(val) => setDraftText(val)}
+            onUpdateContent={handleUpdateText}
           />
         );
       case 'cta':
@@ -249,7 +300,7 @@ export default function GeneratedOutputRenderer({
             content={isEditing ? draftText : item.content}
             structuredData={item.structuredData}
             isEditing={isEditing}
-            onUpdateContent={(val) => setDraftText(val)}
+            onUpdateContent={handleUpdateText}
           />
         );
       case 'hashtags':
@@ -258,16 +309,16 @@ export default function GeneratedOutputRenderer({
             content={isEditing ? draftText : item.content}
             structuredData={item.structuredData}
             isEditing={isEditing}
-            onUpdateContent={(val) => setDraftText(val)}
+            onUpdateContent={handleUpdateText}
           />
         );
       case 'executive-summary':
-        if (item.structuredData) {
+        if (item.structuredData || draftStructured) {
           return (
             <ExecutiveSummaryPreview
-              content={isEditing ? (draftStructured || item.structuredData) : item.structuredData}
+              content={isEditing ? (draftStructured || item.structuredData) : (item.structuredData || draftStructured)}
               isEditing={isEditing}
-              onUpdateContent={(val) => setDraftStructured(val)}
+              onUpdateContent={handleUpdateStructured}
               audience={audience}
               tone={tone}
             />
@@ -275,12 +326,12 @@ export default function GeneratedOutputRenderer({
         }
         break;
       case 'advisory':
-        if (item.structuredData) {
+        if (item.structuredData || draftStructured) {
           return (
             <AdvisoryPreview
-              content={isEditing ? (draftStructured || item.structuredData) : item.structuredData}
+              content={isEditing ? (draftStructured || item.structuredData) : (item.structuredData || draftStructured)}
               isEditing={isEditing}
-              onUpdateContent={(val) => setDraftStructured(val)}
+              onUpdateContent={handleUpdateStructured}
               audience={audience}
               tone={tone}
             />
@@ -288,35 +339,35 @@ export default function GeneratedOutputRenderer({
         }
         break;
       case 'infographic':
-        if (item.structuredData) {
+        if (item.structuredData || draftStructured) {
           return (
             <InfographicPreview
-              content={isEditing ? (draftStructured || item.structuredData) : item.structuredData}
+              content={isEditing ? (draftStructured || item.structuredData) : (item.structuredData || draftStructured)}
               isEditing={isEditing}
-              onUpdateContent={(val) => setDraftStructured(val)}
+              onUpdateContent={handleUpdateStructured}
               audience={audience}
             />
           );
         }
         break;
       case 'presentation':
-        if (item.structuredData) {
+        if (item.structuredData || draftStructured) {
           return (
             <PresentationPreview
-              content={isEditing ? (draftStructured || item.structuredData) : item.structuredData}
+              content={isEditing ? (draftStructured || item.structuredData) : (item.structuredData || draftStructured)}
               isEditing={isEditing}
-              onUpdateContent={(val) => setDraftStructured(val)}
+              onUpdateContent={handleUpdateStructured}
             />
           );
         }
         break;
       case 'video-script':
-        if (item.structuredData) {
+        if (item.structuredData || draftStructured) {
           return (
             <VideoScriptPreview
-              content={isEditing ? (draftStructured || item.structuredData) : item.structuredData}
+              content={isEditing ? (draftStructured || item.structuredData) : (item.structuredData || draftStructured)}
               isEditing={isEditing}
-              onUpdateContent={(val) => setDraftStructured(val)}
+              onUpdateContent={handleUpdateStructured}
             />
           );
         }
@@ -331,7 +382,7 @@ export default function GeneratedOutputRenderer({
         <textarea
           rows={8}
           value={draftText}
-          onChange={(e) => setDraftText(e.target.value)}
+          onChange={(e) => handleUpdateText(e.target.value)}
           aria-label={`Edit ${formatMeta?.name || formatId} content`}
           className="w-full p-3.5 rounded-xl border border-input-border bg-input-bg text-xs sm:text-sm text-text-primary leading-relaxed focus:outline-none focus:ring-2 focus:ring-focus-ring"
         />

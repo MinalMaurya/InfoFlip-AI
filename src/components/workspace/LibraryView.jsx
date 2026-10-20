@@ -398,6 +398,7 @@ export default function LibraryView({
                   {isExpanded && (
                     <div className="px-4 pb-4 pt-2 border-t border-border bg-sidebar-bg animate-slide-down">
                       <GeneratedOutputRenderer
+                        key={item.itemId}
                         item={item}
                         config={conv?.config || {}}
                         sourceDocument={conv?.activeSource || item.sourceReference}

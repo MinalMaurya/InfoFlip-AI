@@ -50,7 +50,7 @@ export class DeterministicTransformer {
           break;
 
         case OUTPUT_FORMAT_IDS.EXECUTIVE_SUMMARY:
-          content = this.generateExecutiveSummary(source, analysis, { audienceStr, tone, lang, detail, objective, style });
+          content = this.generateExecutiveSummary(source, analysis, { audienceStr, tone, lang, detail, objective, style, options });
           break;
 
         case OUTPUT_FORMAT_IDS.ADVISORY:
@@ -273,14 +273,20 @@ export class DeterministicTransformer {
 
   // 3. EXECUTIVE SUMMARY GENERATOR
   generateExecutiveSummary(source, analysis, config) {
-    const { lang, audienceStr, tone } = config;
+    const { lang, audienceStr, tone, detail = 'Balanced', options = {} } = config;
     const title = analysis.overview?.title || `${analysis.overview?.mainTopic || 'Operational'} Executive Briefing`;
     const overview = analysis.overview?.summary || (source.extractedText || '').slice(0, 250);
-    const facts = (analysis.keyFacts || []).map(f => typeof f === 'string' ? f : f.fact).slice(0, 4);
+    const isRegen = Boolean(options?.isRegeneration || options?.variantSeed);
+
+    const factPool = (analysis.keyFacts || []).map(f => typeof f === 'string' ? f : f.fact);
+    let facts = factPool.slice(0, detail === 'Concise' ? 2 : 4);
+    if (isRegen && factPool.length > 2) {
+      facts = [factPool[1], ...(factPool[2] ? [factPool[2]] : []), ...(detail === 'Concise' ? [] : [factPool[0]])];
+    }
+
     const numbers = (analysis.importantNumbers || []).map(n => `${n.label}: ${n.value} (${n.context})`);
     const orgs = (analysis.entities?.organizations || []).join(', ');
     const isEmergency = isEmergencyContent({ analysis, config: { tone, targetAudience: audienceStr, language: lang }, sourceContent: source });
-    const isVerified = Boolean(analysis.verification?.isVerified || source?.isVerified || analysis.claims?.some(c => c.isVerified));
 
     const implications = isEmergency
       ? [
@@ -302,13 +308,17 @@ export class DeterministicTransformer {
           'Maintain real-time audit logging for source factual statements.'
         ];
 
+    const overviewSuffix = isRegen
+      ? `Calibrated briefing synthesized for ${audienceStr} under ${tone.toLowerCase()} protocol.`
+      : `Prepared specifically for ${audienceStr} under an official ${tone.toLowerCase()} protocol.`;
+
     return {
       title: `${title} - Executive Summary`,
-      executiveOverview: `${overview} Prepared specifically for ${audienceStr} under an official ${tone.toLowerCase()} protocol.`,
+      executiveOverview: `${overview} ${overviewSuffix}`.trim(),
       keyPoints: facts.length > 0 ? facts : ['Official situational guidelines have been reviewed and normalized from source.'],
       importantFindings: numbers.length > 0 ? numbers : ['All quantitative observations reflect figures reported directly in source documentation.'],
-      implications,
-      recommendedConsiderations
+      implications: detail === 'Concise' ? implications.slice(0, 1) : implications,
+      recommendedConsiderations: detail === 'Concise' ? recommendedConsiderations.slice(0, 1) : recommendedConsiderations
     };
   }
 

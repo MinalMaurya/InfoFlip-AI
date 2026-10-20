@@ -463,21 +463,32 @@ export default function RightSidebar({
             </button>
             {expandedGroup === 'language' && (
               <div className="p-2.5 bg-surface grid grid-cols-3 gap-1.5 border-t border-border animate-slide-down">
-                {TRANSFORMATION_LANGUAGES.map(lang => (
-                  <button
-                    key={lang.id}
-                    type="button"
-                    onClick={() => onUpdateConfig({ language: lang.id })}
-                    className={`p-1.5 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1 border transition-colors ${
-                      config.language === lang.id
-                        ? 'border-primary bg-surface-selected text-text-primary'
-                        : 'border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover'
-                    }`}
-                  >
-                    <span>{lang.flag}</span>
-                    <span>{lang.id}</span>
-                  </button>
-                ))}
+                {TRANSFORMATION_LANGUAGES.map(lang => {
+                  const isExperimental = lang.id === 'Hindi' || lang.id === 'Marathi';
+                  return (
+                    <button
+                      key={lang.id}
+                      type="button"
+                      onClick={() => onUpdateConfig({ language: lang.id })}
+                      title={isExperimental ? `${lang.id} (Experimental in v0.2.1)` : `${lang.id} (Fully Supported)`}
+                      className={`p-1.5 rounded-lg text-[11px] font-semibold flex flex-col items-center justify-center gap-0.5 border transition-colors ${
+                        config.language === lang.id
+                          ? 'border-primary bg-surface-selected text-text-primary'
+                          : 'border-border text-text-secondary hover:text-text-primary hover:bg-surface-hover'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1">
+                        <span>{lang.flag}</span>
+                        <span>{lang.id}</span>
+                      </div>
+                      {isExperimental && (
+                        <span className="text-[9px] font-normal text-text-muted">
+                          (Exp.)
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>

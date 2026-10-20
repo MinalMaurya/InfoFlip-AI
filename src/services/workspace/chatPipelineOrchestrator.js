@@ -945,15 +945,38 @@ export function editCanonicalContentItem(item, newContentOrStructured, conversat
   if (!item) return null;
 
   let nextText = '';
-  let nextStructured = item.structuredData;
+  let nextStructured = item.structuredData ? { ...item.structuredData } : null;
+  const cleanFormatId = String(item.formatId || item.channelId || '').toLowerCase();
 
   if (typeof newContentOrStructured === 'object' && newContentOrStructured !== null) {
     nextStructured = newContentOrStructured;
     nextText = serializeModule3ContentToText(item.formatId, newContentOrStructured);
   } else {
     nextText = String(newContentOrStructured ?? '');
-    if (nextStructured && item.formatId === 'linkedin') {
-      nextStructured = { ...nextStructured, text: nextText };
+    if (cleanFormatId === 'linkedin') {
+      nextStructured = { ...(nextStructured || {}), text: nextText };
+    } else if (cleanFormatId === 'twitter' || cleanFormatId === 'x-twitter') {
+      const posts = nextText.includes('\n\n---\n\n')
+        ? nextText.split('\n\n---\n\n').map(p => p.trim()).filter(Boolean)
+        : nextText.split(/(?=\n\d+\/\d+)/).map(p => p.trim()).filter(Boolean);
+      const displayPosts = posts.length > 0 ? posts : [nextText];
+      nextStructured = {
+        ...(nextStructured || {}),
+        posts: displayPosts,
+        isThread: displayPosts.length > 1,
+        postCount: displayPosts.length
+      };
+    } else if (cleanFormatId === 'whatsapp') {
+      nextStructured = {
+        ...(nextStructured || {}),
+        text: nextText,
+        rawText: nextText
+      };
+    } else if (nextStructured) {
+      nextStructured = {
+        ...nextStructured,
+        text: nextText
+      };
     }
   }
 
@@ -968,7 +991,12 @@ export function editCanonicalContentItem(item, newContentOrStructured, conversat
     ...reviewed,
     itemId: item.itemId,
     outputId: item.outputId,
+    content: nextText,
     structuredData: nextStructured,
+    approvalStatus: APPROVAL_STATUSES.PENDING_REVIEW,
+    approvalInfo: null,
+    requiresHumanReview: true,
+    isEdited: true,
     updatedAt: new Date().toISOString()
   };
 }
@@ -1083,7 +1111,13 @@ export async function regenerateCanonicalContentItem(item, conversation, options
     return item;
   }
 
-  const formatId = item.formatId || item.channelId;
+  const rawFormatId = item.formatId || item.channelId || item.format;
+  const formatId = rawFormatId === 'x-twitter' ? 'twitter' : rawFormatId;
+
+  if (!formatId || !isSupportedWorkspaceFormat(formatId)) {
+    throw new Error(`Unsupported or invalid format identifier: "${rawFormatId}".`);
+  }
+
   const config = conversation.config || DEFAULT_GENERATION_CONFIG;
   const sourceData = conversation.activeSource;
   const analysisData = conversation.activeAnalysis;
@@ -1102,6 +1136,12 @@ export async function regenerateCanonicalContentItem(item, conversation, options
   let newContentText = item.content;
   let newStructuredData = item.structuredData;
   let newMetadata = { ...item.metadata };
+
+  const effectiveOptions = {
+    isRegeneration: true,
+    variantSeed: Date.now() + Math.random(),
+    ...options
+  };
 
   if (MODULE4_CHANNEL_IDS.has(formatId)) {
     const regenerated = await regenerateSingleChannel(
@@ -1123,7 +1163,7 @@ export async function regenerateCanonicalContentItem(item, conversation, options
       },
       item.outputId,
       formatId,
-      options
+      effectiveOptions
     );
     newContentText = regenerated.content;
     newStructuredData = regenerated.structuredData || null;
@@ -1144,7 +1184,7 @@ export async function regenerateCanonicalContentItem(item, conversation, options
       },
       item.outputId,
       formatId,
-      options
+      effectiveOptions
     );
     newStructuredData = typeof regenerated.content === 'object' ? regenerated.content : null;
     newContentText = serializeModule3ContentToText(formatId, regenerated.content);
@@ -1203,6 +1243,61 @@ export async function regenerateCanonicalContentItem(item, conversation, options
     approvalInfo: null,
     previousApprovedVersion,
     updatedAt: new Date().toISOString()
+  };
+}
+
+/**
+ * Regenerates multiple canonical content items in batch (e.g. for Compare All).
+ * - Regenerates each selected format independently via `regenerateCanonicalContentItem`.
+ * - Handles partial failures without incorrectly marking failed outputs as successful or overwriting valid content.
+ * - Does not touch unselected formats.
+ *
+ * @param {Array<object>} items - List of canonical content items to regenerate
+ * @param {object} conversation - Conversation context containing activeSource and activeAnalysis
+ * @param {object} [options] - Options (e.g. protectApproved, configOverrides)
+ * @returns {Promise<{ updatedItemsById: object, succeededIds: string[], failedIds: string[], errors: object }>}
+ */
+export async function regenerateCanonicalContentItems(items = [], conversation, options = {}) {
+  if (!Array.isArray(items) || items.length === 0) {
+    return { updatedItemsById: {}, succeededIds: [], failedIds: [], errors: {} };
+  }
+
+  const updatedItemsById = {};
+  const succeededIds = [];
+  const failedIds = [];
+  const errors = {};
+
+  for (const item of items) {
+    if (!item || !item.itemId) continue;
+    try {
+      const regenerated = await regenerateCanonicalContentItem(item, conversation, options);
+      if (regenerated) {
+        updatedItemsById[item.itemId] = regenerated;
+        succeededIds.push(item.itemId);
+      } else {
+        failedIds.push(item.itemId);
+        errors[item.itemId] = 'Regeneration returned empty item';
+      }
+    } catch (err) {
+      failedIds.push(item.itemId);
+      errors[item.itemId] = err.message || 'Regeneration failed';
+      // Partial failure: Preserve original item and attach warning metadata rather than corrupting valid content
+      updatedItemsById[item.itemId] = {
+        ...item,
+        metadata: {
+          ...item.metadata,
+          regenerationError: err.message || 'Regeneration failed',
+          lastRegenerationAttemptAt: new Date().toISOString()
+        }
+      };
+    }
+  }
+
+  return {
+    updatedItemsById,
+    succeededIds,
+    failedIds,
+    errors
   };
 }
 

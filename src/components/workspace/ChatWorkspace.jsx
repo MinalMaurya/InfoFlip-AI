@@ -65,6 +65,7 @@ export default function ChatWorkspace({
   onRejectItem,
   onApproveAllInTurn,
   onRegenerateItem,
+  onRegenerateAllInTurn,
   onRestoreApprovedItem,
   regeneratingItemId,
   isGenerating,
@@ -84,6 +85,43 @@ export default function ChatWorkspace({
   const [expandedAnalysisByMessage, setExpandedAnalysisByMessage] = useState({});
   const [expandedSourceByMessage, setExpandedSourceByMessage] = useState({});
   const [exportToast, setExportToast] = useState('');
+
+  // Per-item draft isolation to prevent cross-format state bleed and preserve unsaved tab edits
+  const [draftsByItemId, setDraftsByItemId] = useState({});
+  const [editingItemIds, setEditingItemIds] = useState({});
+
+  const handleUpdateDraftText = (itemId, text) => {
+    setDraftsByItemId(prev => ({
+      ...prev,
+      [itemId]: { ...(prev[itemId] || {}), text }
+    }));
+  };
+
+  const handleUpdateDraftStructured = (itemId, structured) => {
+    setDraftsByItemId(prev => ({
+      ...prev,
+      [itemId]: { ...(prev[itemId] || {}), structured }
+    }));
+  };
+
+  const handleToggleEdit = (itemId, isEditing) => {
+    setEditingItemIds(prev => ({
+      ...prev,
+      [itemId]: isEditing
+    }));
+  };
+
+  const handleSaveItemEdit = (itemId, newContentOrStructured) => {
+    if (onEditItem) {
+      onEditItem(itemId, newContentOrStructured);
+    }
+    setEditingItemIds(prev => ({ ...prev, [itemId]: false }));
+    setDraftsByItemId(prev => {
+      const next = { ...prev };
+      delete next[itemId];
+      return next;
+    });
+  };
 
   const promptTextareaRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -946,7 +984,7 @@ export default function ChatWorkspace({
                           })}
                         </div>
 
-                        {/* View All / Batch Approve Passed Controls */}
+                        {/* View All / Batch Approve Passed / Regenerate All Controls */}
                         <div className="flex items-center gap-2">
                           {turnOutputs.length > 1 && (
                             <button
@@ -960,6 +998,19 @@ export default function ChatWorkspace({
                               className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-sidebar-bg text-text-secondary hover:text-text-primary hover:bg-surface-hover border border-border active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                             >
                               {isAllExpanded ? 'Tabbed View' : `Compare All (${turnOutputs.length})`}
+                            </button>
+                          )}
+
+                          {turnOutputs.length > 1 && onRegenerateAllInTurn && (
+                            <button
+                              type="button"
+                              onClick={() => onRegenerateAllInTurn(turnOutputs.map(o => o.itemId))}
+                              disabled={isGenerating}
+                              title="Regenerate every format output in this turn independently with current settings."
+                              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-sidebar-bg text-text-secondary hover:text-text-primary hover:bg-surface-hover border border-border disabled:opacity-50 active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring flex items-center gap-1"
+                            >
+                              <RefreshCw className={`w-3 h-3 ${isGenerating ? 'animate-spin text-primary' : ''}`} />
+                              <span>{isGenerating ? 'Regenerating...' : `Regenerate All (${turnOutputs.length})`}</span>
                             </button>
                           )}
 
@@ -982,10 +1033,11 @@ export default function ChatWorkspace({
                           {turnOutputs.map((out) => (
                             <div key={out.itemId} className="pt-4 first:pt-0">
                               <GeneratedOutputRenderer
+                                key={out.itemId}
                                 item={out}
                                 config={msg.configSnapshot || conversation?.config}
                                 sourceDocument={turnSourceDoc}
-                                onEdit={onEditItem}
+                                onEdit={handleSaveItemEdit}
                                 onApprove={onApproveItem}
                                 onReject={onRejectItem}
                                 onRegenerate={onRegenerateItem}
@@ -997,6 +1049,12 @@ export default function ChatWorkspace({
                                   }))
                                 }
                                 isRegenerating={regeneratingItemId === out.itemId}
+                                externalDraftText={draftsByItemId[out.itemId]?.text ?? null}
+                                externalDraftStructured={draftsByItemId[out.itemId]?.structured ?? null}
+                                onUpdateDraftText={handleUpdateDraftText}
+                                onUpdateDraftStructured={handleUpdateDraftStructured}
+                                isEditingExternal={editingItemIds[out.itemId] ?? null}
+                                onToggleEditExternal={handleToggleEdit}
                               />
                             </div>
                           ))}
@@ -1004,10 +1062,11 @@ export default function ChatWorkspace({
                       ) : (
                         activeItem && (
                           <GeneratedOutputRenderer
+                            key={activeItem.itemId}
                             item={activeItem}
                             config={msg.configSnapshot || conversation?.config}
                             sourceDocument={turnSourceDoc}
-                            onEdit={onEditItem}
+                            onEdit={handleSaveItemEdit}
                             onApprove={onApproveItem}
                             onReject={onRejectItem}
                             onRegenerate={onRegenerateItem}
@@ -1019,6 +1078,12 @@ export default function ChatWorkspace({
                               }))
                             }
                             isRegenerating={regeneratingItemId === activeItem.itemId}
+                            externalDraftText={draftsByItemId[activeItem.itemId]?.text ?? null}
+                            externalDraftStructured={draftsByItemId[activeItem.itemId]?.structured ?? null}
+                            onUpdateDraftText={handleUpdateDraftText}
+                            onUpdateDraftStructured={handleUpdateDraftStructured}
+                            isEditingExternal={editingItemIds[activeItem.itemId] ?? null}
+                            onToggleEditExternal={handleToggleEdit}
                           />
                         )
                       )}
