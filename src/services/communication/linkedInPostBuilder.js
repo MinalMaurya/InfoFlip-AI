@@ -525,10 +525,15 @@ export function buildLinkedInPost({
   dates = [],
   numbers = [],
   urgency = 'low',
-  rawText = ''
+  rawText = '',
+  detail = 'Balanced',
+  objective = '',
+  style = '',
+  options = {}
 } = {}) {
   const isHindi = lang === 'Hindi';
   const isMarathi = lang === 'Marathi';
+  const isRegen = Boolean(options?.isRegeneration || options?.variantSeed);
 
   const isEmergency = isEmergencyContent({
     analysis,
@@ -551,25 +556,43 @@ export function buildLinkedInPost({
   let hook = '';
   if (isEmergency) {
     if (isHindi) {
-      hook = /चेतावनी|अलर्ट|परामर्श/i.test(mainTopic)
-        ? `🚨 ${mainTopic}`
-        : `🚨 मौसम चेतावनी एवं जन सुरक्षा परामर्श: ${mainTopic}`;
+      if (isRegen) {
+        hook = /चेतावनी|अलर्ट|परामर्श/i.test(mainTopic)
+          ? `🚨 अद्यतन सुरक्षा परामर्श: ${mainTopic}`
+          : `🚨 मौसम चेतावनी एवं जन सुरक्षा परामर्श: ${mainTopic}`;
+      } else {
+        hook = /चेतावनी|अलर्ट|परामर्श/i.test(mainTopic)
+          ? `🚨 ${mainTopic}`
+          : `🚨 मौसम चेतावनी एवं जन सुरक्षा परामर्श: ${mainTopic}`;
+      }
     } else if (isMarathi) {
-      hook = /इशारा|अलर्ट|सूचना/i.test(mainTopic)
-        ? `🚨 ${mainTopic}`
-        : `🚨 हवामान इशारा व सार्वजनिक सुरक्षा सूचना: ${mainTopic}`;
+      if (isRegen) {
+        hook = /इशारा|अलर्ट|सूचना/i.test(mainTopic)
+          ? `🚨 अद्यतन सुरक्षा सूचना: ${mainTopic}`
+          : `🚨 हवामान इशारा व सार्वजनिक सुरक्षा सूचना: ${mainTopic}`;
+      } else {
+        hook = /इशारा|अलर्ट|सूचना/i.test(mainTopic)
+          ? `🚨 ${mainTopic}`
+          : `🚨 हवामान इशारा व सार्वजनिक सुरक्षा सूचना: ${mainTopic}`;
+      }
     } else {
-      hook = /alert|warning|advisory/i.test(mainTopic)
-        ? `🚨 ${mainTopic}`
-        : `🚨 Public Safety Advisory: ${mainTopic}`;
+      if (isRegen) {
+        hook = /alert|warning|advisory/i.test(mainTopic)
+          ? `🚨 Updated Public Advisory: ${mainTopic}`
+          : `🚨 Public Safety Advisory Update: ${mainTopic}`;
+      } else {
+        hook = /alert|warning|advisory/i.test(mainTopic)
+          ? `🚨 ${mainTopic}`
+          : `🚨 Public Safety Advisory: ${mainTopic}`;
+      }
     }
   } else {
     if (isHindi) {
-      hook = `📌 महत्वपूर्ण अपडेट: ${mainTopic}`;
+      hook = isRegen ? `📌 रणनीतिक अपडेट: ${mainTopic}` : `📌 महत्वपूर्ण अपडेट: ${mainTopic}`;
     } else if (isMarathi) {
-      hook = `📌 महत्त्वाची माहिती: ${mainTopic}`;
+      hook = isRegen ? `📌 विशेष माहिती: ${mainTopic}` : `📌 महत्त्वाची माहिती: ${mainTopic}`;
     } else {
-      hook = `📌 Professional Briefing: ${mainTopic}`;
+      hook = isRegen ? `📌 Strategic Briefing: ${mainTopic}` : `📌 Professional Briefing: ${mainTopic}`;
     }
   }
 
@@ -603,17 +626,21 @@ export function buildLinkedInPost({
     }
   } else {
     if (isHindi) {
-      keyFactsHeader = 'मुख्य महत्वपूर्ण बिंदु:';
+      keyFactsHeader = isRegen ? 'मुख्य रणनीतिक बिंदु:' : 'मुख्य महत्वपूर्ण बिंदु:';
     } else if (isMarathi) {
-      keyFactsHeader = 'प्रमुख ठळक मुद्दे:';
+      keyFactsHeader = isRegen ? 'प्रमुख कृती मुद्दे:' : 'प्रमुख ठळक मुद्दे:';
     } else {
-      keyFactsHeader = 'Key highlights to know:';
+      keyFactsHeader = isRegen ? 'Key strategic points to note:' : 'Key highlights to know:';
     }
   }
 
   // 4. Scannable Bullet Points (Deduplicated against intro and numbers)
   const cleanFacts = deduplicateFacts(keyFacts, cleanIntro, numbers, dates);
-  const bullets = cleanFacts.slice(0, 4).map(f => `• ${f}`).join('\n');
+  const factLimit = detail === 'Concise' ? 2 : (detail === 'Detailed' ? 5 : 4);
+  const reorderedFacts = (isRegen && cleanFacts.length >= 2)
+    ? [cleanFacts[1], cleanFacts[0], ...cleanFacts.slice(2)]
+    : cleanFacts;
+  const bullets = reorderedFacts.slice(0, factLimit).map(f => `• ${f}`).join('\n');
 
   // 5. Numbers / Metrics line with truthful labeling
   let metricsSection = '';

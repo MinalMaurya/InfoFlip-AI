@@ -60,7 +60,7 @@ You MUST respond strictly with valid JSON conforming to the following structure:
 }`;
 }
 
-export function buildCommunicationUserPrompt(request) {
+export function buildCommunicationUserPrompt(request, options = {}) {
   const {
     sourceId = 'src-1',
     sourceContent = {},
@@ -71,6 +71,16 @@ export function buildCommunicationUserPrompt(request) {
   } = request;
 
   const rawText = sourceContent.extractedText || sourceContent.rawText || '';
+
+  const isRegen = Boolean(options.isRegeneration || options.variantSeed);
+  const regenDirective = isRegen ? `
+==============================
+🔄 REGENERATION VARIANT DIRECTIVE
+==============================
+- This is a REGENERATION request for a new candidate variation.
+- Generate a fresh, distinct candidate variation with alternative framing, wording, and hooks.
+- Strictly maintain 100% adherence to all grounded source facts and figures.
+` : '';
 
   // Summarize key facts from Module 2
   const factsList = Array.isArray(analysis.keyFacts)
@@ -123,6 +133,7 @@ ${channelDef.promptInstructions}`;
 
   return `Please generate communication-ready assets for the following requested channels:
 Requested Channels: ${requestedChannels.join(', ')}
+${regenDirective}
 ${emergencySection}
 ==============================
 CONFIGURATION & AUDIENCE
@@ -132,7 +143,7 @@ Tone: ${config.tone || 'Informative'}
 Language: ${config.language || 'English'}
 Detail Level: ${config.detailLevel || 'Balanced'}
 Objective: ${config.objective || 'Inform'}
-Content Style: ${config.style || 'Structured'}
+Content Style: ${config.contentStyle || config.style || 'Structured'}
 
 ==============================
 GROUND TRUTH & FACTS

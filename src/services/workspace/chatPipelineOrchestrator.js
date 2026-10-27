@@ -17,6 +17,7 @@ import {
   transformContent,
   regenerateSingleOutput
 } from '../transformation/transformationService.js';
+import { DeterministicTransformer } from '../transformation/deterministicTransformer.js';
 import {
   generateCommunication,
   regenerateSingleChannel
@@ -500,6 +501,7 @@ export async function executeChatTurn({
   sourceText = '',
   file = null,
   requestedFormats = null,
+  selectedFormatIds = null,
   configOverrides = {},
   onProgress = () => {},
   delayMs = 30
@@ -510,8 +512,12 @@ export async function executeChatTurn({
     ...configOverrides
   };
 
-  const rawRequestedFormats = Array.isArray(requestedFormats)
+  const explicitFormats = Array.isArray(requestedFormats)
     ? requestedFormats
+    : (Array.isArray(selectedFormatIds) ? selectedFormatIds : null);
+
+  const rawRequestedFormats = Array.isArray(explicitFormats)
+    ? explicitFormats
     : (activeConfig.selectedFormats || DEFAULT_GENERATION_CONFIG.selectedFormats);
 
   const { supported: validFormats, unsupported: unsupportedFormats } = partitionRequestedFormats(rawRequestedFormats);
@@ -765,7 +771,26 @@ export async function executeChatTurn({
     }
 
     // Otherwise pull from Module 3 transformationResult
-    const mod3Item = transformationResult.outputs.find(o => o.format === formatId);
+    let mod3Item = transformationResult.outputs.find(o => o.format === formatId);
+    if (!mod3Item || !mod3Item.content) {
+      try {
+        const detTransformer = new DeterministicTransformer();
+        const recoveredOutputs = await detTransformer.transform({
+          sourceId: currentSource.sourceId,
+          transformationId: transformationResult.transformationId,
+          sourceContent: currentSource,
+          analysis: currentAnalysis,
+          config: finalConfig,
+          requestedFormats: [formatId]
+        }, { isRegeneration: false, fallbackReason: 'Recovered missing output via deterministic fallback' });
+        if (recoveredOutputs && recoveredOutputs.length > 0) {
+          mod3Item = recoveredOutputs[0];
+        }
+      } catch (recErr) {
+        console.warn(`Failed to recover output for format ${formatId}:`, recErr.message);
+      }
+    }
+
     if (mod3Item && mod3Item.content) {
       let serializedText = serializeModule3ContentToText(formatId, mod3Item.content);
       if (isFollowUpTurn && followUp.wantsShorter && (followUp.mentionedFormatIds.length === 0 || followUp.mentionedFormatIds.includes(formatId))) {
@@ -784,6 +809,23 @@ export async function executeChatTurn({
           wordCount: serializedText.split(/\s+/).filter(Boolean).length
         },
         sourceTraceability: defaultTraceability
+      });
+    } else {
+      const uniqueOutputId = `out-${formatId}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+      combinedOutputsForReview.push({
+        outputId: uniqueOutputId,
+        channelId: formatId,
+        title: `${fmtMeta.name} — Generation Incomplete`,
+        content: `Unable to generate ${fmtMeta.name}. The source content provided was insufficient or the generation provider was unavailable.`,
+        structuredData: null,
+        metadata: {
+          provider: 'DeterministicFallback',
+          isFallback: true,
+          errorReason: 'Source insufficient or generation failed',
+          characterCount: 0,
+          wordCount: 0
+        },
+        sourceTraceability: []
       });
     }
   }
@@ -857,6 +899,8 @@ export async function executeChatTurn({
       structuredData: rawMatch?.structuredData || revItem.structuredData || null,
       sourceReference,
       lineage,
+      version: 1,
+      versionHistory: [],
       createdAt: nowIso,
       updatedAt: nowIso
     };
@@ -1133,6 +1177,20 @@ export async function regenerateCanonicalContentItem(item, conversation, options
         }
       : item.previousApprovedVersion || null;
 
+  const currentVersion = typeof item.version === 'number' ? item.version : 1;
+  const nextVersion = currentVersion + 1;
+  const existingHistory = Array.isArray(item.versionHistory) ? [...item.versionHistory] : [];
+  const priorSnapshot = {
+    version: currentVersion,
+    content: item.content,
+    title: item.title,
+    structuredData: item.structuredData || null,
+    metadata: { ...(item.metadata || {}) },
+    approvalStatus: item.approvalStatus,
+    generatedAt: item.metadata?.generatedAt || item.updatedAt || item.createdAt || new Date().toISOString()
+  };
+  const updatedVersionHistory = [...existingHistory, priorSnapshot];
+
   let newContentText = item.content;
   let newStructuredData = item.structuredData;
   let newMetadata = { ...item.metadata };
@@ -1209,7 +1267,8 @@ export async function regenerateCanonicalContentItem(item, conversation, options
     isIndependentlyVerified,
     verificationStatus: isIndependentlyVerified
       ? newMetadata.verificationStatus
-      : 'Source not independently verified'
+      : 'Source not independently verified',
+    regenerationError: null
   };
 
   const revalidated = revalidateOutput(
@@ -1238,6 +1297,8 @@ export async function regenerateCanonicalContentItem(item, conversation, options
     outputId: item.outputId,
     content: newContentText,
     structuredData: newStructuredData,
+    version: nextVersion,
+    versionHistory: updatedVersionHistory,
     approvalStatus: APPROVAL_STATUSES.PENDING_REVIEW,
     requiresHumanReview: true,
     approvalInfo: null,

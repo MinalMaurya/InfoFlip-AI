@@ -23,8 +23,15 @@ CRITICAL ANTI-HALLUCINATION RULES:
 6. Language: Respect the requested language (English, Hindi, or Marathi) accurately and professionally.`;
 }
 
-export function buildTransformationUserPrompt(request) {
-  const { source, analysis, configuration, requestedOutputs } = request;
+export function buildTransformationUserPrompt(request = {}, options = {}) {
+  const source = request.source || request.sourceContent || {};
+  const analysis = request.analysis || {};
+  const configuration = request.configuration || request.config || {};
+  const requestedOutputs = request.requestedOutputs || request.requestedFormats || [];
+
+  const targetAudienceStr = Array.isArray(configuration.targetAudience)
+    ? configuration.targetAudience.join(', ')
+    : (configuration.targetAudience || 'General Public');
 
   const formatsInstructions = requestedOutputs.map(formatId => {
     const formatDef = getOutputFormatById(formatId);
@@ -34,8 +41,16 @@ Expected JSON structure:
 ${JSON.stringify(formatDef?.expectedStructure || {}, null, 2)}`;
   }).join('\n\n');
 
-  return `Please transform the following source into the requested outputs.
+  const isRegen = Boolean(options.isRegeneration || options.variantSeed);
+  const regenDirective = isRegen ? `
+---
+REGENERATION VARIATION DIRECTIVE:
+- This is a REGENERATION request for a new candidate variation.
+- Generate a fresh, distinct variation with alternative phrasing, layout, and rhetorical emphasis.
+- Preserve 100% of the grounded source facts and figures without inventing any new claims.` : '';
 
+  return `Please transform the following source into the requested outputs.
+${regenDirective}
 ---
 SOURCE CONTENT:
 ${source.extractedText || source.rawText || 'No source text provided.'}
@@ -57,7 +72,7 @@ ${(analysis.keyFacts || []).map(f => `  * [${f.importance || 'fact'}] ${typeof f
 
 ---
 USER CONFIGURATION:
-- Target Audience: ${(configuration.targetAudience || []).join(', ')}
+- Target Audience: ${targetAudienceStr}
 - Desired Tone: ${configuration.tone}
 - Output Language: ${configuration.language}
 - Level of Detail: ${configuration.detailLevel} (Concise / Balanced / Detailed)

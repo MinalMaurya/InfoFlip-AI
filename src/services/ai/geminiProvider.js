@@ -339,7 +339,7 @@ export async function callGeminiGenerateContent({
       const finishReason = candidate?.finishReason || 'UNKNOWN';
       const candidateText = candidate?.content?.parts?.[0]?.text;
 
-      if (!candidateText) {
+      if (!candidateText || candidateText.trim().length === 0) {
         if (finishReason && finishReason !== 'STOP') {
           throw new Error(`Gemini generation stopped unexpectedly with reason: ${finishReason}`);
         }
@@ -484,11 +484,14 @@ if (typeof window !== 'undefined') {
  * Seamlessly falls back to DeterministicNLPProvider on error, quota exhaustion, or timeout.
  */
 export class GeminiAIProvider extends AIProviderInterface {
-  constructor(apiKey = null, options = {}) {
+  constructor(apiKeyOrOptions = null, options = {}) {
     super('GeminiAIProvider');
-    this.apiKey = apiKey || (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_GEMINI_API_KEY : null);
+    const opts = (apiKeyOrOptions && typeof apiKeyOrOptions === 'object') ? apiKeyOrOptions : options;
+    const key = (typeof apiKeyOrOptions === 'string') ? apiKeyOrOptions : opts.apiKey;
+    this.apiKey = key || (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_GEMINI_API_KEY : null);
     const envModel = typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_MODEL ? import.meta.env.VITE_GEMINI_MODEL : null;
-    this.model = options.model || envModel || 'gemini-3.8-flash';
+    this.model = opts.model || envModel || 'gemini-3.8-flash';
+    this.fetchFn = opts.fetchFn || null;
     this.fallbackProvider = new DeterministicNLPProvider();
     this.isQuotaExhausted = false;
   }
@@ -501,7 +504,7 @@ export class GeminiAIProvider extends AIProviderInterface {
    * Diagnostic health check for live Gemini connectivity
    */
   async checkConnection(options = {}) {
-    return checkGeminiConnection(this.apiKey, { model: this.model, ...options });
+    return checkGeminiConnection(this.apiKey, { model: this.model, fetchFn: options.fetchFn || this.fetchFn, ...options });
   }
 
   /**
@@ -522,7 +525,8 @@ export class GeminiAIProvider extends AIProviderInterface {
           ...out.metadata,
           provider: 'DeterministicFallback',
           isFallback: true,
-          reason: 'Missing API key'
+          reason: 'Missing API key',
+          fallbackReason: 'Missing API key'
         }
       }));
     }
@@ -540,14 +544,16 @@ export class GeminiAIProvider extends AIProviderInterface {
           ...out.metadata,
           provider: 'DeterministicFallback',
           isFallback: true,
-          reason: 'Gemini quota exhausted'
+          reason: 'Gemini quota exhausted',
+          fallbackReason: 'Gemini quota exhausted'
         }
       }));
     }
 
     try {
+      const isRegen = Boolean(options?.isRegeneration || options?.variantSeed);
       const systemInstruction = buildTransformationSystemPrompt();
-      const userPrompt = buildTransformationUserPrompt(request);
+      const userPrompt = buildTransformationUserPrompt(request, options);
 
       const { json } = await callGeminiGenerateContent({
         apiKey: this.apiKey,
@@ -556,16 +562,29 @@ export class GeminiAIProvider extends AIProviderInterface {
         prompt: userPrompt,
         jsonMode: true,
         thinkingLevel: 'low',
-        temperature: 0.2,
+        temperature: isRegen ? 0.35 : 0.2,
         timeoutMs: Math.min(options.timeoutMs || 20000, 20000),
         retries: options.retries ?? 1,
         retryDelayMs: Math.min(options.retryDelayMs || 800, 1000),
-        fetchFn: options.fetchFn
+        fetchFn: options.fetchFn || this.fetchFn
       });
 
       const rawOutputs = Array.isArray(json?.outputs) ? json.outputs : [];
       if (rawOutputs.length === 0) {
         throw new Error('No outputs produced by Gemini API.');
+      }
+
+      // Validate that each output contains non-empty content
+      for (const out of rawOutputs) {
+        if (!out.content) {
+          throw new Error(`Empty content returned by Gemini for format ${out.format || 'unknown'}`);
+        }
+        if (typeof out.content === 'string' && out.content.trim().length === 0) {
+          throw new Error(`Empty content returned by Gemini for format ${out.format || 'unknown'}`);
+        }
+        if (typeof out.content === 'object' && Object.keys(out.content).length === 0) {
+          throw new Error(`Empty object content returned by Gemini for format ${out.format || 'unknown'}`);
+        }
       }
 
       return rawOutputs.map(out => {
@@ -582,6 +601,7 @@ export class GeminiAIProvider extends AIProviderInterface {
             provider: 'Gemini 3.8 Flash',
             isFallback: false,
             reason: null,
+            fallbackReason: null,
             generatedAt: new Date().toISOString(),
             wordCount,
             charCount
@@ -615,7 +635,8 @@ export class GeminiAIProvider extends AIProviderInterface {
           ...out.metadata,
           provider: 'DeterministicFallback',
           isFallback: true,
-          reason: fallbackReason
+          reason: fallbackReason,
+          fallbackReason: fallbackReason
         }
       }));
     }
@@ -678,7 +699,7 @@ ${sourceData.extractedText || sourceData.rawText}`;
         timeoutMs: Math.min(options.timeoutMs || 20000, 20000),
         retries: options.retries ?? 1,
         retryDelayMs: Math.min(options.retryDelayMs || 800, 1000),
-        fetchFn: options.fetchFn
+        fetchFn: options.fetchFn || this.fetchFn
       });
 
       return {
@@ -745,14 +766,16 @@ ${sourceData.extractedText || sourceData.rawText}`;
           ...out.metadata,
           provider: 'DeterministicFallback',
           isFallback: true,
+          reason: 'Gemini quota exhausted',
           fallbackReason: 'Gemini quota exhausted'
         }
       }));
     }
 
     try {
+      const isRegen = Boolean(options?.isRegeneration || options?.variantSeed);
       const systemInstruction = buildCommunicationSystemPrompt();
-      const userPrompt = buildCommunicationUserPrompt(request);
+      const userPrompt = buildCommunicationUserPrompt(request, options);
 
       const { json } = await callGeminiGenerateContent({
         apiKey: this.apiKey,
@@ -761,16 +784,24 @@ ${sourceData.extractedText || sourceData.rawText}`;
         prompt: userPrompt,
         jsonMode: true,
         thinkingLevel: 'low',
-        temperature: 0.2,
+        temperature: isRegen ? 0.35 : 0.2,
         timeoutMs: Math.min(options.timeoutMs || 20000, 20000),
         retries: options.retries ?? 1,
         retryDelayMs: Math.min(options.retryDelayMs || 800, 1000),
-        fetchFn: options.fetchFn
+        fetchFn: options.fetchFn || this.fetchFn
       });
 
       const rawOutputs = Array.isArray(json?.outputs) ? json.outputs : [];
       if (rawOutputs.length === 0) {
         throw new Error('No communication outputs produced by Gemini API.');
+      }
+
+      // Validate that each channel output contains non-empty content
+      for (const out of rawOutputs) {
+        const str = typeof out.content === 'string' ? out.content.trim() : JSON.stringify(out.content || '');
+        if (!str || str === '""' || str === '{}' || str === '[]') {
+          throw new Error(`Empty content returned by Gemini for channel ${out.channelId || 'unknown'}`);
+        }
       }
 
       return rawOutputs.map(out => {
@@ -786,6 +817,7 @@ ${sourceData.extractedText || sourceData.rawText}`;
           metadata: {
             provider: 'Gemini 3.8 Flash',
             isFallback: false,
+            reason: null,
             fallbackReason: null,
             generatedAt: new Date().toISOString(),
             wordCount,
@@ -821,7 +853,8 @@ ${sourceData.extractedText || sourceData.rawText}`;
           ...out.metadata,
           provider: 'DeterministicFallback',
           isFallback: true,
-          fallbackReason
+          reason: fallbackReason,
+          fallbackReason: fallbackReason
         }
       }));
     }

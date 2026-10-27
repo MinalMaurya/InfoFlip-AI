@@ -632,6 +632,21 @@ export default function App() {
             }
           }));
         }
+      } catch (err) {
+        console.error('Failed to regenerate output item:', err);
+        persistWorkspace((prev) => ({
+          ...prev,
+          contentItemsById: {
+            ...prev.contentItemsById,
+            [itemId]: {
+              ...existingItem,
+              metadata: {
+                ...existingItem.metadata,
+                regenerationError: err.message || 'Regeneration failed. Please try again.'
+              }
+            }
+          }
+        }));
       } finally {
         setRegeneratingItemId(null);
       }

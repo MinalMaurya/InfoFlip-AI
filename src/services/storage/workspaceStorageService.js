@@ -144,6 +144,8 @@ export function sanitizeWorkspaceState(raw) {
           sourceTraceability: Array.isArray(item.sourceTraceability) ? item.sourceTraceability : [],
           sourceReference: item.sourceReference && typeof item.sourceReference === 'object' ? item.sourceReference : null,
           previousApprovedVersion: item.previousApprovedVersion && typeof item.previousApprovedVersion === 'object' ? item.previousApprovedVersion : null,
+          version: typeof item.version === 'number' ? item.version : 1,
+          versionHistory: Array.isArray(item.versionHistory) ? item.versionHistory : [],
           approvalInfo: item.approvalInfo && typeof item.approvalInfo === 'object' ? item.approvalInfo : null,
           lineage: item.lineage && typeof item.lineage === 'object' ? item.lineage : {
             sourceId: item.sourceId || 'src-unknown',

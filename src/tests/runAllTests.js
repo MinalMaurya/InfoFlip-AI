@@ -81,8 +81,14 @@ if (v021Tests.status !== 0) {
   process.exit(v021Tests.status || 1);
 }
 
+const v030Tests = spawnSync('node', [path.join(__dirname, 'contentGenerationReliabilityV030.test.js')], { stdio: 'inherit' });
+if (v030Tests.status !== 0) {
+  console.error('\n❌ Content generation reliability v0.3.0 test suite failed!');
+  process.exit(v030Tests.status || 1);
+}
+
 console.log('====================================================');
-console.log('🎉 ALL SUITES PASSED: 954/954 TESTS PASSING (100%)');
+console.log('🎉 ALL SUITES PASSED: 1047/1047 TESTS PASSING (100%)');
 console.log('  - Module 1 (Input & Ingestion): 57/57');
 console.log('  - Module 2 (Understanding & Analysis): 63/63');
 console.log('  - Module 3 (Transformation & Output Engine): 103/103');
@@ -95,6 +101,7 @@ console.log('  - Chat-Centered Workspace, Landing Page & UI Suite: 59/59');
 console.log('  - Route Refresh & Navigation Preservation Suite: 13/13');
 console.log('  - Landing Page Animation, Responsiveness & Header Suite: 20/20');
 console.log('  - v0.2.1 Output Management, Regeneration & Isolation Suite: 66/66');
+console.log('  - v0.3.0 Content Generation Reliability Suite: 93/93');
 console.log('====================================================\n');
 
 

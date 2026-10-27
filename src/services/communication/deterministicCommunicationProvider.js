@@ -51,13 +51,28 @@ export class DeterministicCommunicationProvider {
       requestedChannels = []
     } = request;
 
+    const rawText = (sourceContent.extractedText || sourceContent.rawText || '').trim();
+    const hasOverview = Boolean(analysis.overview?.mainTopic || analysis.overview?.summary);
+    const hasFacts = Array.isArray(analysis.keyFacts) && analysis.keyFacts.length > 0;
+
+    if (!rawText && !hasOverview && !hasFacts) {
+      throw new Error('Deterministic communication fallback failed: Insufficient source content or analysis provided (minimum 15 characters required) to generate grounded communication output without hallucination.');
+    }
+    if (rawText.length > 0 && rawText.length < 15 && !hasOverview && !hasFacts) {
+      throw new Error('Deterministic communication fallback failed: Source text is too brief (minimum 15 characters required) to produce meaningful output.');
+    }
+
     const lang = config.language || 'English';
-    const audience = config.targetAudience || 'General Public';
+    const audience = Array.isArray(config.targetAudience) 
+      ? config.targetAudience.join(', ') 
+      : (config.targetAudience || 'General Public');
     const tone = config.tone || 'Informative';
+    const detail = config.detailLevel || 'Balanced';
+    const objective = config.primaryObjective || config.objective || '';
+    const style = config.contentStyle || config.style || '';
     const fallbackReason = options.fallbackReason || options.reason || null;
 
     // Extract core grounding materials
-    const rawText = sourceContent.extractedText || sourceContent.rawText || '';
     const mainTopic = analysis.overview?.mainTopic || analysis.overview?.title || 'Important Update';
     const summary = analysis.overview?.summary || rawText.slice(0, 200);
     
@@ -103,7 +118,11 @@ export class DeterministicCommunicationProvider {
             dates,
             numbers,
             urgency,
-            rawText
+            rawText,
+            detail,
+            objective,
+            style,
+            options
           });
           content = res.content;
           title = res.title;
@@ -123,7 +142,7 @@ export class DeterministicCommunicationProvider {
             sourceId,
             audience,
             tone,
-            detail: config.detailLevel || 'Balanced',
+            detail,
             options
           });
           content = res.content;
@@ -145,7 +164,7 @@ export class DeterministicCommunicationProvider {
             sourceId,
             audience,
             tone,
-            detail: config.detailLevel || 'Balanced',
+            detail,
             options
           });
           content = res.content;
@@ -156,7 +175,20 @@ export class DeterministicCommunicationProvider {
         }
 
         case COMMUNICATION_CHANNEL_IDS.EMAIL: {
-          const res = this.buildEmail({ mainTopic, summary, keyFacts, audience, tone, dates, lang, sourceId });
+          const res = this.buildEmail({ 
+            mainTopic, 
+            summary, 
+            keyFacts, 
+            audience, 
+            tone, 
+            dates, 
+            lang, 
+            sourceId, 
+            detail, 
+            objective, 
+            style, 
+            options 
+          });
           content = res.content;
           title = res.title;
           structuredData = res.structuredData;
@@ -165,7 +197,17 @@ export class DeterministicCommunicationProvider {
         }
 
         case COMMUNICATION_CHANNEL_IDS.SMS: {
-          const res = this.buildSMS({ mainTopic, keyFacts, dates, numbers, lang, sourceId });
+          const res = this.buildSMS({ 
+            mainTopic, 
+            keyFacts, 
+            dates, 
+            numbers, 
+            lang, 
+            sourceId, 
+            tone, 
+            audience, 
+            options 
+          });
           content = res.content;
           title = res.title;
           structuredData = res.structuredData;
@@ -174,7 +216,19 @@ export class DeterministicCommunicationProvider {
         }
 
         case COMMUNICATION_CHANNEL_IDS.ANNOUNCEMENT: {
-          const res = this.buildAnnouncement({ mainTopic, summary, keyFacts, dates, urgency, lang, sourceId });
+          const res = this.buildAnnouncement({ 
+            mainTopic, 
+            summary, 
+            keyFacts, 
+            dates, 
+            urgency, 
+            lang, 
+            sourceId, 
+            tone, 
+            audience, 
+            detail, 
+            options 
+          });
           content = res.content;
           title = res.title;
           structuredData = res.structuredData;
@@ -183,7 +237,18 @@ export class DeterministicCommunicationProvider {
         }
 
         case COMMUNICATION_CHANNEL_IDS.CTA: {
-          const res = this.buildCTA({ mainTopic, keyFacts, dates, lang, sourceId });
+          const res = this.buildCTA({ 
+            mainTopic, 
+            keyFacts, 
+            dates, 
+            lang, 
+            sourceId, 
+            audience, 
+            tone, 
+            objective, 
+            style, 
+            options 
+          });
           content = res.content;
           title = res.title;
           structuredData = res.structuredData;
@@ -192,7 +257,13 @@ export class DeterministicCommunicationProvider {
         }
 
         case COMMUNICATION_CHANNEL_IDS.HASHTAGS: {
-          const res = this.buildHashtags({ mainTopic, analysis, entities, sourceId });
+          const res = this.buildHashtags({ 
+            mainTopic, 
+            analysis, 
+            entities, 
+            sourceId, 
+            options 
+          });
           content = res.content;
           title = res.title;
           structuredData = res.structuredData;
@@ -417,35 +488,57 @@ export class DeterministicCommunicationProvider {
   }
 
   // 4. EMAIL DISPATCH
-  buildEmail({ mainTopic, summary, keyFacts, audience, tone, dates, lang, sourceId }) {
+  buildEmail({ 
+    mainTopic, 
+    summary, 
+    keyFacts = [], 
+    audience = 'General Public', 
+    tone = 'Informative', 
+    dates = [], 
+    lang = 'English', 
+    sourceId = 'src-1',
+    detail = 'Balanced',
+    objective = '',
+    style = '',
+    options = {}
+  }) {
     const isHindi = lang === 'Hindi';
     const isMarathi = lang === 'Marathi';
+    const isRegen = Boolean(options?.isRegeneration || options?.variantSeed);
 
     const deadline = dates.length > 0 ? ` Note that relevant dates include ${dates[0].date}.` : '';
+    const factLimit = detail === 'Concise' ? 2 : (detail === 'Detailed' ? 5 : 4);
+    const factsPool = (isRegen && keyFacts.length >= 2)
+      ? [keyFacts[1], keyFacts[0], ...keyFacts.slice(2)]
+      : keyFacts;
+    const factsBullets = factsPool.slice(0, factLimit).map(f => `• ${f}`).join('\n');
 
-    let subject = `Subject: [Update] ${mainTopic}`;
-    let preview = `Preview: Essential information and key actions regarding ${mainTopic}.`;
+    let subject = isRegen ? `Subject: [Key Insights] ${mainTopic}` : `Subject: [Update] ${mainTopic}`;
+    let preview = isRegen ? `Preview: Critical takeaways and verified action items regarding ${mainTopic}.` : `Preview: Essential information and key actions regarding ${mainTopic}.`;
     let greeting = `Dear ${audience || 'Colleague'},`;
-    let opening = `We are writing to provide you with an important briefing on ${mainTopic}.\n\n${summary}`;
-    let factsHeading = `Key factual points for your review:`;
-    let factsBullets = keyFacts.slice(0, 4).map(f => `• ${f}`).join('\n');
-    let cta = `Recommended Next Step: Please review the verified details above and ensure any required coordination is completed.${deadline}`;
+    let opening = isRegen
+      ? `We are sharing this detailed operational overview on ${mainTopic} for your reference.\n\n${summary}`
+      : `We are writing to provide you with an important briefing on ${mainTopic}.\n\n${summary}`;
+    let factsHeading = isRegen ? `Key operational points for your review:` : `Key factual points for your review:`;
+    let cta = isRegen
+      ? `Recommended Next Step: Please review the operational directives outlined above and align relevant stakeholders accordingly.${deadline}`
+      : `Recommended Next Step: Please review the verified details above and ensure any required coordination is completed.${deadline}`;
     let closing = `Best regards,\nInfoFlip Communication Desk`;
 
     if (isHindi) {
-      subject = `विषय: [महत्वपूर्ण अपडेट] ${mainTopic}`;
+      subject = isRegen ? `विषय: [रणनीतिक अपडेट] ${mainTopic}` : `विषय: [महत्वपूर्ण अपडेट] ${mainTopic}`;
       preview = `पूर्वावलोकन: ${mainTopic} के संबंध में आवश्यक जानकारी और कदम।`;
       greeting = `प्रिय ${audience || 'साथी'},`;
       opening = `हम आपको ${mainTopic} के बारे में यह आधिकारिक विवरण साझा कर रहे हैं।\n\n${summary}`;
-      factsHeading = `सत्यापित मुख्य बिंदु:`;
+      factsHeading = isRegen ? `मुख्य रणनीतिक बिंदु:` : `सत्यापित मुख्य बिंदु:`;
       cta = `आगामी कदम: कृपया दिए गए विवरण की समीक्षा करें और आवश्यक निर्देशों का पालन करें।${deadline}`;
       closing = `सादर,\nइन्फोफ्लिप संचार विभाग`;
     } else if (isMarathi) {
-      subject = `विषय: [महत्त्वाचे अपडेट] ${mainTopic}`;
+      subject = isRegen ? `विषय: [विशेष अपडेट] ${mainTopic}` : `विषय: [महत्त्वाचे अपडेट] ${mainTopic}`;
       preview = `पूर्वावलोकन: ${mainTopic} संदर्भात महत्त्वाची माहिती आणि सूचना.`;
       greeting = `सस्नेह नमस्कार ${audience || 'मित्रहो'},`;
       opening = `आम्ही आपणास ${mainTopic} बाबतची अधिकृत माहिती देत आहोत.\n\n${summary}`;
-      factsHeading = `सत्यापित प्रमुख मुद्दे:`;
+      factsHeading = isRegen ? `प्रमुख कृती मुद्दे:` : `सत्यापित प्रमुख मुद्दे:`;
       cta = `पुढील पाऊल: कृपया वरील माहितीची खात्री करून आवश्यक ती कार्यवाही करावी.${deadline}`;
       closing = `आपला नम्र,\nइन्फोफ्लिप संप्रेषण कक्ष`;
     }
@@ -460,11 +553,11 @@ export class DeterministicCommunicationProvider {
         previewText: preview.replace('Preview: ', ''),
         greeting,
         opening,
-        keyFacts: keyFacts.slice(0, 4),
+        keyFacts: factsPool.slice(0, factLimit),
         cta,
         closing
       },
-      traceability: keyFacts.slice(0, 4).map(f => ({
+      traceability: factsPool.slice(0, factLimit).map(f => ({
         fact: f,
         sourceId,
         origin: 'analysis.keyFacts'
@@ -473,20 +566,38 @@ export class DeterministicCommunicationProvider {
   }
 
   // 5. SMS ALERT (< 160 chars)
-  buildSMS({ mainTopic, keyFacts, dates, numbers, lang, sourceId }) {
+  buildSMS({ 
+    mainTopic, 
+    keyFacts = [], 
+    dates = [], 
+    numbers = [], 
+    lang = 'English', 
+    sourceId = 'src-1',
+    tone = 'Informative',
+    audience = 'General Public',
+    options = {}
+  }) {
     const isHindi = lang === 'Hindi';
     const isMarathi = lang === 'Marathi';
+    const isRegen = Boolean(options?.isRegeneration || options?.variantSeed);
 
-    const firstFact = keyFacts[0] || 'Please review official notice.';
+    const factIndex = (isRegen && keyFacts.length > 1) ? 1 : 0;
+    const selectedFact = keyFacts[factIndex] || keyFacts[0] || 'Please review official notice.';
     const dateStr = dates.length > 0 ? ` by ${dates[0].date}` : '';
 
     let content = '';
     if (isHindi) {
-      content = `सूचना: ${mainTopic}। ${firstFact.slice(0, 75)}। विवरण हेतु आधिकारिक पोर्टल देखें।`;
+      content = isRegen
+        ? `अपडेट: ${mainTopic}। ${selectedFact.slice(0, 75)}। विस्तृत जानकारी पोर्टल पर उपलब्ध।`
+        : `सूचना: ${mainTopic}। ${selectedFact.slice(0, 75)}। विवरण हेतु आधिकारिक पोर्टल देखें।`;
     } else if (isMarathi) {
-      content = `सूचना: ${mainTopic}. ${firstFact.slice(0, 75)}. अधिक माहितीसाठी अधिकृत संकेतस्थळ पहा.`;
+      content = isRegen
+        ? `अपडेट: ${mainTopic}. ${selectedFact.slice(0, 75)}. तपशील अधिकृत संकेतस्थळावर उपलब्ध.`
+        : `सूचना: ${mainTopic}. ${selectedFact.slice(0, 75)}. अधिक माहितीसाठी अधिकृत संकेतस्थळ पहा.`;
     } else {
-      content = `ALERT: ${mainTopic}. ${firstFact.slice(0, 80)}${dateStr}. Refer to official guidelines for action.`;
+      content = isRegen
+        ? `NOTICE: ${mainTopic}. ${selectedFact.slice(0, 80)}${dateStr}. Consult official portal for next steps.`
+        : `ALERT: ${mainTopic}. ${selectedFact.slice(0, 80)}${dateStr}. Refer to official guidelines for action.`;
     }
 
     // Keep under 160 characters if possible
@@ -502,7 +613,7 @@ export class DeterministicCommunicationProvider {
         isUnderLimit: content.length <= 160
       },
       traceability: [{
-        fact: firstFact,
+        fact: selectedFact,
         sourceId,
         origin: 'analysis.keyFacts'
       }]
@@ -510,31 +621,49 @@ export class DeterministicCommunicationProvider {
   }
 
   // 6. PUBLIC ANNOUNCEMENT
-  buildAnnouncement({ mainTopic, summary, keyFacts, dates, urgency, lang, sourceId }) {
+  buildAnnouncement({ 
+    mainTopic, 
+    summary, 
+    keyFacts = [], 
+    dates = [], 
+    urgency, 
+    lang = 'English', 
+    sourceId = 'src-1',
+    tone = 'Informative',
+    audience = 'General Public',
+    detail = 'Balanced',
+    options = {}
+  }) {
     const isHindi = lang === 'Hindi';
     const isMarathi = lang === 'Marathi';
+    const isRegen = Boolean(options?.isRegeneration || options?.variantSeed);
 
     const deadlineSection = dates.length > 0 
       ? `\n\n${isHindi ? 'लागू तिथियां / समय सीमा:' : isMarathi ? 'लागू तारखा / मुदत:' : 'EFFECTIVE TIMELINE & DATES:'}\n${dates.map(d => `• ${d.date}: ${d.context}`).join('\n')}` 
       : '';
 
-    let titleText = `PUBLIC ANNOUNCEMENT: ${mainTopic.toUpperCase()}`;
+    const factLimit = detail === 'Concise' ? 2 : (detail === 'Detailed' ? 5 : 4);
+    const factsPool = (isRegen && keyFacts.length >= 2)
+      ? [keyFacts[1], keyFacts[0], ...keyFacts.slice(2)]
+      : keyFacts;
+    const instructions = factsPool.slice(0, factLimit).map((f, i) => `${i + 1}. ${f}`).join('\n');
+
+    let titleText = isRegen 
+      ? `PUBLIC ANNOUNCEMENT (REVISED): ${mainTopic.toUpperCase()}`
+      : `PUBLIC ANNOUNCEMENT: ${mainTopic.toUpperCase()}`;
     let overviewText = `FOR IMMEDIATE RELEASE / PUBLIC NOTICE\n\n${summary}`;
     let instructionsHeading = 'IMPORTANT PUBLIC INSTRUCTIONS:';
-    let instructions = keyFacts.slice(0, 4).map((f, i) => `${i + 1}. ${f}`).join('\n');
     let advisoryNote = 'Issued for general public awareness. Please consult designated authorities for further verification.';
 
     if (isHindi) {
-      titleText = `सार्वजनिक घोषणा: ${mainTopic}`;
+      titleText = isRegen ? `सार्वजनिक घोषणा (अद्यतन): ${mainTopic}` : `सार्वजनिक घोषणा: ${mainTopic}`;
       overviewText = `जनहित में जारी आधिकारिक सूचना\n\n${summary}`;
       instructionsHeading = 'नागरिकों के लिए महत्वपूर्ण निर्देश:';
-      instructions = keyFacts.slice(0, 4).map((f, i) => `${i + 1}. ${f}`).join('\n');
       advisoryNote = 'यह सूचना जन-जागरूकता हेतु जारी की गई है। किसी भी संशय की स्थिति में अधिकृत स्रोत से पुष्टि करें।';
     } else if (isMarathi) {
-      titleText = `सार्वजनिक घोषणा: ${mainTopic}`;
+      titleText = isRegen ? `सार्वजनिक घोषणा (सुधारित): ${mainTopic}` : `सार्वजनिक घोषणा: ${mainTopic}`;
       overviewText = `जनहितार्थ अधिकृत सूचना\n\n${summary}`;
       instructionsHeading = 'नागरिकांसाठी महत्त्वाच्या सूचना:';
-      instructions = keyFacts.slice(0, 4).map((f, i) => `${i + 1}. ${f}`).join('\n');
       advisoryNote = 'ही सूचना लोकजागृतीसाठी प्रसिद्ध केली आहे. अधिक माहितीसाठी अधिकृत विभागाशी संपर्क साधावा.';
     }
 
@@ -546,10 +675,10 @@ export class DeterministicCommunicationProvider {
       structuredData: {
         headline: titleText,
         overview: summary,
-        instructions: keyFacts.slice(0, 4),
+        instructions: factsPool.slice(0, factLimit),
         effectiveDates: dates
       },
-      traceability: keyFacts.slice(0, 4).map(f => ({
+      traceability: factsPool.slice(0, factLimit).map(f => ({
         fact: f,
         sourceId,
         origin: 'analysis.keyFacts'
@@ -558,25 +687,53 @@ export class DeterministicCommunicationProvider {
   }
 
   // 7. CALL-TO-ACTION (CTA) VARIANTS
-  buildCTA({ mainTopic, keyFacts, dates, lang, sourceId }) {
+  buildCTA({ 
+    mainTopic, 
+    keyFacts = [], 
+    dates = [], 
+    lang = 'English', 
+    sourceId = 'src-1',
+    audience = 'General Public',
+    tone = 'Informative',
+    objective = '',
+    style = '',
+    options = {}
+  }) {
     const isHindi = lang === 'Hindi';
     const isMarathi = lang === 'Marathi';
+    const isRegen = Boolean(options?.isRegeneration || options?.variantSeed);
 
     const deadlineStr = dates.length > 0 ? ` (Deadline: ${dates[0].date})` : '';
 
-    let v1 = `Primary Action: Review the latest guidance on ${mainTopic} and verify your readiness${deadlineStr}.`;
-    let v2 = `Immediate Step: Check official requirements and download the verified documentation now.`;
-    let v3 = `Community Share: Forward these verified facts to team members and impacted stakeholders.`;
-    let v4 = `Urgent Follow-up: Confirm all pending actions before the scheduled cutoff window.`;
+    let v1 = isRegen
+      ? `Primary Action: Take immediate action based on latest verified updates for ${mainTopic}${deadlineStr}.`
+      : `Primary Action: Review the latest guidance on ${mainTopic} and verify your readiness${deadlineStr}.`;
+    let v2 = isRegen
+      ? `Immediate Step: Access the official compliance checklist and secure verified documentation.`
+      : `Immediate Step: Check official requirements and download the verified documentation now.`;
+    let v3 = isRegen
+      ? `Community Share: Disseminate these critical parameters across internal teams and partner channels.`
+      : `Community Share: Forward these verified facts to team members and impacted stakeholders.`;
+    let v4 = isRegen
+      ? `Urgent Follow-up: Audit all active procedures prior to the next scheduled assessment.`
+      : `Urgent Follow-up: Confirm all pending actions before the scheduled cutoff window.`;
 
     if (isHindi) {
-      v1 = `मुख्य कदम: ${mainTopic} संबंधी नवीनतम निर्देशों की समीक्षा करें और पुष्टि करें${deadlineStr}।`;
-      v2 = `तत्काल कदम: आधिकारिक आवश्यकताओं की जांच करें और सत्यापित जानकारी प्राप्त करें।`;
+      v1 = isRegen
+        ? `मुख्य कदम: ${mainTopic} हेतु नवीनतम सत्यापित निर्देशों पर तत्काल अमल करें${deadlineStr}।`
+        : `मुख्य कदम: ${mainTopic} संबंधी नवीनतम निर्देशों की समीक्षा करें और पुष्टि करें${deadlineStr}।`;
+      v2 = isRegen
+        ? `तत्काल कदम: आधिकारिक जांच सूची का उपयोग करें और सभी जरूरी दस्तावेज प्राप्त करें।`
+        : `तत्काल कदम: आधिकारिक आवश्यकताओं की जांच करें और सत्यापित जानकारी प्राप्त करें।`;
       v3 = `साझा करने हेतु: इस सत्यापित जानकारी को अपने सहयोगियों और प्रभावित लोगों तक पहुंचाएं।`;
       v4 = `समयबद्ध कदम: समय सीमा समाप्त होने से पूर्व आवश्यक कार्यवाही पूरी करें।`;
     } else if (isMarathi) {
-      v1 = `मुख्य कृती: ${mainTopic} बाबत अधिकृत नियमावली तपासा आणि खात्री करा${deadlineStr}.`;
-      v2 = `त्वरित कृती: अधिकृत अटींची पडताळणी करा आणि आवश्यक ती कागदपत्रे मिळवा.`;
+      v1 = isRegen
+        ? `मुख्य कृती: ${mainTopic} संदर्भातील अद्यतन सूचनांनुसार तातडीने कृती करा${deadlineStr}.`
+        : `मुख्य कृती: ${mainTopic} बाबत अधिकृत नियमावली तपासा आणि खात्री करा${deadlineStr}.`;
+      v2 = isRegen
+        ? `त्वरित कृती: अधिकृत तपासणी सूची वापरा आणि महत्त्वाची कागदपत्रे पडताळून घ्या.`
+        : `त्वरित कृती: अधिकृत अटींची पडताळणी करा आणि आवश्यक ती कागदपत्रे मिळवा.`;
       v3 = `माहिती शेअर करा: ही सत्यापित माहिती सर्व सहकारी आणि संबंधितांपर्यंत पोहोचवा.`;
       v4 = `मुदतपूर्व कृती: अंतिम मुदतीपूर्वी सर्व प्रलंबित कामे पूर्ण करा.`;
     }
@@ -604,8 +761,9 @@ export class DeterministicCommunicationProvider {
   }
 
   // 8. HASHTAG SUGGESTIONS
-  buildHashtags({ mainTopic, analysis, entities, sourceId }) {
+  buildHashtags({ mainTopic, analysis = {}, entities = {}, sourceId = 'src-1', options = {} }) {
     const isEmerg = isEmergencyContent({ analysis, mainTopic });
+    const isRegen = Boolean(options?.isRegeneration || options?.variantSeed);
     const tagsSet = new Set();
 
     if (isEmerg) {
@@ -649,7 +807,10 @@ export class DeterministicCommunicationProvider {
     tagsSet.add('#InfoFlip');
 
     // Filter all tags to ensure readability (length <= 25)
-    const validTags = Array.from(tagsSet).filter(t => t.length >= 3 && t.length <= 25);
+    let validTags = Array.from(tagsSet).filter(t => t.length >= 3 && t.length <= 25);
+    if (isRegen && validTags.length > 3) {
+      validTags = [validTags[1], validTags[2], validTags[0], ...validTags.slice(3)];
+    }
     const tagsArray = validTags.slice(0, 8);
     const content = `RECOMMENDED TOPIC HASHTAGS:\n\n${tagsArray.join(' ')}\n\n(Generated strictly from source topics, entities, and category)`;
 
