@@ -429,7 +429,46 @@ export function resolveFollowUpContext({
     }
   }
 
-  // 5. Format mentions in follow-up instructions
+  // 5. Objective adjustments
+  const objectiveMatchers = [
+    { regex: /\beducate|educational\b/, objective: 'Educate' },
+    { regex: /\bannounce|announcement\b/, objective: 'Announce' },
+    { regex: /\bexplain|explanatory\b/, objective: 'Explain' },
+    { regex: /\bpersuade|persuasive\b/, objective: 'Persuade' },
+    { regex: /\badvise|advisory\b/, objective: 'Advise' },
+    { regex: /\bpromote|promotional\b/, objective: 'Promote' },
+    { regex: /\bsummarize|summary brief\b/, objective: 'Summarize' },
+    { regex: /\bengage|engagement\b/, objective: 'Engage' },
+    { regex: /\binform|informative\b/, objective: 'Inform' }
+  ];
+  for (const o of objectiveMatchers) {
+    if (o.regex.test(lower)) {
+      resolvedConfig.objective = o.objective;
+      adjustments.push(`Objective: ${o.objective}`);
+      break;
+    }
+  }
+
+  // 6. Content Style adjustments
+  const styleMatchers = [
+    { regex: /\bplain text|unformatted|no bullets\b/, style: 'Plain Text' },
+    { regex: /\bbullet points|bullets\b/, style: 'Bullet Points' },
+    { regex: /\bstorytelling|narrative\b/, style: 'Storytelling' },
+    { regex: /\bexecutive style|executive briefing\b/, style: 'Executive' },
+    { regex: /\btechnical style\b/, style: 'Technical' },
+    { regex: /\bsocial media style|social format\b/, style: 'Social Media' },
+    { regex: /\bstructured\b/, style: 'Structured' },
+    { regex: /\bprofessional style\b/, style: 'Professional' }
+  ];
+  for (const s of styleMatchers) {
+    if (s.regex.test(lower)) {
+      resolvedConfig.contentStyle = s.style;
+      adjustments.push(`Style: ${s.style}`);
+      break;
+    }
+  }
+
+  // 7. Format mentions in follow-up instructions
   // If user specifically asks to adjust a format (e.g. "Make the LinkedIn post shorter"),
   // focus the follow-up refinement on the mentioned format(s).
   const formatMentions = [
@@ -441,7 +480,7 @@ export function resolveFollowUpContext({
     { regex: /\bannouncement\b/, id: 'announcement' },
     { regex: /\bcta\b|\bcall to action\b|\bcall-to-action\b/, id: 'cta' },
     { regex: /\bhashtag/, id: 'hashtags' },
-    { regex: /\bexecutive summary\b|\bsummary\b/, id: 'executive-summary' },
+    { regex: /\bexecutive summary\b|\bsummary\b|\barticle\b/, id: 'executive-summary' },
     { regex: /\badvisory\b/, id: 'advisory' },
     { regex: /\binfographic\b/, id: 'infographic' },
     { regex: /\bpresentation\b|\bslide/, id: 'presentation' },

@@ -143,6 +143,8 @@ export class DeterministicCommunicationProvider {
             audience,
             tone,
             detail,
+            objective,
+            style,
             options
           });
           content = res.content;
@@ -165,6 +167,8 @@ export class DeterministicCommunicationProvider {
             audience,
             tone,
             detail,
+            objective,
+            style,
             options
           });
           content = res.content;
@@ -227,6 +231,8 @@ export class DeterministicCommunicationProvider {
             tone, 
             audience, 
             detail, 
+            objective,
+            style,
             options 
           });
           content = res.content;
@@ -328,6 +334,8 @@ export class DeterministicCommunicationProvider {
     audience = 'General Public',
     tone = 'Informative',
     detail = 'Balanced',
+    objective = '',
+    style = '',
     options = {}
   }) {
     const isHindi = lang === 'Hindi';
@@ -339,7 +347,16 @@ export class DeterministicCommunicationProvider {
 
     let tonePrefix = '📢';
     let toneLabel = 'UPDATE';
-    if (toneNormalized.includes('urgent') || toneNormalized.includes('crisis')) {
+    if (objective === 'Advise') {
+      tonePrefix = '🛡️';
+      toneLabel = 'ACTION ADVISORY';
+    } else if (objective === 'Educate') {
+      tonePrefix = '💡';
+      toneLabel = 'EXPLAINER';
+    } else if (objective === 'Announce') {
+      tonePrefix = '📢';
+      toneLabel = 'ANNOUNCEMENT';
+    } else if (toneNormalized.includes('urgent') || toneNormalized.includes('crisis')) {
       tonePrefix = '🚨';
       toneLabel = 'URGENT ADVISORY';
     } else if (toneNormalized.includes('formal') || toneNormalized.includes('professional')) {
@@ -353,9 +370,11 @@ export class DeterministicCommunicationProvider {
     const factPool = Array.isArray(keyFacts) && keyFacts.length > 0 ? keyFacts : ['Verified information'];
     let selectedFact1 = factPool[0];
     let selectedFact2 = factPool[1] || factPool[0];
+    let selectedFact3 = factPool[2] || factPool[0];
     if (isRegen && factPool.length > 2) {
       selectedFact1 = factPool[1];
       selectedFact2 = factPool[2];
+      selectedFact3 = factPool[0];
     } else if (isRegen && factPool.length === 2) {
       selectedFact1 = factPool[1];
       selectedFact2 = factPool[0];
@@ -364,32 +383,41 @@ export class DeterministicCommunicationProvider {
     let tweet1 = '';
     let tweet2 = '';
     let tweet3 = '';
+    let tweet4 = '';
 
     if (isHindi) {
       tweet1 = `1/3 ${tonePrefix} ${mainTopic}${numStr}: ${summary.slice(0, 160)}...`;
-      tweet2 = `2/3 🔍 मुख्य तथ्य:\n• ${selectedFact1}\n• ${selectedFact2}`;
+      tweet2 = `2/3 🔍 मुख्य तथ्य:\n• ${selectedFact1.slice(0, 95)}\n• ${selectedFact2.slice(0, 95)}`;
       tweet3 = `3/3 ℹ️ पूरी जानकारी का पालन करें और दूसरों के साथ साझा करें। #InfoFlip #${mainTopic.replace(/[^a-zA-Z0-9]/g, '')}`;
     } else if (isMarathi) {
       tweet1 = `1/3 ${tonePrefix} ${mainTopic}${numStr}: ${summary.slice(0, 160)}...`;
-      tweet2 = `2/3 🔍 प्रमुख मुद्दे:\n• ${selectedFact1}\n• ${selectedFact2}`;
+      tweet2 = `2/3 🔍 प्रमुख मुद्दे:\n• ${selectedFact1.slice(0, 95)}\n• ${selectedFact2.slice(0, 95)}`;
       tweet3 = `3/3 ℹ️ ही माहिती लक्षात ठेवा आणि इतरांसोबत शेअर करा. #InfoFlip #${mainTopic.replace(/[^a-zA-Z0-9]/g, '')}`;
     } else {
       const audienceTag = audience && audience !== 'General Public' ? ` [For ${audience}]` : '';
       if (isRegen) {
-        tweet1 = `1/3 ${tonePrefix} [${toneLabel}] ${mainTopic}${numStr}:${audienceTag} ${summary.slice(0, 170)}`;
-        tweet2 = `2/3 🔍 Key Highlights & Directives:\n• ${selectedFact1}\n• ${selectedFact2}`;
+        tweet1 = `1/3 ${tonePrefix} [${toneLabel}] ${mainTopic}${numStr}:${audienceTag} ${summary.slice(0, 150)}`;
+        tweet2 = `2/3 🔍 Key Highlights & Directives:\n• ${selectedFact1.slice(0, 90)}\n• ${selectedFact2.slice(0, 90)}`;
         tweet3 = `3/3 ℹ️ Verified under ${tone} protocol. Share official updates with relevant teams. #${mainTopic.replace(/[^a-zA-Z0-9]/g, '')} #InfoFlip`;
       } else {
-        tweet1 = `1/3 ${tonePrefix} ${mainTopic}${numStr}:${audienceTag} ${summary.slice(0, 180)}`;
-        tweet2 = `2/3 🔍 Key Highlights:\n• ${selectedFact1}\n• ${selectedFact2}`;
+        tweet1 = `1/3 ${tonePrefix} [${toneLabel}] ${mainTopic}${numStr}:${audienceTag} ${summary.slice(0, 150)}`;
+        tweet2 = `2/3 🔍 Key Highlights:\n• ${selectedFact1.slice(0, 90)}\n• ${selectedFact2.slice(0, 90)}`;
         tweet3 = `3/3 ℹ️ Follow official guidelines and share with those affected. #${mainTopic.replace(/[^a-zA-Z0-9]/g, '')} #Update`;
+      }
+      if (detail === 'Detailed') {
+        tweet4 = `4/4 📊 Directives & Follow-up:\n• ${selectedFact3.slice(0, 100)}\nConsult authorized portals for active logs.`;
       }
     }
 
     let posts = [tweet1, tweet2, tweet3];
     if (detail === 'Concise') {
       posts = [tweet1, tweet2];
+    } else if (detail === 'Detailed' && tweet4) {
+      posts = [tweet1.replace('1/3', '1/4'), tweet2.replace('2/3', '2/4'), tweet3.replace('3/3', '3/4'), tweet4];
     }
+
+    // Strictly enforce 280-character maximum per tweet
+    posts = posts.map(p => (p.length > 280 ? p.slice(0, 277) + '...' : p));
 
     const content = posts.join('\n\n---\n\n');
 
@@ -422,6 +450,8 @@ export class DeterministicCommunicationProvider {
     audience = 'General Public',
     tone = 'Informative',
     detail = 'Balanced',
+    objective = '',
+    style = '',
     options = {}
   }) {
     const isHindi = lang === 'Hindi';
@@ -431,7 +461,13 @@ export class DeterministicCommunicationProvider {
     const toneNormalized = String(tone || 'Informative').toLowerCase();
 
     let headerPrefix = '📢 OFFICIAL BROADCAST';
-    if (toneNormalized.includes('urgent') || toneNormalized.includes('crisis')) {
+    if (objective === 'Advise') {
+      headerPrefix = '🛡️ ACTION ADVISORY';
+    } else if (objective === 'Educate') {
+      headerPrefix = '💡 LEARNING BRIEF';
+    } else if (objective === 'Announce') {
+      headerPrefix = '📢 OFFICIAL ANNOUNCEMENT';
+    } else if (toneNormalized.includes('urgent') || toneNormalized.includes('crisis')) {
       headerPrefix = '⚠️ URGENT ADVISORY';
     } else if (toneNormalized.includes('empathetic') || toneNormalized.includes('supportive')) {
       headerPrefix = '🤝 COMMUNITY NOTICE';
@@ -632,6 +668,8 @@ export class DeterministicCommunicationProvider {
     tone = 'Informative',
     audience = 'General Public',
     detail = 'Balanced',
+    objective = '',
+    style = '',
     options = {}
   }) {
     const isHindi = lang === 'Hindi';
@@ -651,6 +689,17 @@ export class DeterministicCommunicationProvider {
     let titleText = isRegen 
       ? `PUBLIC ANNOUNCEMENT (REVISED): ${mainTopic.toUpperCase()}`
       : `PUBLIC ANNOUNCEMENT: ${mainTopic.toUpperCase()}`;
+
+    if (objective === 'Advise') {
+      titleText = isRegen
+        ? `PUBLIC ADVISORY NOTICE (REVISED): ${mainTopic.toUpperCase()}`
+        : `PUBLIC ADVISORY NOTICE: ${mainTopic.toUpperCase()}`;
+    } else if (objective === 'Educate') {
+      titleText = isRegen
+        ? `PUBLIC EDUCATIONAL BRIEFING (REVISED): ${mainTopic.toUpperCase()}`
+        : `PUBLIC EDUCATIONAL BRIEFING: ${mainTopic.toUpperCase()}`;
+    }
+
     let overviewText = `FOR IMMEDIATE RELEASE / PUBLIC NOTICE\n\n${summary}`;
     let instructionsHeading = 'IMPORTANT PUBLIC INSTRUCTIONS:';
     let advisoryNote = 'Issued for general public awareness. Please consult designated authorities for further verification.';

@@ -4,7 +4,7 @@ import { buildTransformationSystemPrompt, buildTransformationUserPrompt } from '
 import { createOutputItem } from '../../types/transformation.js';
 import { buildCommunicationSystemPrompt, buildCommunicationUserPrompt } from '../communication/communicationPrompts.js';
 import { createCommunicationOutputItem } from '../../types/communication.js';
-import { DeterministicCommunicationProvider } from '../communication/deterministicCommunicationProvider.js';
+import { DeterministicCommunicationProvider, removeRepetitiveHeadings } from '../communication/deterministicCommunicationProvider.js';
 
 /**
  * Global quota exhaustion tracker within the active browser session.
@@ -574,7 +574,7 @@ export class GeminiAIProvider extends AIProviderInterface {
         throw new Error('No outputs produced by Gemini API.');
       }
 
-      // Validate that each output contains non-empty content
+      // Validate that each output contains non-empty content and valid structure
       for (const out of rawOutputs) {
         if (!out.content) {
           throw new Error(`Empty content returned by Gemini for format ${out.format || 'unknown'}`);
@@ -584,6 +584,28 @@ export class GeminiAIProvider extends AIProviderInterface {
         }
         if (typeof out.content === 'object' && Object.keys(out.content).length === 0) {
           throw new Error(`Empty object content returned by Gemini for format ${out.format || 'unknown'}`);
+        }
+        // Critical structure check for executive-summary / article briefs
+        if (out.format === 'executive-summary' && typeof out.content === 'object') {
+          if (!out.content.title && !out.content.executiveOverview && !out.content.keyPoints) {
+            throw new Error('Invalid structure for executive-summary: missing title, executiveOverview, and keyPoints.');
+          }
+        }
+      }
+
+      // Cross-format anti-duplication guardrail: distinct formats must not return identical content
+      if (rawOutputs.length > 1) {
+        const seenTexts = new Map();
+        for (const out of rawOutputs) {
+          const str = (typeof out.content === 'string' ? out.content.trim() : JSON.stringify(out.content)).toLowerCase();
+          if (seenTexts.has(str)) {
+            const priorFormat = seenTexts.get(str);
+            if (priorFormat !== out.format) {
+              throw new Error(`Cross-format duplication detected: identical content generated under '${priorFormat}' and '${out.format}'.`);
+            }
+          } else {
+            seenTexts.set(str, out.format);
+          }
         }
       }
 
@@ -796,11 +818,48 @@ ${sourceData.extractedText || sourceData.rawText}`;
         throw new Error('No communication outputs produced by Gemini API.');
       }
 
-      // Validate that each channel output contains non-empty content
+      // Validate and sanitize each channel output
       for (const out of rawOutputs) {
-        const str = typeof out.content === 'string' ? out.content.trim() : JSON.stringify(out.content || '');
+        let str = typeof out.content === 'string' ? out.content.trim() : JSON.stringify(out.content || '');
         if (!str || str === '""' || str === '{}' || str === '[]') {
           throw new Error(`Empty content returned by Gemini for channel ${out.channelId || 'unknown'}`);
+        }
+
+        // Channel-specific post-processing guardrails
+        if (out.channelId === 'sms') {
+          // Strictly enforce SMS character limit <= 160
+          if (str.length > 160) {
+            str = str.slice(0, 157) + '...';
+          }
+          out.content = str;
+        } else if (out.channelId === 'linkedin') {
+          out.content = removeRepetitiveHeadings(str);
+        } else if (out.channelId === 'whatsapp') {
+          // Limit hashtags to at most 1
+          const tagMatches = str.match(/#\w+/g) || [];
+          if (tagMatches.length > 1) {
+            let count = 0;
+            out.content = str.replace(/#\w+/g, (match) => {
+              count++;
+              return count <= 1 ? match : '';
+            }).replace(/\s{2,}/g, ' ').trim();
+          }
+        }
+      }
+
+      // Cross-channel anti-duplication guardrail
+      if (rawOutputs.length > 1) {
+        const seenTexts = new Map();
+        for (const out of rawOutputs) {
+          const str = (typeof out.content === 'string' ? out.content.trim() : JSON.stringify(out.content)).toLowerCase();
+          if (seenTexts.has(str)) {
+            const priorChannel = seenTexts.get(str);
+            if (priorChannel !== out.channelId) {
+              throw new Error(`Cross-channel duplication detected: identical content returned for '${priorChannel}' and '${out.channelId}'.`);
+            }
+          } else {
+            seenTexts.set(str, out.channelId);
+          }
         }
       }
 

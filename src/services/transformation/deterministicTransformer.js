@@ -343,7 +343,7 @@ export class DeterministicTransformer {
 
   // 3. EXECUTIVE SUMMARY GENERATOR
   generateExecutiveSummary(source, analysis, config) {
-    const { lang, audienceStr, tone, detail = 'Balanced', options = {} } = config;
+    const { lang, audienceStr, tone, detail = 'Balanced', objective = 'Inform', style = 'Structured', options = {} } = config;
     const isRegen = Boolean(options?.isRegeneration || options?.variantSeed);
     const isHindi = lang === 'Hindi';
     const isMarathi = lang === 'Marathi';
@@ -363,13 +363,20 @@ export class DeterministicTransformer {
     const orgs = (analysis?.entities?.organizations || []).join(', ');
     const isEmergency = isEmergencyContent({ analysis, config: { tone, targetAudience: audienceStr, language: lang }, sourceContent: source });
 
-    let title = `${baseTitle} - Executive Summary`;
+    let titleSuffix = 'Executive Summary';
+    if (objective === 'Advise') titleSuffix = 'Strategic Advisory Summary';
+    else if (objective === 'Educate') titleSuffix = 'Educational Synthesis & Summary';
+    else if (objective === 'Announce') titleSuffix = 'Official Announcement Briefing';
+    else if (objective === 'Persuade') titleSuffix = 'Strategic Impact Briefing';
+
+    let title = `${baseTitle} - ${titleSuffix}`;
     let implications = [];
     let recommendedConsiderations = [];
     let overviewSuffix = '';
 
     if (isHindi) {
-      title = `${baseTitle} - कार्यकारी सारांश`;
+      const hiSuffix = objective === 'Advise' ? 'रणनीतिक परामर्श सारांश' : (objective === 'Educate' ? 'शैक्षणिक सारांश' : 'कार्यकारी सारांश');
+      title = `${baseTitle} - ${hiSuffix}`;
       overviewSuffix = isRegen
         ? `लक्षित वर्ग (${audienceStr}) के लिए ${tone} शैली में पुनरीक्षित सारांश।`
         : `लक्षित वर्ग (${audienceStr}) के लिए आधिकारिक ${tone} प्रोटोकॉल के तहत तैयार।`;
@@ -453,7 +460,7 @@ export class DeterministicTransformer {
 
   // 4. ADVISORY GENERATOR
   generateAdvisory(source, analysis, config) {
-    const { lang, audienceStr, tone, detail = 'Balanced', options = {} } = config;
+    const { lang, audienceStr, tone, detail = 'Balanced', objective = 'Inform', style = 'Structured', options = {} } = config;
     const isRegen = Boolean(options?.isRegeneration || options?.variantSeed);
     const isHindi = lang === 'Hindi';
     const isMarathi = lang === 'Marathi';
@@ -477,7 +484,13 @@ export class DeterministicTransformer {
       analysis?.claims?.some(c => c.isIndependentlyVerified && (c.verificationEvidence || c.evidence))
     );
 
-    let title = `OFFICIAL ADVISORY: ${mainTopic}`;
+    let advisoryPrefix = 'OFFICIAL ADVISORY';
+    if (objective === 'Advise') advisoryPrefix = 'STRATEGIC ACTION ADVISORY';
+    else if (objective === 'Educate') advisoryPrefix = 'EDUCATIONAL ADVISORY & GUIDANCE';
+    else if (objective === 'Announce') advisoryPrefix = 'PUBLIC ANNOUNCEMENT ADVISORY';
+    else if (style === 'Technical') advisoryPrefix = 'TECHNICAL ADVISORY BRIEF';
+
+    let title = `${advisoryPrefix}: ${mainTopic}`;
     let potentialImpact = `Impact assessment targeted for ${audienceStr}: Potential operational disruptions and safety concerns.`;
     let recommendedActions = [
       'Adhere strictly to authorized guidelines and avoid speculative reports.',
@@ -531,17 +544,23 @@ export class DeterministicTransformer {
 
   // 5. INFOGRAPHIC CONTENT GENERATOR
   generateInfographic(source, analysis, config) {
-    const { lang, audienceStr, detail = 'Balanced', options = {} } = config;
+    const { lang, audienceStr, tone, detail = 'Balanced', objective = 'Inform', style = 'Structured', options = {} } = config;
     const isRegen = Boolean(options?.isRegeneration || options?.variantSeed);
     const isHindi = lang === 'Hindi';
     const isMarathi = lang === 'Marathi';
 
     const title = analysis?.overview?.mainTopic || 'Data & Situation Overview';
+    let subtitleDesc = `Visual breakdown and key takeaways for ${audienceStr}`;
+    if (objective === 'Educate') subtitleDesc = `Educational visual guide and conceptual breakdown for ${audienceStr}`;
+    else if (objective === 'Advise') subtitleDesc = `Strategic advisory and operational roadmap for ${audienceStr}`;
+    else if (objective === 'Announce') subtitleDesc = `Official public announcement and data breakdown for ${audienceStr}`;
+    else if (style === 'Technical') subtitleDesc = `Technical parameter breakdown and metrics for ${audienceStr}`;
+
     const subtitle = isHindi 
       ? `${audienceStr} के लिए दृश्य विश्लेषण एवं मुख्य बिंदु`
       : isMarathi
       ? `${audienceStr} साठी व्हिज्युअल माहिती व ठळक मुद्दे`
-      : `Visual breakdown and key takeaways for ${audienceStr}`;
+      : subtitleDesc;
 
     const factPool = (analysis?.keyFacts || []).map(f => typeof f === 'string' ? f : f.fact).filter(Boolean);
     const numbers = (analysis?.importantNumbers || []).slice(0, detail === 'Concise' ? 2 : 4);
@@ -603,12 +622,20 @@ export class DeterministicTransformer {
 
   // 6. PRESENTATION CONTENT GENERATOR
   generatePresentation(source, analysis, config) {
-    const { audienceStr, tone, lang, detail = 'Balanced', options = {} } = config;
+    const { audienceStr, tone, lang, detail = 'Balanced', objective = 'Inform', style = 'Structured', options = {} } = config;
     const isRegen = Boolean(options?.isRegeneration || options?.variantSeed);
     const isHindi = lang === 'Hindi';
     const isMarathi = lang === 'Marathi';
 
-    const title = analysis?.overview?.mainTopic || 'Strategic Overview & Operational Directives';
+    let title = analysis?.overview?.mainTopic || 'Strategic Overview & Operational Directives';
+    if (objective === 'Educate') {
+      title = analysis?.overview?.mainTopic ? `Educational Overview: ${analysis.overview.mainTopic}` : 'Educational Framework & Overview';
+    } else if (objective === 'Advise') {
+      title = analysis?.overview?.mainTopic ? `Strategic Advisory Briefing: ${analysis.overview.mainTopic}` : 'Strategic Advisory Briefing';
+    } else if (objective === 'Announce') {
+      title = analysis?.overview?.mainTopic ? `Official Announcement: ${analysis.overview.mainTopic}` : 'Official Announcement Briefing';
+    }
+
     const facts = (analysis?.keyFacts || []).map(f => typeof f === 'string' ? f : f.fact).filter(Boolean);
     const numbers = (analysis?.importantNumbers || []);
     const isVerified = Boolean(analysis?.verification?.isVerified || source?.isVerified || analysis?.claims?.some(c => c.isVerified));
@@ -628,7 +655,7 @@ export class DeterministicTransformer {
       {
         slideNumber: 1,
         title: s1Title,
-        purpose: isHindi ? 'सत्र का उद्देश्य एवं रूपरेखा' : isMarathi ? 'सत्राचा मुख्य उद्देश' : 'Executive framing and session objectives',
+        purpose: isHindi ? 'सत्र का उद्देश्य एवं रूपरेखा' : isMarathi ? 'सत्राचा मुख्य उद्देश' : (objective === 'Educate' ? 'Educational framing and core learning goals' : 'Executive framing and session objectives'),
         bullets: [
           `Target Stakeholders: ${audienceStr}`,
           `Domain / Sector: ${analysis?.overview?.category || 'General'}`,
@@ -690,7 +717,7 @@ export class DeterministicTransformer {
 
   // 7. VIDEO SCRIPT GENERATOR
   generateVideoScript(source, analysis, config) {
-    const { audienceStr, tone, lang, detail = 'Balanced', options = {} } = config;
+    const { audienceStr, tone, lang, detail = 'Balanced', objective = 'Inform', style = 'Structured', options = {} } = config;
     const isRegen = Boolean(options?.isRegeneration || options?.variantSeed);
     const isHindi = lang === 'Hindi';
     const isMarathi = lang === 'Marathi';
@@ -704,6 +731,14 @@ export class DeterministicTransformer {
     let hookNarration = isRegen
       ? `Attention all ${audienceStr}. Here is a concise, verified operational update regarding ${analysis?.overview?.mainTopic || 'the situation'}.`
       : `Attention ${audienceStr}. Here is a vital update regarding ${analysis?.overview?.mainTopic || 'current operations'}.`;
+
+    if (objective === 'Educate') {
+      hookNarration = `Welcome ${audienceStr}. In this educational video briefing, we break down the essential context regarding ${analysis?.overview?.mainTopic || 'the situation'}.`;
+    } else if (objective === 'Advise') {
+      hookNarration = `Attention ${audienceStr}. Here are key actionable recommendations and verified guidance regarding ${analysis?.overview?.mainTopic || 'current operations'}.`;
+    } else if (objective === 'Announce') {
+      hookNarration = `Official announcement for ${audienceStr}. Here are the critical dates, directives, and verified details regarding ${analysis?.overview?.mainTopic || 'current operations'}.`;
+    }
 
     if (isHindi) {
       hookNarration = `सभी ${audienceStr} ध्यान दें। ${analysis?.overview?.mainTopic || 'वर्तमान स्थिति'} के संबंध में यह एक महत्वपूर्ण आधिकारिक विवरण है।`;
@@ -759,11 +794,15 @@ export class DeterministicTransformer {
       }
     ];
 
-    const displayScenes = detail === 'Concise' ? [scenes[0], scenes[2], scenes[4]] : scenes;
+    const displayScenes = detail === 'Concise' 
+      ? [scenes[0], scenes[2], scenes[4]] 
+      : (detail === 'Detailed' ? scenes : [scenes[0], scenes[1], scenes[2], scenes[4]]);
+
+    const durationEstimate = detail === 'Concise' ? '45 seconds' : (detail === 'Detailed' ? '90 seconds' : '60 seconds');
 
     return {
       title,
-      durationEstimate: detail === 'Concise' ? '45 seconds' : '90 seconds',
+      durationEstimate,
       scenes: displayScenes
     };
   }

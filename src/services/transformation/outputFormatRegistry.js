@@ -81,11 +81,11 @@ export const OUTPUT_FORMAT_REGISTRY = {
         recommendedConsiderations: 'array of strings'
       }
     },
-    promptInstructions: `Generate a formal Executive Summary:
-- Title: Clear, executive-level subject line.
-- Executive Overview: 2-3 sentence strategic summary.
-- Key Points: 3-5 grounded bullet points representing core situation.
-- Important Findings: Verifiable quantitative metrics and data points from source.
+    promptInstructions: `Generate a formal Executive Summary or Article-style brief:
+- Title: Clear, executive-level subject line with logical framing.
+- Executive Overview: Coherent strategic summary paragraph preserving source meaning and factual qualifications.
+- Key Points: Grounded bullet points representing core situation (prioritize key information, figures, decisions, and conclusions). Adjust count based on detail level (Concise: 2-3; Balanced: 3-5; Detailed: 5-7).
+- Important Findings: Verifiable quantitative metrics and data points taken directly from source. Avoid adding opinions or facts absent from the source.
 - Implications: Operational, organizational, or civic impact.
 - Recommended Considerations: Objective considerations based strictly on source context. Do NOT invent recommendations.`
   },
@@ -202,5 +202,10 @@ export function getAllOutputFormats() {
  * Retrieves registry entry for a specific format ID
  */
 export function getOutputFormatById(formatId) {
-  return OUTPUT_FORMAT_REGISTRY[formatId] || null;
+  if (!formatId || typeof formatId !== 'string') return null;
+  const clean = formatId.trim().toLowerCase();
+  if (clean === 'article' || clean === 'summary') {
+    return OUTPUT_FORMAT_REGISTRY[OUTPUT_FORMAT_IDS.EXECUTIVE_SUMMARY];
+  }
+  return OUTPUT_FORMAT_REGISTRY[clean] || null;
 }

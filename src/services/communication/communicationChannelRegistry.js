@@ -22,15 +22,17 @@ export const COMMUNICATION_CHANNEL_REGISTRY = {
     maxCharacters: 3000,
     characterLimitWarning: 2800,
     promptInstructions: `Generate a high-impact, professional, and readable LinkedIn post:
-- Single clear relevant title or opening hook that immediately engages the audience.
-- Never use repetitive redundant headings (e.g., avoid "Key Development" followed by "Strategic Update").
+- Professional, readable structure with appropriate opening hook and closing CTA.
+- Relevant paragraph breaks and clean spacing for comfortable reading.
+- Conclude with an appropriate closing and 3-5 readable, relevant hashtags (<= 25 chars).
+- Avoid generic engagement bait (e.g. "What are your thoughts on this?") and avoid unsupported claims.
+- Single clear relevant title or opening hook that immediately engages the target audience.
+- Strictly avoid repetitive redundant headings (e.g., avoid "Key Development" followed by "Strategic Update").
 - For emergency, disaster, weather-alert, and public-safety content:
   * Prioritize clear safety instructions, verified directives, and concise formatting over promotional language.
-  * Avoid generic engagement questions such as "What are your thoughts on this?". Use actionable next steps or verified emergency guidance.
-  * Use 3-5 readable, concise hashtags (e.g. #WeatherAlert, #PublicSafety, #DisasterPreparedness). Avoid extremely long hashtags.
-- For standard professional topics: clear core message, grounded facts, professional call-to-action, and 3-5 relevant hashtags.
-- Important verifiable facts and statistics taken directly from the source.
-- Avoid unnecessary repetition or duplication.`
+  * Use actionable next steps or verified emergency guidance/helplines.
+- For standard professional topics: clear core message, grounded facts, professional call-to-action, and relevant hashtags.
+- Important verifiable facts and statistics taken directly from the source.`
   },
 
   [COMMUNICATION_CHANNEL_IDS.TWITTER]: {
@@ -44,9 +46,10 @@ export const COMMUNICATION_CHANNEL_REGISTRY = {
     maxCharacters: 280,
     characterLimitWarning: 270,
     promptInstructions: `Generate a concise post or thread for X (Twitter):
-- Strong, punchy first sentence highlighting the core development.
-- Strictly preserve critical numbers, deadlines, or guidance.
-- Respect 280 characters per tweet; provide a numbered thread (1/X, 2/X) when content requires depth.
+- Lead with a strong, punchy first sentence highlighting the core development.
+- Concise posts strictly respecting the 280-character limit per tweet.
+- Provide a numbered thread (1/X, 2/X, 3/X) when content requires depth.
+- Never cut off important facts, numbers, dates, or helplines to satisfy a length limit; expand into a thread instead.
 - Include essential grounded hashtags at the conclusion.`
   },
 
@@ -60,9 +63,11 @@ export const COMMUNICATION_CHANNEL_REGISTRY = {
     accentColor: 'emerald',
     maxCharacters: 1024,
     characterLimitWarning: 950,
-    promptInstructions: `Generate a highly scannable WhatsApp broadcast message:
-- Use short, readable paragraphs and clean line spacing.
-- Clearly highlight key warnings, dates, or directives (*bold*).
+    promptInstructions: `Generate a concise, scannable WhatsApp broadcast message:
+- Concise, conversational wording and natural message structure.
+- Short, readable paragraphs and clean line spacing.
+- Appropriate formatting for the selected language (*bold* for key terms, dates, and actions).
+- Avoid unnecessary bureaucratic headings, redundant boilerplate, and excessive hashtags (limit to 0-1 hashtags).
 - Use tasteful, appropriate emojis (📢, 📌, ⚠️, 🗓️, ✅) only when useful.
 - Conclude with a clear, direct action step or helpline.`
   },

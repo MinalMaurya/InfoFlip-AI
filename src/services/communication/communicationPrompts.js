@@ -10,6 +10,14 @@
 
 import { getCommunicationChannelById } from './communicationChannelRegistry.js';
 import { isEmergencyContent } from './linkedInPostBuilder.js';
+import {
+  getAudienceDirectives,
+  getToneDirectives,
+  getDetailDirectives,
+  getObjectiveDirectives,
+  getStyleDirectives,
+  getLanguageDirectives
+} from '../transformation/transformationPrompts.js';
 
 export function buildCommunicationSystemPrompt() {
   return `You are the Social & Communication Generator (Module 4) of InfoFlip-AI (SIH 2026 Problem Statement ID 26154).
@@ -30,17 +38,22 @@ STRICT ANTI-HALLUCINATION & QUALITY RULES:
    - Unverified citations, claims, or URLs
    - NEVER strengthen safety directives beyond what the source explicitly states (e.g. do NOT turn "avoid unnecessary travel" into "stay indoors" or mandatory evacuation orders)
    - NEVER add phrases like "officially confirmed", "verified data", or "real-time official feed" without evidence
-3. LINKEDIN POST RULES:
-   - Single clear relevant title/hook. NEVER use repetitive redundant headings (e.g. do NOT follow "Key Development" with "Strategic Update" or duplicate title lines).
-   - For emergency, disaster-response, weather-alert, and public-safety content:
-     * NEVER include generic engagement questions such as "What are your thoughts on this?", "How is your organization addressing this?", or "Join the conversation below".
-     * Prioritize clear safety instructions, essential directives, and concise formatting over promotional language.
-     * Include 3-5 relevant, readable hashtags (e.g. #WeatherAlert, #PublicSafety, #DisasterPreparedness). Avoid extremely long hashtags.
-   - For standard professional topics: use professional framing, concise bullets, and relevant professional call-to-action.
-4. Clearly distinguish source-stated facts from communication phrasing.
-5. Adapt tone, conciseness, and format to each platform's natural conventions while strictly preserving factual grounding.
-6. Support accurate English, Hindi, and Marathi outputs based on requested language.
-7. Provide source traceability references for key facts used in each channel.
+
+3. CHANNEL-SPECIFIC ARCHITECTURAL CONVENTIONS:
+   - LINKEDIN: Professional, readable structure with single clear title/hook, relevant paragraph breaks, closing CTA, and 3-5 readable hashtags (<= 25 chars). Strictly avoid repetitive redundant headings and avoid generic engagement bait ("What are your thoughts?").
+   - WHATSAPP: Concise, conversational message structure with *bold* formatting for key dates and directives. Avoid bureaucratic headings and excessive hashtags (0-1 max).
+   - TWITTER/X: Concise posts strictly respecting the 280-character limit per tweet. Output a numbered thread (1/X, 2/X, 3/X) when content requires depth. Never cut off key numbers or helplines.
+   - EMAIL: Complete newsletter dispatch with subject, preview, greeting, structured overview, key points, and closing sign-off.
+   - SMS: Ultra-compact alert strictly under 160 characters.
+   - ANNOUNCEMENT: Official public notice structure with headline banner, overview, numbered public instructions, and advisory note.
+   - CTA: Multiple distinct action variants (Primary, Immediate, Community, Urgent).
+   - HASHTAGS: Concise, readable topic tags (<= 25 chars) drawn directly from source keywords, category, and entities.
+
+4. CROSS-CHANNEL ANTI-DUPLICATION:
+   - Each channel must be generated according to its own platform conventions and length constraints.
+   - Do NOT output identical text across different channels. Each channel output must feel native to its designated medium while preserving shared source facts.
+5. Respect requested language (English, Hindi Devanagari, or Marathi Devanagari) across all channels.
+6. Provide source traceability references for key facts used in each channel.
 
 You MUST respond strictly with valid JSON conforming to the following structure:
 {
@@ -131,19 +144,36 @@ ${channelDef.promptInstructions}`;
 - Ground all guidance strictly in source facts. DO NOT invent alert tiers, unstated helplines, or imaginary casualty figures.
 ` : '';
 
+  const targetAudienceStr = typeof config.targetAudience === 'string'
+    ? config.targetAudience
+    : (Array.isArray(config.targetAudience) ? config.targetAudience.join(', ') : 'General Public');
+
+  const audienceDirective = getAudienceDirectives(targetAudienceStr);
+  const toneDirective = getToneDirectives(config.tone);
+  const detailDirective = getDetailDirectives(config.detailLevel);
+  const objectiveDirective = getObjectiveDirectives(config.objective);
+  const styleDirective = getStyleDirectives(config.contentStyle || config.style);
+  const languageDirective = getLanguageDirectives(config.language);
+
   return `Please generate communication-ready assets for the following requested channels:
 Requested Channels: ${requestedChannels.join(', ')}
 ${regenDirective}
 ${emergencySection}
 ==============================
-CONFIGURATION & AUDIENCE
+CONFIGURATION & ACTIVE DIRECTIVES
 ==============================
-Target Audience: ${config.targetAudience || 'General Public'}
+Target Audience: ${targetAudienceStr}
+  * Directive: ${audienceDirective}
 Tone: ${config.tone || 'Informative'}
+  * Directive: ${toneDirective}
 Language: ${config.language || 'English'}
+  * Directive: ${languageDirective}
 Detail Level: ${config.detailLevel || 'Balanced'}
+  * Directive: ${detailDirective}
 Objective: ${config.objective || 'Inform'}
+  * Directive: ${objectiveDirective}
 Content Style: ${config.contentStyle || config.style || 'Structured'}
+  * Directive: ${styleDirective}
 
 ==============================
 GROUND TRUTH & FACTS
